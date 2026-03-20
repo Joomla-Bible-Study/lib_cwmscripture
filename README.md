@@ -1,12 +1,13 @@
 # lib_cwmscripture
 
-A Joomla 4+ library extension that provides Bible scripture retrieval, parsing, rendering, and translation management. It serves as the shared scripture engine for the [CWM Proclaim](https://www.christianwebministries.org) component and the `plg_content_scripturelinks` plugin.
+A Joomla 5.2+ library extension that provides Bible scripture retrieval, parsing, rendering, and translation management. It serves as the shared scripture engine for the [CWM Proclaim](https://www.christianwebministries.org) component and the `plg_content_scripturelinks` plugin.
 
 ## Requirements
 
 - Joomla 5.2+
 - PHP 8.3+
 - MySQL 5.7+ / MariaDB 10.2+ (InnoDB, utf8mb4)
+- Node.js 20+ / npm 10.1+ (for building frontend assets)
 
 ## Installation
 
@@ -25,6 +26,33 @@ The installer creates three database tables (safe to run alongside an existing P
 | `#__bsms_scripture_cache` | TTL-based cache for external API responses |
 
 A default catalog of 20 public-domain translations is seeded on install.
+
+## Development
+
+### Building Frontend Assets
+
+Source files live in `build/media_source/` (ES6 JS and CSS). Built outputs go to `media/lib_cwmscripture/`.
+
+```bash
+npm ci                  # Install dependencies
+npm run build           # Build JS (Rollup) and CSS (CSSO)
+npm run build:js        # Build JS only
+npm run build:css       # Build CSS only
+npm run watch           # Watch JS for changes
+```
+
+The build produces for each source file:
+- Unminified `.js` / `.css` (tracked in git, used by Joomla debug mode)
+- Minified `.min.js` + `.min.js.map` + `.min.js.gz` (gitignored, used in production)
+- Minified `.min.css` + `.min.css.map` (gitignored)
+
+### Linting
+
+```bash
+npm run lint:js                          # ESLint (JS)
+composer lint                            # php-cs-fixer dry run (PHP)
+composer lint:fix                        # php-cs-fixer auto-fix (PHP)
+```
 
 ## Architecture
 

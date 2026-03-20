@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<extension version="4.0" type="library" method="upgrade">
+<extension version="5.2" type="library" method="upgrade">
     <name>lib_cwmscripture</name>
 	<description>LIB_CWMSCRIPTURE_DESCRIPTION</description>
 	<version>1.0.0</version>
 	<creationDate>March 2026</creationDate>
     <author>CWM Team</author>
-    <authorEmail>support@christianwebministries.org</authorEmail>
+    <authorEmail>info@christianwebministries.org</authorEmail>
     <authorUrl>https://www.christianwebministries.org</authorUrl>
 	<copyright>Copyright © 2026 CWM Team All rights reserved</copyright>
 	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
