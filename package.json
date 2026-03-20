@@ -1,0 +1,32 @@
+{
+  "name": "lib_cwmscripture",
+  "version": "1.0.0",
+  "description": "CWM Scripture Library - Frontend assets build pipeline",
+  "license": "GPL-2.0-or-later",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Joomla-Bible-Study/lib_cwmscripture.git"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.1.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.17.0",
+    "@rollup/plugin-node-resolve": "^16.0.3",
+    "@rollup/plugin-terser": "^1.0.0",
+    "csso": "^5.0.5",
+    "eslint": "^10.0.1",
+    "globals": "^15.14.0",
+    "rollup": "^4.58.0",
+    "rollup-plugin-gzip": "^4.1.1"
+  },
+  "scripts": {
+    "build": "npm run build:js && npm run build:css",
+    "build:js": "rollup -c build/rollup.config.js",
+    "build:css": "node build/build-css.js",
+    "watch": "rollup -c build/rollup.config.js -w",
+    "lint:js": "eslint --max-warnings=0 ."
+  }
+}

@@ -6,6 +6,11 @@
   "license": "GPL-2.0-or-later",
   "assets": [
     {
+      "name": "lib_cwmscripture.cwm-fetch",
+      "type": "script",
+      "uri": "lib_cwmscripture/js/cwm-fetch.js"
+    },
+    {
       "name": "lib_cwmscripture.scripture-text",
       "type": "style",
       "uri": "lib_cwmscripture/css/scripture-text.css"
@@ -14,6 +19,15 @@
       "name": "lib_cwmscripture.scripture-tooltip",
       "type": "style",
       "uri": "lib_cwmscripture/css/scripture-tooltip.css"
+    },
+    {
+      "name": "lib_cwmscripture.scripture-tooltip",
+      "type": "script",
+      "uri": "lib_cwmscripture/js/scripture-tooltip.js",
+      "dependencies": [
+        "core",
+        "lib_cwmscripture.cwm-fetch"
+      ]
     },
     {
       "name": "lib_cwmscripture.scripture-switcher-css",
@@ -25,13 +39,14 @@
       "type": "script",
       "uri": "lib_cwmscripture/js/scripture-switcher.js",
       "dependencies": [
-        "core"
+        "core",
+        "lib_cwmscripture.cwm-fetch"
       ]
     },
     {
-      "name": "lib_cwmscripture.scripture-tooltip",
+      "name": "lib_cwmscripture.scripture-autocomplete",
       "type": "script",
-      "uri": "lib_cwmscripture/js/scripture-tooltip.js",
+      "uri": "lib_cwmscripture/js/scripture-autocomplete.js",
       "dependencies": [
         "core"
       ]
@@ -47,6 +62,15 @@
       "uri": "lib_cwmscripture/js/translations-manager.js",
       "dependencies": [
         "core"
+      ]
+    },
+    {
+      "name": "lib_cwmscripture.bible-translations",
+      "type": "script",
+      "uri": "lib_cwmscripture/js/bible-translations.js",
+      "dependencies": [
+        "core",
+        "lib_cwmscripture.cwm-fetch"
       ]
     }
   ]

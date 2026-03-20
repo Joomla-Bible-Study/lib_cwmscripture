@@ -1,0 +1,46 @@
+{
+  "name": "joomla-bible-study/lib-cwmscripture",
+  "type": "joomla-library",
+  "description": "CWM Scripture Library - Bible scripture retrieval, parsing, rendering, and translation management for Joomla",
+  "keywords": [
+    "bible",
+    "scripture",
+    "joomla",
+    "library"
+  ],
+  "homepage": "https://github.com/Joomla-Bible-Study/lib_cwmscripture",
+  "license": "GPL-2.0-or-later",
+  "authors": [
+    {
+      "name": "CWM Team",
+      "email": "support@christianwebministries.org",
+      "homepage": "https://www.christianwebministries.org"
+    }
+  ],
+  "minimum-stability": "stable",
+  "prefer-stable": true,
+  "config": {
+    "optimize-autoloader": true,
+    "platform": {
+      "php": "8.3.0"
+    },
+    "allow-plugins": {}
+  },
+  "autoload": {
+    "psr-4": {
+      "CWM\\Library\\Scripture\\": "src/"
+    }
+  },
+  "require": {
+    "php": "^8.3.0",
+    "ext-json": "*",
+    "ext-mbstring": "*"
+  },
+  "require-dev": {
+    "friendsofphp/php-cs-fixer": "^3.0"
+  },
+  "scripts": {
+    "lint": "php-cs-fixer fix --dry-run --diff",
+    "lint:fix": "php-cs-fixer fix"
+  }
+}

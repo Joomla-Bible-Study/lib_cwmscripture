@@ -11,11 +11,11 @@
      * Expects a <div id="bible-translations-config"> element with data attributes
      * for the AJAX base URL, form token, and all translated UI strings.
      *
-     * @package  Proclaim.Admin
-     * @since    10.1.0
+     * @package  CWM.Library.Scripture
+     * @since    1.0.0
      */
 
-    const init = () => {
+    document.addEventListener('DOMContentLoaded', () => {
         const config = document.getElementById('bible-translations-config');
 
         if (!config) {
@@ -177,7 +177,7 @@
          * The server safely returns count=0 when nothing needs removing.
          */
         const cleanupProvider = (source) => {
-            window.ProclaimFetch.fetchJson(
+            window.CwmScriptureFetch.fetchJson(
                 `${baseUrl}cleanupProvider&${token}=1&source=${encodeURIComponent(source)}`,
                 {},
                 { timeout: 30000, retries: 1 },
@@ -261,7 +261,7 @@
                 const liveKey = keyInput ? keyInput.value.trim() : '';
                 const keyParam = liveKey ? `&api_key=${encodeURIComponent(liveKey)}` : '';
 
-                window.ProclaimFetch.fetchJson(
+                window.CwmScriptureFetch.fetchJson(
                     `${baseUrl}syncApiBible&${token}=1${keyParam}`,
                     {},
                     { timeout: 30000, retries: 1 },
@@ -302,7 +302,7 @@
          * Refresh the local provider badge with current translation count.
          */
         const refreshLocalBadge = () => {
-            window.ProclaimFetch.fetchJson(
+            window.CwmScriptureFetch.fetchJson(
                 `${baseUrl}getStatus&${token}=1`,
                 {},
                 { timeout: 30000, retries: 1 },
@@ -319,7 +319,7 @@
                     }
                 })
                 .catch((err) => {
-                    console.error('[Proclaim] refreshLocalBadge error:', err);
+                    console.error('[CwmScripture] refreshLocalBadge error:', err);
                     const badge = document.getElementById('local-provider-status');
                     badge.className = 'badge bg-secondary ms-3';
                     badge.textContent = strings.statusUnknown;
@@ -746,14 +746,14 @@
                 container.innerHTML = `<div class="text-center py-3"><span class="spinner-border spinner-border-sm" role="status"></span> ${strings.loading}</div>`;
             }
 
-            window.ProclaimFetch.fetchJson(
+            window.CwmScriptureFetch.fetchJson(
                 `${baseUrl}getTranslations&${token}=1`,
                 {},
                 { timeout: 30000, retries: 1 },
             )
                 .then((data) => {
                     if (!data.success) {
-                        console.error('[Proclaim] getTranslations:', data.message);
+                        console.error('[CwmScripture] getTranslations:', data.message);
                         container.innerHTML = `<div class="alert alert-warning">${esc(data.message || strings.loadError)}</div>`;
                         container.style.minHeight = '';
 
@@ -788,7 +788,7 @@
                     container.style.minHeight = '';
                 })
                 .catch((err) => {
-                    console.error('[Proclaim] loadTranslations error:', err);
+                    console.error('[CwmScripture] loadTranslations error:', err);
                     container.innerHTML = `<div class="alert alert-warning">${strings.loadError}</div>`;
                     container.style.minHeight = '';
                 });
@@ -1040,7 +1040,7 @@
                     this.disabled = true;
                     this.innerHTML = `<span class="spinner-border spinner-border-sm" role="status"></span> ${strings.downloading}`;
 
-                    window.ProclaimFetch.fetchJson(
+                    window.CwmScriptureFetch.fetchJson(
                         `${baseUrl}downloadTranslation&${token}=1&abbreviation=${encodeURIComponent(abbr)}`,
                         {},
                         { timeout: 60000, retries: 1 },
@@ -1069,7 +1069,7 @@
                     this.disabled = true;
                     this.innerHTML = `<span class="spinner-border spinner-border-sm" role="status"></span> ${strings.bibleRefreshing}`;
 
-                    window.ProclaimFetch.fetchJson(
+                    window.CwmScriptureFetch.fetchJson(
                         `${baseUrl}downloadTranslation&${token}=1&abbreviation=${encodeURIComponent(abbr)}&force=1`,
                         {},
                         { timeout: 600000, retries: 0 },
@@ -1102,7 +1102,7 @@
 
                     this.disabled = true;
 
-                    window.ProclaimFetch.fetchJson(
+                    window.CwmScriptureFetch.fetchJson(
                         `${baseUrl}removeTranslation&${token}=1&abbreviation=${encodeURIComponent(abbr)}`,
                         {},
                         { timeout: 30000, retries: 1 },
@@ -1190,7 +1190,7 @@
                 const abbr = queue[index].abbreviation;
                 index += 1;
 
-                window.ProclaimFetch.fetchJson(
+                window.CwmScriptureFetch.fetchJson(
                     `${baseUrl}downloadTranslation&${token}=1&abbreviation=${encodeURIComponent(abbr)}`,
                     {},
                     { timeout: 60000, retries: 1 },
@@ -1228,7 +1228,7 @@
 
                 removeAllBtn.disabled = true;
 
-                window.ProclaimFetch.fetchJson(
+                window.CwmScriptureFetch.fetchJson(
                     `${baseUrl}removeAllTranslations&${token}=1`,
                     {},
                     { timeout: 30000, retries: 1 },
@@ -1263,7 +1263,7 @@
                 updateAllBtn.disabled = true;
                 updateAllBtn.innerHTML = `<span class="spinner-border spinner-border-sm" role="status"></span> ${strings.bibleUpdatingAll}`;
 
-                window.ProclaimFetch.fetchJson(
+                window.CwmScriptureFetch.fetchJson(
                     `${baseUrl}updateAllTranslations&${token}=1`,
                     {},
                     { timeout: 0, retries: 0 },
@@ -1297,27 +1297,22 @@
             loadTranslations();
         }
 
-        // Detect the scripture tab pane — different ID in Proclaim admin vs plugin page
-        const scripturePane = document.getElementById('scripture')
-            || document.getElementById('attrib-translations');
-
         // 1. joomla.tab.shown — catches user clicks and Joomla tab recall events.
         document.addEventListener('joomla.tab.shown', (e) => {
-            const controls = e.target.getAttribute('aria-controls') || '';
-            if (controls === 'scripture' || controls === 'attrib-translations') {
-                initScriptureTab();
-            }
+            if (e.target.getAttribute('aria-controls') === 'scripture') initScriptureTab();
         });
 
         // 2. setTimeout(0) — catches recalls that fire during DOMContentLoaded
         //    before our joomla.tab.shown listener was registered.
         setTimeout(() => {
-            if (!scriptureInitDone && scripturePane?.hasAttribute('active')) {
+            if (!scriptureInitDone && document.getElementById('scripture')?.hasAttribute('active')) {
                 initScriptureTab();
             }
         }, 0);
 
         // 3. MutationObserver — belt-and-suspenders for late active attribute changes.
+        const scripturePane = document.getElementById('scripture');
+
         if (scripturePane) {
             const observer = new MutationObserver(() => {
                 if (!scriptureInitDone && scripturePane.hasAttribute('active')) {
@@ -1327,14 +1322,6 @@
             });
             observer.observe(scripturePane, { attributes: true, attributeFilter: ['active'] });
         }
-    };
-
-    // Run immediately if DOM is already ready (scripts loaded via inline <script defer> in body),
-    // otherwise wait for DOMContentLoaded (scripts loaded via WebAssetManager in <head>)
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init);
-    } else {
-        init();
-    }
+    });
 
 })();

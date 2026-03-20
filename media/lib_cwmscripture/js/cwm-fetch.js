@@ -2,16 +2,17 @@
     'use strict';
 
     /**
-     * ProclaimFetch — Shared fetch wrapper with timeout, retry & resilience
+     * CwmScriptureFetch — Shared fetch wrapper with timeout, retry & resilience
      *
      * Provides fetch() with configurable timeout (AbortController-based),
      * automatic retry with exponential backoff, HTML gatekeeper detection,
      * and session expiry handling.
      *
-     * Exposed as window.ProclaimFetch for cross-file usage (Rollup IIFE constraint).
+     * Exposed as window.CwmScriptureFetch for cross-file usage (Rollup IIFE constraint).
+     * Also aliased as window.ProclaimFetch for backward compatibility.
      *
-     * @package  Proclaim
-     * @since    10.1.0
+     * @package  CWM.Library.Scripture
+     * @since    1.0.0
      */
     (() => {
 
@@ -186,7 +187,7 @@
          *
          * @param {string} url         Request URL
          * @param {RequestInit} [fetchOpts={}]  Standard fetch options
-         * @param {object} [cwmOpts={}]  ProclaimFetch options (timeout, retries, retryDelay, backoffMultiplier, signal)
+         * @param {object} [cwmOpts={}]  CwmScriptureFetch options (timeout, retries, retryDelay, backoffMultiplier, signal)
          * @returns {Promise<Response>}
          */
         async function cwmFetch(url, fetchOpts = {}, cwmOpts = {}) {
@@ -241,7 +242,7 @@
          *
          * @param {string} url         Request URL
          * @param {RequestInit} [fetchOpts={}]  Standard fetch options
-         * @param {object} [cwmOpts={}]  ProclaimFetch options
+         * @param {object} [cwmOpts={}]  CwmScriptureFetch options
          * @returns {Promise<object>}  Parsed JSON
          */
         async function cwmFetchJson(url, fetchOpts = {}, cwmOpts = {}) {
@@ -336,13 +337,16 @@
         }
 
         // Expose on window
-        window.ProclaimFetch = {
+        const api = {
             fetch: cwmFetch,
             fetchJson: cwmFetchJson,
             ADMIN_TIMEOUT,
             FRONTEND_TIMEOUT,
             LONG_TIMEOUT,
         };
+        window.CwmScriptureFetch = api;
+        // Backward compatibility alias for Proclaim
+        window.ProclaimFetch = api;
     })();
 
 })();

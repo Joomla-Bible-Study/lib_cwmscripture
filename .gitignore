@@ -1,0 +1,22 @@
+# Dependencies
+/node_modules/
+/vendor/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# PHP CS Fixer cache
+.php-cs-fixer.cache
+
+# Build outputs (generated from build/media_source/ via npm run build)
+media/lib_cwmscripture/js/*.min.js
+media/lib_cwmscripture/js/*.min.js.map
+media/lib_cwmscripture/js/*.min.js.gz
+media/lib_cwmscripture/css/*.min.css
+media/lib_cwmscripture/css/*.min.css.map
