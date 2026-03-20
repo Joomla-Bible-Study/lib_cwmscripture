@@ -54,6 +54,47 @@ composer lint                            # php-cs-fixer dry run (PHP)
 composer lint:fix                        # php-cs-fixer auto-fix (PHP)
 ```
 
+### Building the Installable Package
+
+Creates `build/dist/lib_cwmscripture-{version}.zip` ready for Joomla:
+
+```bash
+npm run build                            # Build minified assets first
+composer build:package                   # Create ZIP
+composer build:package:verbose           # Create ZIP with file listing
+```
+
+The resulting ZIP can be:
+1. Installed directly via Joomla Extension Manager
+2. Included in a `pkg_*.zip` package alongside other extensions (e.g. `pkg_cwmscripture`)
+3. Referenced by other build scripts (Proclaim, ScriptureLinks)
+
+### Version Checking for Consumers
+
+Other extensions can check the installed library version at install time:
+
+```php
+use CWM\Library\Scripture\LibraryVersion;
+
+// Check if library is installed
+if (!LibraryVersion::isInstalled()) {
+    // Install from embedded ZIP
+}
+
+// Check if upgrade is needed
+if (LibraryVersion::needsUpgrade('1.2.0')) {
+    // Installed version is older than 1.2.0
+}
+
+// Check version satisfies minimum
+if (LibraryVersion::satisfies('1.0.0')) {
+    // Installed version is >= 1.0.0
+}
+
+// Get installed version string
+$version = LibraryVersion::getInstalledVersion(); // e.g. "1.0.0"
+```
+
 ## Architecture
 
 ### Namespace

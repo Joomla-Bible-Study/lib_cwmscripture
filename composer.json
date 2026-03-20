@@ -44,7 +44,9 @@
     "lint": "php-cs-fixer fix --dry-run --diff",
     "lint:fix": "php-cs-fixer fix",
     "test": "phpunit",
-    "test:unit": "phpunit --testsuite unit"
+    "test:unit": "phpunit --testsuite unit",
+    "build:package": "php build/build-package.php",
+    "build:package:verbose": "php build/build-package.php --verbose"
   },
   "autoload-dev": {
     "psr-4": {
