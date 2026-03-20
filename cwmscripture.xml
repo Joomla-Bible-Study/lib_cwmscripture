@@ -11,6 +11,7 @@
 	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
 	<libraryname>cwmscripture</libraryname>
     <namespace path="src">CWM\Library\Scripture</namespace>
+    <scriptfile>script.php</scriptfile>
 
     <files folder="lib_cwmscripture">
         <folder>src</folder>
