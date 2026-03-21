@@ -15,7 +15,7 @@
      * @since    1.0.0
      */
 
-    document.addEventListener('DOMContentLoaded', () => {
+    function initBibleTranslations() {
         const config = document.getElementById('bible-translations-config');
 
         if (!config) {
@@ -1297,31 +1297,45 @@
             loadTranslations();
         }
 
-        // 1. joomla.tab.shown — catches user clicks and Joomla tab recall events.
-        document.addEventListener('joomla.tab.shown', (e) => {
-            if (e.target.getAttribute('aria-controls') === 'scripture') initScriptureTab();
-        });
+        // Detect the tab pane that contains our config div.
+        // Proclaim uses 'scripture', plugin settings uses a generated ID.
+        const configParentTab = config.closest('joomla-tab-element');
 
-        // 2. setTimeout(0) — catches recalls that fire during DOMContentLoaded
-        //    before our joomla.tab.shown listener was registered.
-        setTimeout(() => {
-            if (!scriptureInitDone && document.getElementById('scripture')?.hasAttribute('active')) {
-                initScriptureTab();
-            }
-        }, 0);
+        if (configParentTab) {
+            // Inside a tab — lazy-init when shown
+            document.addEventListener('joomla.tab.shown', (e) => {
+                if (e.target === configParentTab || e.target.getAttribute('aria-controls') === configParentTab.id) {
+                    initScriptureTab();
+                }
+            });
 
-        // 3. MutationObserver — belt-and-suspenders for late active attribute changes.
-        const scripturePane = document.getElementById('scripture');
+            // Check if already active
+            setTimeout(() => {
+                if (!scriptureInitDone && configParentTab.hasAttribute('active')) {
+                    initScriptureTab();
+                }
+            }, 0);
 
-        if (scripturePane) {
+            // MutationObserver for late activation
             const observer = new MutationObserver(() => {
-                if (!scriptureInitDone && scripturePane.hasAttribute('active')) {
+                if (!scriptureInitDone && configParentTab.hasAttribute('active')) {
                     observer.disconnect();
                     initScriptureTab();
                 }
             });
-            observer.observe(scripturePane, { attributes: true, attributeFilter: ['active'] });
+            observer.observe(configParentTab, { attributes: true, attributeFilter: ['active'] });
+        } else {
+            // Not inside a tab — init immediately
+            initScriptureTab();
         }
-    });
+    }
+
+    // Support both: loaded via WebAssetManager (before DOMContentLoaded) and
+    // injected inline by TranslationsmanagerField (after DOMContentLoaded).
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initBibleTranslations);
+    } else {
+        initBibleTranslations();
+    }
 
 })();
