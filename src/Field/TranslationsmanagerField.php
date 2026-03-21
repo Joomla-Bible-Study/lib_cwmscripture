@@ -45,12 +45,9 @@ class TranslationsmanagerField extends FormField
      */
     protected function getInput(): string
     {
-        // Load plugin language file so all PLG_CONTENT_SCRIPTURELINKS_* keys are available
-        Factory::getLanguage()->load('plg_content_scripturelinks', JPATH_ADMINISTRATOR);
-        Factory::getLanguage()->load(
-            'plg_content_scripturelinks',
-            JPATH_PLUGINS . '/content/scripturelinks'
-        );
+        // Load library language file
+        Factory::getLanguage()->load('lib_cwmscripture', JPATH_ADMINISTRATOR);
+        Factory::getLanguage()->load('lib_cwmscripture', JPATH_LIBRARIES . '/cwmscripture');
 
         $prefix = $this->formControl
             ? $this->formControl . '[' . $this->group . ']'
@@ -92,12 +89,9 @@ class TranslationsmanagerField extends FormField
      */
     public static function renderScriptureTab(string $fieldPrefix = 'jform[params]'): string
     {
-        // Ensure plugin language is loaded
-        Factory::getLanguage()->load('plg_content_scripturelinks', JPATH_ADMINISTRATOR);
-        Factory::getLanguage()->load(
-            'plg_content_scripturelinks',
-            JPATH_PLUGINS . '/content/scripturelinks'
-        );
+        // Load library language file
+        Factory::getLanguage()->load('lib_cwmscripture', JPATH_ADMINISTRATOR);
+        Factory::getLanguage()->load('lib_cwmscripture', JPATH_LIBRARIES . '/cwmscripture');
 
         $params         = ScriptureParamsHelper::getParams();
         $token          = Session::getFormToken();
@@ -122,22 +116,22 @@ class TranslationsmanagerField extends FormField
         // Left column: Providers
         $html .= '<div class="col-12 col-lg-6">';
         $html .= '<div class="cwmadmin-panel mb-4">';
-        $html .= '<h3 class="tab-description">' . Text::_('PLG_CONTENT_SCRIPTURELINKS_PROVIDERS_TITLE') . '</h3>';
-        $html .= '<p class="text-muted">' . Text::_('PLG_CONTENT_SCRIPTURELINKS_PROVIDERS_DESC') . '</p>';
+        $html .= '<h3 class="tab-description">' . Text::_('LIB_CWMSCRIPTURE_PROVIDERS_TITLE') . '</h3>';
+        $html .= '<p class="text-muted">' . Text::_('LIB_CWMSCRIPTURE_PROVIDERS_DESC') . '</p>';
 
         $html .= self::renderSwitcher(
             $fieldPrefix . '[provider_getbible]',
             'jform_params_provider_getbible',
-            Text::_('PLG_CONTENT_SCRIPTURELINKS_GETBIBLE_LABEL'),
-            Text::_('PLG_CONTENT_SCRIPTURELINKS_GETBIBLE_DESC'),
+            Text::_('LIB_CWMSCRIPTURE_GETBIBLE_LABEL'),
+            Text::_('LIB_CWMSCRIPTURE_GETBIBLE_DESC'),
             $providerGetbible
         );
 
         $html .= self::renderSwitcher(
             $fieldPrefix . '[provider_api_bible]',
             'jform_params_provider_api_bible',
-            Text::_('PLG_CONTENT_SCRIPTURELINKS_APIBIBLE_LABEL'),
-            Text::_('PLG_CONTENT_SCRIPTURELINKS_APIBIBLE_DESC'),
+            Text::_('LIB_CWMSCRIPTURE_APIBIBLE_LABEL'),
+            Text::_('LIB_CWMSCRIPTURE_APIBIBLE_DESC'),
             $providerApiBible
         );
 
@@ -149,7 +143,7 @@ class TranslationsmanagerField extends FormField
         $apiKeyHidden = $providerApiBible ? '' : ' style="display:none;"';
         $html .= '<div class="control-group" id="api-bible-key-group"' . $apiKeyHidden . '>';
         $html .= '<div class="control-label"><label for="jform_params_api_bible_api_key">'
-            . Text::_('PLG_CONTENT_SCRIPTURELINKS_APIKEY_LABEL') . '</label></div>';
+            . Text::_('LIB_CWMSCRIPTURE_APIKEY_LABEL') . '</label></div>';
         $html .= '<div class="controls"><div class="input-group">';
         $html .= '<input type="password" name="' . self::esc($fieldPrefix . '[api_bible_api_key]') . '" '
             . 'id="jform_params_api_bible_api_key" '
@@ -160,7 +154,7 @@ class TranslationsmanagerField extends FormField
             . 'aria-label="Toggle visibility">'
             . '<span class="icon-eye" aria-hidden="true"></span></button>';
         $html .= '</div>';
-        $html .= '<div class="form-text">' . Text::_('PLG_CONTENT_SCRIPTURELINKS_APIKEY_DESC') . '</div>';
+        $html .= '<div class="form-text">' . Text::_('LIB_CWMSCRIPTURE_APIKEY_DESC') . '</div>';
         $html .= '</div></div>';
 
         // Get API Key + Sync buttons
@@ -168,13 +162,13 @@ class TranslationsmanagerField extends FormField
         $html .= '<a href="https://api.bible/sign-in" target="_blank" rel="noopener noreferrer" '
             . 'class="btn btn-sm btn-outline-secondary">'
             . '<i class="icon-key" aria-hidden="true"></i> '
-            . Text::_('PLG_CONTENT_SCRIPTURELINKS_GET_API_KEY') . '</a>';
+            . Text::_('LIB_CWMSCRIPTURE_GET_API_KEY') . '</a>';
         $html .= '</div>';
 
         $html .= '<div id="api-bible-sync-row" class="mb-3" style="display:none;">';
         $html .= '<button type="button" class="btn btn-sm btn-primary" id="btn-sync-api-bible">'
             . '<i class="icon-refresh" aria-hidden="true"></i> '
-            . Text::_('PLG_CONTENT_SCRIPTURELINKS_SYNC_TRANSLATIONS') . '</button>';
+            . Text::_('LIB_CWMSCRIPTURE_SYNC_TRANSLATIONS') . '</button>';
         $html .= '<span id="api-bible-sync-status" class="ms-2 small"></span>';
         $html .= '</div>';
 
@@ -183,30 +177,30 @@ class TranslationsmanagerField extends FormField
         // Right column: Settings
         $html .= '<div class="col-12 col-lg-6">';
         $html .= '<div class="cwmadmin-panel mb-4">';
-        $html .= '<h3 class="tab-description">' . Text::_('PLG_CONTENT_SCRIPTURELINKS_SETTINGS_TITLE') . '</h3>';
+        $html .= '<h3 class="tab-description">' . Text::_('LIB_CWMSCRIPTURE_SETTINGS_TITLE') . '</h3>';
 
         // Default version
         $html .= '<div class="control-group">';
         $html .= '<div class="control-label"><label for="jform_params_default_version">'
-            . Text::_('PLG_CONTENT_SCRIPTURELINKS_VERSION_LABEL') . '</label></div>';
+            . Text::_('LIB_CWMSCRIPTURE_VERSION_LABEL') . '</label></div>';
         $html .= '<div class="controls">';
         $html .= self::renderVersionSelect(
             $fieldPrefix . '[default_version]',
             'jform_params_default_version',
             $defaultVersion
         );
-        $html .= '<div class="form-text">' . Text::_('PLG_CONTENT_SCRIPTURELINKS_VERSION_DESC') . '</div>';
+        $html .= '<div class="form-text">' . Text::_('LIB_CWMSCRIPTURE_VERSION_DESC') . '</div>';
         $html .= '</div></div>';
 
         // Cache days
         $html .= '<div class="control-group">';
         $html .= '<div class="control-label"><label for="jform_params_cache_days">'
-            . Text::_('PLG_CONTENT_SCRIPTURELINKS_CACHE_LABEL') . '</label></div>';
+            . Text::_('LIB_CWMSCRIPTURE_CACHE_LABEL') . '</label></div>';
         $html .= '<div class="controls">';
         $html .= '<input type="number" name="' . self::esc($fieldPrefix . '[cache_days]') . '" '
             . 'id="jform_params_cache_days" value="' . $cacheDays . '" '
             . 'min="1" max="365" class="form-control" />';
-        $html .= '<div class="form-text">' . Text::_('PLG_CONTENT_SCRIPTURELINKS_CACHE_DESC') . '</div>';
+        $html .= '<div class="form-text">' . Text::_('LIB_CWMSCRIPTURE_CACHE_DESC') . '</div>';
         $html .= '</div></div>';
 
         $html .= '</div></div>'; // end panel, end right column
@@ -216,23 +210,23 @@ class TranslationsmanagerField extends FormField
         $html .= '<div class="row"><div class="col-12"><div class="cwmadmin-panel mb-4">';
         $html .= '<div class="d-flex justify-content-between align-items-center mb-3">';
         $html .= '<h3 class="tab-description mb-0" id="translations-card-header">'
-            . Text::_('PLG_CONTENT_SCRIPTURELINKS_LOCAL_TRANSLATIONS') . '</h3>';
+            . Text::_('LIB_CWMSCRIPTURE_LOCAL_TRANSLATIONS') . '</h3>';
         $html .= '<div class="btn-group btn-group-sm">';
         $html .= '<button type="button" class="btn btn-primary d-none" id="btn-update-all-translations">'
             . '<i class="icon-download" aria-hidden="true"></i> '
-            . Text::_('PLG_CONTENT_SCRIPTURELINKS_STR_BIBLE_UPDATE_ALL') . '</button>';
+            . Text::_('LIB_CWMSCRIPTURE_STR_BIBLE_UPDATE_ALL') . '</button>';
         $html .= '<button type="button" class="btn btn-danger d-none" id="btn-remove-all-translations">'
             . '<i class="icon-trash" aria-hidden="true"></i> '
-            . Text::_('PLG_CONTENT_SCRIPTURELINKS_STR_REMOVE_ALL') . '</button>';
+            . Text::_('LIB_CWMSCRIPTURE_STR_REMOVE_ALL') . '</button>';
         $html .= '<button type="button" class="btn btn-outline-secondary" id="btn-refresh-translations">'
             . '<i class="icon-refresh" aria-hidden="true"></i></button>';
         $html .= '</div></div>';
-        $html .= '<p class="text-muted">' . Text::_('PLG_CONTENT_SCRIPTURELINKS_LOCAL_TRANSLATIONS_DESC') . '</p>';
+        $html .= '<p class="text-muted">' . Text::_('LIB_CWMSCRIPTURE_LOCAL_TRANSLATIONS_DESC') . '</p>';
 
         $html .= '<div id="translations-list">';
         $html .= '<div class="text-center py-3">'
             . '<span class="spinner-border spinner-border-sm" role="status"></span> '
-            . Text::_('PLG_CONTENT_SCRIPTURELINKS_STR_LOADING') . '</div>';
+            . Text::_('LIB_CWMSCRIPTURE_STR_LOADING') . '</div>';
         $html .= '</div>';
         $html .= '</div></div></div>';
 
@@ -240,61 +234,61 @@ class TranslationsmanagerField extends FormField
         $html .= '<div id="bible-translations-config" class="d-none"'
             . ' data-gdpr-mode="' . $gdprMode . '"'
             . ' data-token="' . $token . '"'
-            . ' data-str-loading="' . self::esc(Text::_('PLG_CONTENT_SCRIPTURELINKS_STR_LOADING')) . '"'
-            . ' data-str-no-translations="' . self::esc(Text::_('PLG_CONTENT_SCRIPTURELINKS_STR_NO_TRANSLATIONS')) . '"'
-            . ' data-str-load-error="' . self::esc(Text::_('PLG_CONTENT_SCRIPTURELINKS_STR_LOAD_ERROR')) . '"'
-            . ' data-str-title="' . self::esc(Text::_('PLG_CONTENT_SCRIPTURELINKS_STR_TITLE')) . '"'
-            . ' data-str-abbreviation="' . self::esc(Text::_('PLG_CONTENT_SCRIPTURELINKS_STR_ABBREVIATION')) . '"'
-            . ' data-str-source="' . self::esc(Text::_('PLG_CONTENT_SCRIPTURELINKS_STR_SOURCE')) . '"'
-            . ' data-str-status="' . self::esc(Text::_('PLG_CONTENT_SCRIPTURELINKS_STR_STATUS')) . '"'
-            . ' data-str-verses="' . self::esc(Text::_('PLG_CONTENT_SCRIPTURELINKS_STR_VERSES')) . '"'
-            . ' data-str-installed="' . self::esc(Text::_('PLG_CONTENT_SCRIPTURELINKS_STR_INSTALLED')) . '"'
-            . ' data-str-not-installed="' . self::esc(Text::_('PLG_CONTENT_SCRIPTURELINKS_STR_NOT_INSTALLED')) . '"'
-            . ' data-str-download="' . self::esc(Text::_('PLG_CONTENT_SCRIPTURELINKS_STR_DOWNLOAD')) . '"'
-            . ' data-str-downloading="' . self::esc(Text::_('PLG_CONTENT_SCRIPTURELINKS_STR_DOWNLOADING')) . '"'
-            . ' data-str-remove="' . self::esc(Text::_('PLG_CONTENT_SCRIPTURELINKS_STR_REMOVE')) . '"'
-            . ' data-str-download-failed="' . self::esc(Text::_('PLG_CONTENT_SCRIPTURELINKS_STR_DOWNLOAD_FAILED')) . '"'
-            . ' data-str-confirm-remove="' . self::esc(Text::_('PLG_CONTENT_SCRIPTURELINKS_STR_CONFIRM_REMOVE')) . '"'
-            . ' data-str-bundled-done="' . self::esc(Text::_('PLG_CONTENT_SCRIPTURELINKS_STR_BUNDLED_DONE')) . '"'
-            . ' data-str-status-ready="' . self::esc(Text::_('PLG_CONTENT_SCRIPTURELINKS_STR_STATUS_READY')) . '"'
-            . ' data-str-status-installed="' . self::esc(Text::_('PLG_CONTENT_SCRIPTURELINKS_STR_STATUS_INSTALLED')) . '"'
-            . ' data-str-status-none="' . self::esc(Text::_('PLG_CONTENT_SCRIPTURELINKS_STR_STATUS_NONE')) . '"'
-            . ' data-str-status-unknown="' . self::esc(Text::_('PLG_CONTENT_SCRIPTURELINKS_STR_STATUS_UNKNOWN')) . '"'
-            . ' data-str-remove-all="' . self::esc(Text::_('PLG_CONTENT_SCRIPTURELINKS_STR_REMOVE_ALL')) . '"'
-            . ' data-str-confirm-remove-all="' . self::esc(Text::_('PLG_CONTENT_SCRIPTURELINKS_STR_CONFIRM_REMOVE_ALL')) . '"'
-            . ' data-str-size="' . self::esc(Text::_('PLG_CONTENT_SCRIPTURELINKS_STR_SIZE')) . '"'
-            . ' data-str-total-size="' . self::esc(Text::_('PLG_CONTENT_SCRIPTURELINKS_STR_TOTAL_SIZE')) . '"'
-            . ' data-str-syncing="' . self::esc(Text::_('PLG_CONTENT_SCRIPTURELINKS_STR_SYNCING')) . '"'
-            . ' data-str-sync-complete="' . self::esc(Text::_('PLG_CONTENT_SCRIPTURELINKS_STR_SYNC_COMPLETE')) . '"'
-            . ' data-str-sync-failed="' . self::esc(Text::_('PLG_CONTENT_SCRIPTURELINKS_STR_SYNC_FAILED')) . '"'
-            . ' data-str-gdpr-disabled="' . self::esc(Text::_('PLG_CONTENT_SCRIPTURELINKS_STR_GDPR_DISABLED')) . '"'
-            . ' data-str-online="' . self::esc(Text::_('PLG_CONTENT_SCRIPTURELINKS_STR_ONLINE')) . '"'
-            . ' data-str-language="' . self::esc(Text::_('PLG_CONTENT_SCRIPTURELINKS_STR_LANGUAGE')) . '"'
-            . ' data-str-all-languages="' . self::esc(Text::_('PLG_CONTENT_SCRIPTURELINKS_STR_ALL_LANGUAGES')) . '"'
-            . ' data-str-filter-all="' . self::esc(Text::_('PLG_CONTENT_SCRIPTURELINKS_STR_FILTER_ALL')) . '"'
-            . ' data-str-filter-installed="' . self::esc(Text::_('PLG_CONTENT_SCRIPTURELINKS_STR_FILTER_INSTALLED')) . '"'
-            . ' data-str-filter-not-installed="' . self::esc(Text::_('PLG_CONTENT_SCRIPTURELINKS_STR_FILTER_NOT_INSTALLED')) . '"'
-            . ' data-str-filter-in-use="' . self::esc(Text::_('PLG_CONTENT_SCRIPTURELINKS_STR_FILTER_IN_USE')) . '"'
-            . ' data-str-search-placeholder="' . self::esc(Text::_('PLG_CONTENT_SCRIPTURELINKS_STR_SEARCH_PLACEHOLDER')) . '"'
-            . ' data-str-usage-count="' . self::esc(Text::_('PLG_CONTENT_SCRIPTURELINKS_STR_USAGE_COUNT')) . '"'
-            . ' data-str-usage-badge="' . self::esc(Text::_('PLG_CONTENT_SCRIPTURELINKS_STR_USAGE_BADGE')) . '"'
-            . ' data-str-suggested="' . self::esc(Text::_('PLG_CONTENT_SCRIPTURELINKS_STR_SUGGESTED')) . '"'
-            . ' data-str-showing-count="' . self::esc(Text::_('PLG_CONTENT_SCRIPTURELINKS_STR_SHOWING_COUNT')) . '"'
+            . ' data-str-loading="' . self::esc(Text::_('LIB_CWMSCRIPTURE_STR_LOADING')) . '"'
+            . ' data-str-no-translations="' . self::esc(Text::_('LIB_CWMSCRIPTURE_STR_NO_TRANSLATIONS')) . '"'
+            . ' data-str-load-error="' . self::esc(Text::_('LIB_CWMSCRIPTURE_STR_LOAD_ERROR')) . '"'
+            . ' data-str-title="' . self::esc(Text::_('LIB_CWMSCRIPTURE_STR_TITLE')) . '"'
+            . ' data-str-abbreviation="' . self::esc(Text::_('LIB_CWMSCRIPTURE_STR_ABBREVIATION')) . '"'
+            . ' data-str-source="' . self::esc(Text::_('LIB_CWMSCRIPTURE_STR_SOURCE')) . '"'
+            . ' data-str-status="' . self::esc(Text::_('LIB_CWMSCRIPTURE_STR_STATUS')) . '"'
+            . ' data-str-verses="' . self::esc(Text::_('LIB_CWMSCRIPTURE_STR_VERSES')) . '"'
+            . ' data-str-installed="' . self::esc(Text::_('LIB_CWMSCRIPTURE_STR_INSTALLED')) . '"'
+            . ' data-str-not-installed="' . self::esc(Text::_('LIB_CWMSCRIPTURE_STR_NOT_INSTALLED')) . '"'
+            . ' data-str-download="' . self::esc(Text::_('LIB_CWMSCRIPTURE_STR_DOWNLOAD')) . '"'
+            . ' data-str-downloading="' . self::esc(Text::_('LIB_CWMSCRIPTURE_STR_DOWNLOADING')) . '"'
+            . ' data-str-remove="' . self::esc(Text::_('LIB_CWMSCRIPTURE_STR_REMOVE')) . '"'
+            . ' data-str-download-failed="' . self::esc(Text::_('LIB_CWMSCRIPTURE_STR_DOWNLOAD_FAILED')) . '"'
+            . ' data-str-confirm-remove="' . self::esc(Text::_('LIB_CWMSCRIPTURE_STR_CONFIRM_REMOVE')) . '"'
+            . ' data-str-bundled-done="' . self::esc(Text::_('LIB_CWMSCRIPTURE_STR_BUNDLED_DONE')) . '"'
+            . ' data-str-status-ready="' . self::esc(Text::_('LIB_CWMSCRIPTURE_STR_STATUS_READY')) . '"'
+            . ' data-str-status-installed="' . self::esc(Text::_('LIB_CWMSCRIPTURE_STR_STATUS_INSTALLED')) . '"'
+            . ' data-str-status-none="' . self::esc(Text::_('LIB_CWMSCRIPTURE_STR_STATUS_NONE')) . '"'
+            . ' data-str-status-unknown="' . self::esc(Text::_('LIB_CWMSCRIPTURE_STR_STATUS_UNKNOWN')) . '"'
+            . ' data-str-remove-all="' . self::esc(Text::_('LIB_CWMSCRIPTURE_STR_REMOVE_ALL')) . '"'
+            . ' data-str-confirm-remove-all="' . self::esc(Text::_('LIB_CWMSCRIPTURE_STR_CONFIRM_REMOVE_ALL')) . '"'
+            . ' data-str-size="' . self::esc(Text::_('LIB_CWMSCRIPTURE_STR_SIZE')) . '"'
+            . ' data-str-total-size="' . self::esc(Text::_('LIB_CWMSCRIPTURE_STR_TOTAL_SIZE')) . '"'
+            . ' data-str-syncing="' . self::esc(Text::_('LIB_CWMSCRIPTURE_STR_SYNCING')) . '"'
+            . ' data-str-sync-complete="' . self::esc(Text::_('LIB_CWMSCRIPTURE_STR_SYNC_COMPLETE')) . '"'
+            . ' data-str-sync-failed="' . self::esc(Text::_('LIB_CWMSCRIPTURE_STR_SYNC_FAILED')) . '"'
+            . ' data-str-gdpr-disabled="' . self::esc(Text::_('LIB_CWMSCRIPTURE_STR_GDPR_DISABLED')) . '"'
+            . ' data-str-online="' . self::esc(Text::_('LIB_CWMSCRIPTURE_STR_ONLINE')) . '"'
+            . ' data-str-language="' . self::esc(Text::_('LIB_CWMSCRIPTURE_STR_LANGUAGE')) . '"'
+            . ' data-str-all-languages="' . self::esc(Text::_('LIB_CWMSCRIPTURE_STR_ALL_LANGUAGES')) . '"'
+            . ' data-str-filter-all="' . self::esc(Text::_('LIB_CWMSCRIPTURE_STR_FILTER_ALL')) . '"'
+            . ' data-str-filter-installed="' . self::esc(Text::_('LIB_CWMSCRIPTURE_STR_FILTER_INSTALLED')) . '"'
+            . ' data-str-filter-not-installed="' . self::esc(Text::_('LIB_CWMSCRIPTURE_STR_FILTER_NOT_INSTALLED')) . '"'
+            . ' data-str-filter-in-use="' . self::esc(Text::_('LIB_CWMSCRIPTURE_STR_FILTER_IN_USE')) . '"'
+            . ' data-str-search-placeholder="' . self::esc(Text::_('LIB_CWMSCRIPTURE_STR_SEARCH_PLACEHOLDER')) . '"'
+            . ' data-str-usage-count="' . self::esc(Text::_('LIB_CWMSCRIPTURE_STR_USAGE_COUNT')) . '"'
+            . ' data-str-usage-badge="' . self::esc(Text::_('LIB_CWMSCRIPTURE_STR_USAGE_BADGE')) . '"'
+            . ' data-str-suggested="' . self::esc(Text::_('LIB_CWMSCRIPTURE_STR_SUGGESTED')) . '"'
+            . ' data-str-showing-count="' . self::esc(Text::_('LIB_CWMSCRIPTURE_STR_SHOWING_COUNT')) . '"'
             . ' data-admin-language="' . self::esc($adminLang) . '"'
-            . ' data-str-core-translation="' . self::esc(Text::_('PLG_CONTENT_SCRIPTURELINKS_STR_CORE_TRANSLATION')) . '"'
-            . ' data-str-core-cannot-remove="' . self::esc(Text::_('PLG_CONTENT_SCRIPTURELINKS_STR_CORE_CANNOT_REMOVE')) . '"'
-            . ' data-str-suggested-desc="' . self::esc(Text::_('PLG_CONTENT_SCRIPTURELINKS_STR_SUGGESTED_DESC')) . '"'
-            . ' data-str-online-only="' . self::esc(Text::_('PLG_CONTENT_SCRIPTURELINKS_STR_ONLINE_ONLY')) . '"'
-            . ' data-str-online-only-desc="' . self::esc(Text::_('PLG_CONTENT_SCRIPTURELINKS_STR_ONLINE_ONLY_DESC')) . '"'
-            . ' data-str-provider-disable-confirm="' . self::esc(Text::_('PLG_CONTENT_SCRIPTURELINKS_STR_PROVIDER_DISABLE_CONFIRM')) . '"'
-            . ' data-str-provider-cleanup-done="' . self::esc(Text::_('PLG_CONTENT_SCRIPTURELINKS_STR_PROVIDER_CLEANUP_DONE')) . '"'
-            . ' data-str-bible-refresh="' . self::esc(Text::_('PLG_CONTENT_SCRIPTURELINKS_STR_BIBLE_REFRESH')) . '"'
-            . ' data-str-bible-refreshing="' . self::esc(Text::_('PLG_CONTENT_SCRIPTURELINKS_STR_BIBLE_REFRESHING')) . '"'
-            . ' data-str-bible-update-all="' . self::esc(Text::_('PLG_CONTENT_SCRIPTURELINKS_STR_BIBLE_UPDATE_ALL')) . '"'
-            . ' data-str-bible-update-all-desc="' . self::esc(Text::_('PLG_CONTENT_SCRIPTURELINKS_STR_BIBLE_UPDATE_ALL_DESC')) . '"'
-            . ' data-str-bible-updating-all="' . self::esc(Text::_('PLG_CONTENT_SCRIPTURELINKS_STR_BIBLE_UPDATING_ALL')) . '"'
-            . ' data-str-bible-update-all-complete="' . self::esc(Text::_('PLG_CONTENT_SCRIPTURELINKS_STR_BIBLE_UPDATE_ALL_COMPLETE')) . '"'
-            . ' data-str-bible-downloaded-at="' . self::esc(Text::_('PLG_CONTENT_SCRIPTURELINKS_STR_BIBLE_DOWNLOADED_AT')) . '"'
+            . ' data-str-core-translation="' . self::esc(Text::_('LIB_CWMSCRIPTURE_STR_CORE_TRANSLATION')) . '"'
+            . ' data-str-core-cannot-remove="' . self::esc(Text::_('LIB_CWMSCRIPTURE_STR_CORE_CANNOT_REMOVE')) . '"'
+            . ' data-str-suggested-desc="' . self::esc(Text::_('LIB_CWMSCRIPTURE_STR_SUGGESTED_DESC')) . '"'
+            . ' data-str-online-only="' . self::esc(Text::_('LIB_CWMSCRIPTURE_STR_ONLINE_ONLY')) . '"'
+            . ' data-str-online-only-desc="' . self::esc(Text::_('LIB_CWMSCRIPTURE_STR_ONLINE_ONLY_DESC')) . '"'
+            . ' data-str-provider-disable-confirm="' . self::esc(Text::_('LIB_CWMSCRIPTURE_STR_PROVIDER_DISABLE_CONFIRM')) . '"'
+            . ' data-str-provider-cleanup-done="' . self::esc(Text::_('LIB_CWMSCRIPTURE_STR_PROVIDER_CLEANUP_DONE')) . '"'
+            . ' data-str-bible-refresh="' . self::esc(Text::_('LIB_CWMSCRIPTURE_STR_BIBLE_REFRESH')) . '"'
+            . ' data-str-bible-refreshing="' . self::esc(Text::_('LIB_CWMSCRIPTURE_STR_BIBLE_REFRESHING')) . '"'
+            . ' data-str-bible-update-all="' . self::esc(Text::_('LIB_CWMSCRIPTURE_STR_BIBLE_UPDATE_ALL')) . '"'
+            . ' data-str-bible-update-all-desc="' . self::esc(Text::_('LIB_CWMSCRIPTURE_STR_BIBLE_UPDATE_ALL_DESC')) . '"'
+            . ' data-str-bible-updating-all="' . self::esc(Text::_('LIB_CWMSCRIPTURE_STR_BIBLE_UPDATING_ALL')) . '"'
+            . ' data-str-bible-update-all-complete="' . self::esc(Text::_('LIB_CWMSCRIPTURE_STR_BIBLE_UPDATE_ALL_COMPLETE')) . '"'
+            . ' data-str-bible-downloaded-at="' . self::esc(Text::_('LIB_CWMSCRIPTURE_STR_BIBLE_DOWNLOADED_AT')) . '"'
             . '></div>';
 
         // Inline JS for eye toggle + API.Bible show/hide
