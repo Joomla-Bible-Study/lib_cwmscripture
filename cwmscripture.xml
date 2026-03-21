@@ -42,6 +42,7 @@
     </update>
 
     <languages folder="lib_cwmscripture/language">
+        <language tag="en-GB">en-GB/en-GB.lib_cwmscripture.ini</language>
         <language tag="en-GB">en-GB/en-GB.lib_cwmscripture.sys.ini</language>
     </languages>
 </extension>

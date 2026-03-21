@@ -8,68 +8,59 @@
     {
       "name": "lib_cwmscripture.cwm-fetch",
       "type": "script",
-      "uri": "lib_cwmscripture/js/cwm-fetch.js"
+      "uri": "media/lib_cwmscripture/js/cwm-fetch.js"
     },
     {
       "name": "lib_cwmscripture.scripture-text",
       "type": "style",
-      "uri": "lib_cwmscripture/css/scripture-text.css"
+      "uri": "media/lib_cwmscripture/css/scripture-text.css"
     },
     {
       "name": "lib_cwmscripture.scripture-tooltip",
       "type": "style",
-      "uri": "lib_cwmscripture/css/scripture-tooltip.css"
+      "uri": "media/lib_cwmscripture/css/scripture-tooltip.css"
     },
     {
       "name": "lib_cwmscripture.scripture-tooltip",
       "type": "script",
-      "uri": "lib_cwmscripture/js/scripture-tooltip.js",
+      "uri": "media/lib_cwmscripture/js/scripture-tooltip.js",
       "dependencies": [
-        "core",
         "lib_cwmscripture.cwm-fetch"
       ]
     },
     {
       "name": "lib_cwmscripture.scripture-switcher-css",
       "type": "style",
-      "uri": "lib_cwmscripture/css/scripture-switcher.css"
+      "uri": "media/lib_cwmscripture/css/scripture-switcher.css"
     },
     {
       "name": "lib_cwmscripture.scripture-switcher",
       "type": "script",
-      "uri": "lib_cwmscripture/js/scripture-switcher.js",
+      "uri": "media/lib_cwmscripture/js/scripture-switcher.js",
       "dependencies": [
-        "core",
         "lib_cwmscripture.cwm-fetch"
       ]
     },
     {
       "name": "lib_cwmscripture.scripture-autocomplete",
       "type": "script",
-      "uri": "lib_cwmscripture/js/scripture-autocomplete.js",
-      "dependencies": [
-        "core"
-      ]
+      "uri": "media/lib_cwmscripture/js/scripture-autocomplete.js"
     },
     {
       "name": "lib_cwmscripture.translations-manager",
       "type": "style",
-      "uri": "lib_cwmscripture/css/translations-manager.css"
+      "uri": "media/lib_cwmscripture/css/translations-manager.css"
     },
     {
       "name": "lib_cwmscripture.translations-manager",
       "type": "script",
-      "uri": "lib_cwmscripture/js/translations-manager.js",
-      "dependencies": [
-        "core"
-      ]
+      "uri": "media/lib_cwmscripture/js/translations-manager.js"
     },
     {
       "name": "lib_cwmscripture.bible-translations",
       "type": "script",
-      "uri": "lib_cwmscripture/js/bible-translations.js",
+      "uri": "media/lib_cwmscripture/js/bible-translations.js",
       "dependencies": [
-        "core",
         "lib_cwmscripture.cwm-fetch"
       ]
     }
