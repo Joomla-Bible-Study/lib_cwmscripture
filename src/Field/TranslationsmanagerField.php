@@ -55,12 +55,14 @@ class TranslationsmanagerField extends FormField
 
         $mediaBase = Uri::root(true) . '/media/lib_cwmscripture';
 
-        // Inject CSS/JS inline since WebAssetManager doesn't work for fields rendered after <head>
+        // Register library assets via WebAssetManager
+        $wa = Factory::getApplication()->getDocument()->getWebAssetManager();
+        $wa->registerAndUseScript('lib_cwmscripture.cwm-fetch', 'media/lib_cwmscripture/js/cwm-fetch.js');
+        $wa->registerAndUseScript('lib_cwmscripture.bible-translations', 'media/lib_cwmscripture/js/bible-translations.js', [], [], ['lib_cwmscripture.cwm-fetch']);
+        $wa->registerAndUseStyle('lib_cwmscripture.translations-manager', 'media/lib_cwmscripture/css/translations-manager.css');
+
         $switcherCss = Uri::root(true) . '/media/system/css/fields/switcher.css';
         $html = '<link rel="stylesheet" href="' . self::esc($switcherCss) . '" />';
-        $html .= '<link rel="stylesheet" href="' . self::esc($mediaBase . '/css/translations-manager.css') . '" />';
-        $html .= '<script src="' . self::esc($mediaBase . '/js/cwm-fetch.js') . '" defer></script>';
-        $html .= '<script src="' . self::esc($mediaBase . '/js/bible-translations.js') . '" defer></script>';
 
         $html .= self::renderScriptureTab($prefix);
 
