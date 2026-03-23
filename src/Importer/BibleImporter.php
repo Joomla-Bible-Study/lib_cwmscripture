@@ -469,21 +469,24 @@ class BibleImporter
      */
     private static function insertBatch(DatabaseInterface $db, array $batch): void
     {
-        $query = $db->getQuery(true)
-            ->insert($db->quoteName('#__bsms_bible_verses'))
-            ->columns($db->quoteName(['translation', 'book', 'chapter', 'verse', 'text']));
+        // Use INSERT IGNORE to skip rows that already exist (unique index
+        // on translation+book+chapter+verse prevents duplicates).
+        $columns = $db->quoteName(['translation', 'book', 'chapter', 'verse', 'text']);
+        $rows    = [];
 
         foreach ($batch as $row) {
-            $query->values(
-                $db->quote($row['translation']) . ', '
+            $rows[] = $db->quote($row['translation']) . ', '
                 . (int) $row['book'] . ', '
                 . (int) $row['chapter'] . ', '
                 . (int) $row['verse'] . ', '
-                . $db->quote($row['text'])
-            );
+                . $db->quote($row['text']);
         }
 
-        $db->setQuery($query);
+        $sql = 'INSERT IGNORE INTO ' . $db->quoteName('#__bsms_bible_verses')
+            . ' (' . implode(', ', $columns) . ') VALUES '
+            . '(' . implode('), (', $rows) . ')';
+
+        $db->setQuery($sql);
         $db->execute();
     }
 
