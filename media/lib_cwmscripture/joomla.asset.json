@@ -1,68 +1,69 @@
 {
-  "$schema": "https://developer.joomla.org/schemas/json-schema/web_assets.json",
-  "name": "lib_cwmscripture",
-  "version": "1.0.0",
-  "description": "CWM Scripture Library assets",
-  "license": "GPL-2.0-or-later",
-  "assets": [
-    {
-      "name": "lib_cwmscripture.cwm-fetch",
-      "type": "script",
-      "uri": "media/lib_cwmscripture/js/cwm-fetch.js"
-    },
-    {
-      "name": "lib_cwmscripture.scripture-text",
-      "type": "style",
-      "uri": "media/lib_cwmscripture/css/scripture-text.css"
-    },
-    {
-      "name": "lib_cwmscripture.scripture-tooltip",
-      "type": "style",
-      "uri": "media/lib_cwmscripture/css/scripture-tooltip.css"
-    },
-    {
-      "name": "lib_cwmscripture.scripture-tooltip",
-      "type": "script",
-      "uri": "media/lib_cwmscripture/js/scripture-tooltip.js",
-      "dependencies": [
-        "lib_cwmscripture.cwm-fetch"
-      ]
-    },
-    {
-      "name": "lib_cwmscripture.scripture-switcher-css",
-      "type": "style",
-      "uri": "media/lib_cwmscripture/css/scripture-switcher.css"
-    },
-    {
-      "name": "lib_cwmscripture.scripture-switcher",
-      "type": "script",
-      "uri": "media/lib_cwmscripture/js/scripture-switcher.js",
-      "dependencies": [
-        "lib_cwmscripture.cwm-fetch"
-      ]
-    },
-    {
-      "name": "lib_cwmscripture.scripture-autocomplete",
-      "type": "script",
-      "uri": "media/lib_cwmscripture/js/scripture-autocomplete.js"
-    },
-    {
-      "name": "lib_cwmscripture.translations-manager",
-      "type": "style",
-      "uri": "media/lib_cwmscripture/css/translations-manager.css"
-    },
-    {
-      "name": "lib_cwmscripture.translations-manager",
-      "type": "script",
-      "uri": "media/lib_cwmscripture/js/translations-manager.js"
-    },
-    {
-      "name": "lib_cwmscripture.bible-translations",
-      "type": "script",
-      "uri": "media/lib_cwmscripture/js/bible-translations.js",
-      "dependencies": [
-        "lib_cwmscripture.cwm-fetch"
-      ]
-    }
-  ]
+    "$schema": "https://developer.joomla.org/schemas/json-schema/web_assets.json",
+    "name": "lib_cwmscripture",
+    "version": "1.0.0",
+    "description": "CWM Scripture Library assets",
+    "license": "GPL-2.0-or-later",
+    "assets": [
+        {
+            "name": "lib_cwmscripture.cwm-fetch",
+            "type": "script",
+            "uri": "media/lib_cwmscripture/js/cwm-fetch.js"
+        },
+        {
+            "name": "lib_cwmscripture.scripture-text",
+            "type": "style",
+            "uri": "media/lib_cwmscripture/css/scripture-text.css"
+        },
+        {
+            "name": "lib_cwmscripture.scripture-tooltip",
+            "type": "style",
+            "uri": "media/lib_cwmscripture/css/scripture-tooltip.css"
+        },
+        {
+            "name": "lib_cwmscripture.scripture-tooltip",
+            "type": "script",
+            "uri": "media/lib_cwmscripture/js/scripture-tooltip.js",
+            "dependencies": [
+                "lib_cwmscripture.cwm-fetch",
+                "bootstrap.popover"
+            ]
+        },
+        {
+            "name": "lib_cwmscripture.scripture-switcher-css",
+            "type": "style",
+            "uri": "media/lib_cwmscripture/css/scripture-switcher.css"
+        },
+        {
+            "name": "lib_cwmscripture.scripture-switcher",
+            "type": "script",
+            "uri": "media/lib_cwmscripture/js/scripture-switcher.js",
+            "dependencies": [
+                "lib_cwmscripture.cwm-fetch"
+            ]
+        },
+        {
+            "name": "lib_cwmscripture.scripture-autocomplete",
+            "type": "script",
+            "uri": "media/lib_cwmscripture/js/scripture-autocomplete.js"
+        },
+        {
+            "name": "lib_cwmscripture.translations-manager",
+            "type": "style",
+            "uri": "media/lib_cwmscripture/css/translations-manager.css"
+        },
+        {
+            "name": "lib_cwmscripture.translations-manager",
+            "type": "script",
+            "uri": "media/lib_cwmscripture/js/translations-manager.js"
+        },
+        {
+            "name": "lib_cwmscripture.bible-translations",
+            "type": "script",
+            "uri": "media/lib_cwmscripture/js/bible-translations.js",
+            "dependencies": [
+                "lib_cwmscripture.cwm-fetch"
+            ]
+        }
+    ]
 }
