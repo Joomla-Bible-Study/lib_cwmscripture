@@ -469,8 +469,9 @@ class BibleImporter
      */
     private static function insertBatch(DatabaseInterface $db, array $batch): void
     {
-        // Use INSERT IGNORE to skip rows that already exist (unique index
-        // on translation+book+chapter+verse prevents duplicates).
+        // Use INSERT ... ON DUPLICATE KEY UPDATE so existing verses get
+        // their text refreshed (e.g. formatting corrections from the API)
+        // while new verses are inserted normally.
         $columns = $db->quoteName(['translation', 'book', 'chapter', 'verse', 'text']);
         $rows    = [];
 
@@ -482,9 +483,10 @@ class BibleImporter
                 . $db->quote($row['text']);
         }
 
-        $sql = 'INSERT IGNORE INTO ' . $db->quoteName('#__bsms_bible_verses')
+        $sql = 'INSERT INTO ' . $db->quoteName('#__bsms_bible_verses')
             . ' (' . implode(', ', $columns) . ') VALUES '
-            . '(' . implode('), (', $rows) . ')';
+            . '(' . implode('), (', $rows) . ')'
+            . ' ON DUPLICATE KEY UPDATE ' . $db->quoteName('text') . ' = VALUES(' . $db->quoteName('text') . ')';
 
         $db->setQuery($sql);
         $db->execute();
