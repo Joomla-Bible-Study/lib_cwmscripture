@@ -111,6 +111,15 @@ return new class () implements InstallerScriptInterface {
             return true;
         }
 
+        // Rebuild the namespace map so the library's CWM\Library\Scripture
+        // namespace is available immediately.  When installed as part of
+        // pkg_proclaim, the component installs next and needs this namespace.
+        $cacheFile = JPATH_ADMINISTRATOR . '/cache/autoload_psr4.php';
+
+        if (file_exists($cacheFile)) {
+            @unlink($cacheFile);
+        }
+
         // Ensure tables exist — on "update" installs (discover install or
         // re-install over existing extension record), Joomla skips the
         // install SQL and only runs update SQL, which may be empty.
