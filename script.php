@@ -111,6 +111,11 @@ return new class () implements InstallerScriptInterface {
             return true;
         }
 
+        // Ensure tables exist — on "update" installs (discover install or
+        // re-install over existing extension record), Joomla skips the
+        // install SQL and only runs update SQL, which may be empty.
+        $this->ensureTables($adapter);
+
         // Seed the GetBible translation catalog if needed
         try {
             $this->seedTranslationCatalog();
@@ -202,6 +207,76 @@ return new class () implements InstallerScriptInterface {
             return $manifest['version'] ?? '0.0.0';
         } catch (\Throwable) {
             return '0.0.0';
+        }
+    }
+
+    /**
+     * Ensure the library's tables exist by running the install SQL if needed.
+     *
+     * When the library is re-installed over an existing #__extensions record
+     * (e.g., from a discover install by Proclaim), Joomla treats it as an
+     * "update" and skips the install SQL. This method detects missing tables
+     * and runs the install SQL manually.
+     *
+     * @param   InstallerAdapter  $adapter  The installer adapter
+     *
+     * @return  void
+     *
+     * @since  1.0.0
+     */
+    private function ensureTables(InstallerAdapter $adapter): void
+    {
+        try {
+            $db     = Factory::getContainer()->get(DatabaseInterface::class);
+            $tables = $db->getTableList();
+            $prefix = $db->getPrefix();
+
+            // Check if the primary table exists
+            if (\in_array($prefix . 'bsms_bible_translations', $tables, true)) {
+                return;
+            }
+
+            // Tables missing — run install SQL
+            $sqlFile = $adapter->getParent()->getPath('source') . '/lib_cwmscripture/sql/install.mysql.utf8.sql';
+
+            if (!file_exists($sqlFile)) {
+                // Try alternative path (already installed location)
+                $sqlFile = JPATH_LIBRARIES . '/cwmscripture/sql/install.mysql.utf8.sql';
+            }
+
+            if (!file_exists($sqlFile)) {
+                Log::add('lib_cwmscripture: install SQL not found, tables not created', Log::WARNING, 'cwmscripture.install');
+
+                return;
+            }
+
+            $sql = file_get_contents($sqlFile);
+
+            // Replace #__ prefix
+            $sql = str_replace('#__', $prefix, $sql);
+
+            // Split and execute statements
+            $statements = $db->splitSql($sql);
+
+            foreach ($statements as $statement) {
+                $statement = trim($statement);
+
+                if ($statement === '') {
+                    continue;
+                }
+
+                try {
+                    $db->setQuery($statement);
+                    $db->execute();
+                } catch (\Exception $e) {
+                    // CREATE TABLE IF NOT EXISTS is safe to fail
+                    Log::add('lib_cwmscripture SQL: ' . $e->getMessage(), Log::WARNING, 'cwmscripture.install');
+                }
+            }
+
+            Log::add('lib_cwmscripture: Created missing tables from install SQL', Log::INFO, 'cwmscripture.install');
+        } catch (\Throwable $e) {
+            Log::add('lib_cwmscripture: ensureTables failed: ' . $e->getMessage(), Log::WARNING, 'cwmscripture.install');
         }
     }
 

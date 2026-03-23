@@ -106,6 +106,15 @@ function build(bool $verbose = false): void
         echo "  + cwmscripture.xml\n";
     }
 
+    // Add install script if present
+    if (file_exists(BASE_DIR . '/script.php')) {
+        $zip->addFile(BASE_DIR . '/script.php', 'script.php');
+
+        if ($verbose) {
+            echo "  + script.php\n";
+        }
+    }
+
     // Add library source files (src/, sql/, language/)
     addDirectoryToZip($zip, BASE_DIR . '/src', 'lib_cwmscripture/src', $verbose);
     addDirectoryToZip($zip, BASE_DIR . '/sql', 'lib_cwmscripture/sql', $verbose);
