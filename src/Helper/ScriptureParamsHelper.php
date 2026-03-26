@@ -45,14 +45,16 @@ class ScriptureParamsHelper
      * @since  1.1.0
      */
     private const DEFAULTS = [
-        'mode'               => 'tag',
-        'display'            => 'link',
-        'default_version'    => 'kjv',
-        'provider_getbible'  => 1,
-        'provider_api_bible' => 0,
-        'api_bible_api_key'  => '',
-        'gdpr_mode'          => 0,
-        'cache_days'         => 30,
+        'mode'                => 'tag',
+        'display'             => 'link',
+        'default_version'     => 'kjv',
+        'provider_getbible'   => 1,
+        'provider_api_bible'  => 0,
+        'api_bible_api_key'   => '',
+        'provider_biblebrain' => 0,
+        'biblebrain_api_key'  => '',
+        'gdpr_mode'           => 0,
+        'cache_days'          => 30,
     ];
 
     /**

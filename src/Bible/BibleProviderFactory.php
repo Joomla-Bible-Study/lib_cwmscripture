@@ -12,6 +12,7 @@
 namespace CWM\Library\Scripture\Bible;
 
 use CWM\Library\Scripture\Bible\Provider\ApiBibleProvider;
+use CWM\Library\Scripture\Bible\Provider\BibleBrainProvider;
 use CWM\Library\Scripture\Bible\Provider\GetBibleProvider;
 use CWM\Library\Scripture\Bible\Provider\LocalProvider;
 use Joomla\CMS\Factory;
@@ -41,7 +42,7 @@ class BibleProviderFactory
     /**
      * Get a Bible provider by name.
      *
-     * @param   string  $name    Provider name: "local", "getbible", or "api_bible"
+     * @param   string  $name    Provider name: "local", "getbible", "api_bible", or "biblebrain"
      * @param   string  $apiKey  Optional API key (required for api_bible)
      *
      * @return  BibleProviderInterface
@@ -57,10 +58,11 @@ class BibleProviderFactory
         }
 
         $provider = match ($name) {
-            'local'     => new LocalProvider(),
-            'getbible'  => new GetBibleProvider(),
-            'api_bible' => new ApiBibleProvider($apiKey),
-            default     => throw new \InvalidArgumentException(
+            'local'      => new LocalProvider(),
+            'getbible'   => new GetBibleProvider(),
+            'api_bible'  => new ApiBibleProvider($apiKey),
+            'biblebrain' => new BibleBrainProvider($apiKey),
+            default      => throw new \InvalidArgumentException(
                 \sprintf('Unknown Bible provider: %s', $name)
             ),
         };
@@ -88,10 +90,12 @@ class BibleProviderFactory
      */
     public static function getProviderForTranslation(string $version, Registry $params): BibleProviderInterface
     {
-        $gdprMode        = (int) $params->get('gdpr_mode', 0) === 1;
-        $getbibleEnabled = !$gdprMode && (int) $params->get('provider_getbible', 1) === 1;
-        $apiBibleEnabled = !$gdprMode && (int) $params->get('provider_api_bible', 0) === 1;
-        $apiBibleKey     = (string) $params->get('api_bible_api_key', '');
+        $gdprMode           = (int) $params->get('gdpr_mode', 0) === 1;
+        $getbibleEnabled    = !$gdprMode && (int) $params->get('provider_getbible', 1) === 1;
+        $apiBibleEnabled    = !$gdprMode && (int) $params->get('provider_api_bible', 0) === 1;
+        $apiBibleKey        = (string) $params->get('api_bible_api_key', '');
+        $bibleBrainEnabled  = !$gdprMode && (int) $params->get('provider_biblebrain', 0) === 1;
+        $bibleBrainKey      = (string) $params->get('biblebrain_api_key', '');
 
         // Check if version is locally installed
         try {
@@ -108,6 +112,26 @@ class BibleProviderFactory
             }
         } catch (\Throwable $e) {
             Log::add('DB error checking local verses: ' . $e->getMessage(), Log::ERROR, 'cwmscripture.bible');
+        }
+
+        // Check if biblebrain supports this version
+        if ($bibleBrainEnabled && !empty($bibleBrainKey)) {
+            try {
+                $db    = Factory::getContainer()->get(DatabaseInterface::class);
+                $query = $db->getQuery(true)
+                    ->select('COUNT(*)')
+                    ->from($db->quoteName('#__bsms_bible_translations'))
+                    ->where($db->quoteName('abbreviation') . ' = :version')
+                    ->where($db->quoteName('source') . ' = ' . $db->quote('biblebrain'))
+                    ->bind(':version', $version);
+                $db->setQuery($query);
+
+                if ((int) $db->loadResult() > 0) {
+                    return self::getProvider('biblebrain', $bibleBrainKey);
+                }
+            } catch (\Throwable $e) {
+                Log::add('DB error checking biblebrain: ' . $e->getMessage(), Log::ERROR, 'cwmscripture.bible');
+            }
         }
 
         // Check if api_bible supports this version
@@ -169,7 +193,7 @@ class BibleProviderFactory
      */
     public static function getProviderNames(): array
     {
-        return ['local', 'getbible', 'api_bible'];
+        return ['local', 'getbible', 'api_bible', 'biblebrain'];
     }
 
     /**

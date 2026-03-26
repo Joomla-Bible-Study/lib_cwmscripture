@@ -97,12 +97,14 @@ class TranslationsmanagerField extends FormField
 
         $params         = ScriptureParamsHelper::getParams();
         $token          = Session::getFormToken();
-        $providerGetbible = (int) $params->get('provider_getbible', 1);
-        $providerApiBible = (int) $params->get('provider_api_bible', 0);
-        $apiBibleKey      = (string) $params->get('api_bible_api_key', '');
-        $gdprMode         = (int) $params->get('gdpr_mode', 0);
-        $defaultVersion   = (string) $params->get('default_version', 'kjv');
-        $cacheDays        = (int) $params->get('cache_days', 30);
+        $providerGetbible  = (int) $params->get('provider_getbible', 1);
+        $providerApiBible  = (int) $params->get('provider_api_bible', 0);
+        $apiBibleKey       = (string) $params->get('api_bible_api_key', '');
+        $providerBibleBrain = (int) $params->get('provider_biblebrain', 0);
+        $bibleBrainKey     = (string) $params->get('biblebrain_api_key', '');
+        $gdprMode          = (int) $params->get('gdpr_mode', 0);
+        $defaultVersion    = (string) $params->get('default_version', 'kjv');
+        $cacheDays         = (int) $params->get('cache_days', 30);
         $adminLang        = 'en-GB';
 
         try {
@@ -172,6 +174,47 @@ class TranslationsmanagerField extends FormField
             . '<i class="icon-refresh" aria-hidden="true"></i> '
             . Text::_('LIB_CWMSCRIPTURE_SYNC_TRANSLATIONS') . '</button>';
         $html .= '<span id="api-bible-sync-status" class="ms-2 small"></span>';
+        $html .= '</div>';
+
+        // ── Bible Brain (Faith Comes By Hearing) ──
+        $html .= '<hr class="my-3">';
+
+        $html .= self::renderSwitcher(
+            $fieldPrefix . '[provider_biblebrain]',
+            'jform_params_provider_biblebrain',
+            Text::_('LIB_CWMSCRIPTURE_BIBLEBRAIN_LABEL'),
+            Text::_('LIB_CWMSCRIPTURE_BIBLEBRAIN_DESC'),
+            $providerBibleBrain
+        );
+
+        // Bible Brain API Key
+        $maskedBbKey = $bibleBrainKey !== ''
+            ? str_repeat("\u{2022}", 20) . substr($bibleBrainKey, -4)
+            : '';
+
+        $bbKeyHidden = $providerBibleBrain ? '' : ' style="display:none;"';
+        $html .= '<div class="control-group" id="biblebrain-key-group"' . $bbKeyHidden . '>';
+        $html .= '<div class="control-label"><label for="jform_params_biblebrain_api_key">'
+            . Text::_('LIB_CWMSCRIPTURE_BIBLEBRAIN_APIKEY_LABEL') . '</label></div>';
+        $html .= '<div class="controls"><div class="input-group">';
+        $html .= '<input type="password" name="' . self::esc($fieldPrefix . '[biblebrain_api_key]') . '" '
+            . 'id="jform_params_biblebrain_api_key" '
+            . 'value="' . self::esc($bibleBrainKey) . '" '
+            . 'placeholder="' . self::esc($maskedBbKey) . '" '
+            . 'class="form-control" />';
+        $html .= '<button type="button" class="btn btn-secondary" id="jform_params_biblebrain_key_toggle" '
+            . 'aria-label="Toggle visibility">'
+            . '<span class="icon-eye" aria-hidden="true"></span></button>';
+        $html .= '</div>';
+        $html .= '<div class="form-text">' . Text::_('LIB_CWMSCRIPTURE_BIBLEBRAIN_APIKEY_DESC') . '</div>';
+        $html .= '</div></div>';
+
+        // Get Bible Brain API Key button
+        $html .= '<div id="biblebrain-key-row" class="mb-3" style="display:none;">';
+        $html .= '<a href="https://4.dbt.io/api/sign-up" target="_blank" rel="noopener noreferrer" '
+            . 'class="btn btn-sm btn-outline-secondary">'
+            . '<i class="icon-key" aria-hidden="true"></i> '
+            . Text::_('LIB_CWMSCRIPTURE_BIBLEBRAIN_GET_KEY') . '</a>';
         $html .= '</div>';
 
         $html .= '</div></div>'; // end panel, end left column
@@ -293,13 +336,20 @@ class TranslationsmanagerField extends FormField
             . ' data-str-bible-downloaded-at="' . self::esc(Text::_('LIB_CWMSCRIPTURE_STR_BIBLE_DOWNLOADED_AT')) . '"'
             . '></div>';
 
-        // Inline JS for eye toggle + API.Bible show/hide
+        // Inline JS for eye toggles + provider show/hide
         $html .= '<script>'
             . '(function(){'
-            // Eye toggle
+            // API.Bible eye toggle
             . 'var t=document.getElementById("jform_params_api_key_toggle");'
             . 'if(t){t.addEventListener("click",function(){'
             . 'var i=document.getElementById("jform_params_api_bible_api_key");'
+            . 'var s=this.querySelector("span");'
+            . 'if(i.type==="password"){i.type="text";s.className="icon-eye-close";}'
+            . 'else{i.type="password";s.className="icon-eye";}});}'
+            // Bible Brain eye toggle
+            . 'var t2=document.getElementById("jform_params_biblebrain_key_toggle");'
+            . 'if(t2){t2.addEventListener("click",function(){'
+            . 'var i=document.getElementById("jform_params_biblebrain_api_key");'
             . 'var s=this.querySelector("span");'
             . 'if(i.type==="password"){i.type="text";s.className="icon-eye-close";}'
             . 'else{i.type="password";s.className="icon-eye";}});}'
@@ -317,6 +367,18 @@ class TranslationsmanagerField extends FormField
             . '}'
             . 'radios.forEach(function(r){r.addEventListener("change",toggleApi);});'
             . 'toggleApi();'
+            // Bible Brain provider toggle — show/hide key group + button row
+            . 'var bbRadios=document.querySelectorAll("input[name=\\"jform[params][provider_biblebrain]\\"]");'
+            . 'var bbKeyGrp=document.getElementById("biblebrain-key-group");'
+            . 'var bbKeyRow=document.getElementById("biblebrain-key-row");'
+            . 'function toggleBb(){'
+            . 'var c=document.querySelector("input[name=\\"jform[params][provider_biblebrain]\\"]:checked");'
+            . 'var on=c&&c.value==="1";'
+            . 'if(bbKeyGrp)bbKeyGrp.style.display=on?"":"none";'
+            . 'if(bbKeyRow)bbKeyRow.style.display=on?"":"none";'
+            . '}'
+            . 'bbRadios.forEach(function(r){r.addEventListener("change",toggleBb);});'
+            . 'toggleBb();'
             . '})();'
             . '</script>';
 
