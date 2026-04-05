@@ -46,7 +46,9 @@
     "test": "phpunit",
     "test:unit": "phpunit --testsuite unit",
     "build:package": "php build/build-package.php",
-    "build:package:verbose": "php build/build-package.php --verbose"
+    "build:package:verbose": "php build/build-package.php --verbose",
+    "sync-languages": "python3 build/sync_languages.py",
+    "sync-languages-force": "python3 build/sync_languages.py --force"
   },
   "autoload-dev": {
     "psr-4": {
