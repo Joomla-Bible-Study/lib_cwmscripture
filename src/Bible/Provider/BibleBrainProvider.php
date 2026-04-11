@@ -16,7 +16,6 @@ use CWM\Library\Scripture\Bible\AudioPassageResult;
 use CWM\Library\Scripture\Bible\AudioProviderInterface;
 use CWM\Library\Scripture\Bible\BiblePassageResult;
 use Joomla\CMS\Log\Log;
-use Joomla\Http\HttpFactory;
 
 // phpcs:disable PSR1.Files.SideEffects
 \defined('_JEXEC') or die;
@@ -144,7 +143,7 @@ class BibleBrainProvider extends AbstractBibleProvider implements AudioProviderI
             );
         }
 
-        $bibleId  = $this->resolveBibleId($translation);
+        $bibleId   = $this->resolveBibleId($translation);
         $filesetId = $this->resolveTextFileset($bibleId);
 
         if (empty($filesetId)) {
@@ -201,7 +200,7 @@ class BibleBrainProvider extends AbstractBibleProvider implements AudioProviderI
             );
         }
 
-        $text = $this->assembleVerseText($verses);
+        $text      = $this->assembleVerseText($verses);
         $copyright = $this->extractCopyright($data);
 
         $this->writeCache('biblebrain', $translation, $reference, $text, $copyright);
@@ -274,7 +273,7 @@ class BibleBrainProvider extends AbstractBibleProvider implements AudioProviderI
             );
         }
 
-        $audioData = $data['data'] ?? [];
+        $audioData  = $data['data'] ?? [];
         $audioFiles = [];
 
         foreach ($audioData as $item) {

@@ -62,7 +62,7 @@ class TranslationsmanagerField extends FormField
         $wa->registerAndUseStyle('lib_cwmscripture.translations-manager', 'media/lib_cwmscripture/css/translations-manager.css');
 
         $switcherCss = Uri::root(true) . '/media/system/css/fields/switcher.css';
-        $html = '<link rel="stylesheet" href="' . self::esc($switcherCss) . '" />';
+        $html        = '<link rel="stylesheet" href="' . self::esc($switcherCss) . '" />';
 
         $html .= self::renderScriptureTab($prefix);
 
@@ -95,17 +95,17 @@ class TranslationsmanagerField extends FormField
         Factory::getLanguage()->load('lib_cwmscripture', JPATH_ADMINISTRATOR);
         Factory::getLanguage()->load('lib_cwmscripture', JPATH_LIBRARIES . '/cwmscripture');
 
-        $params         = ScriptureParamsHelper::getParams();
-        $token          = Session::getFormToken();
-        $providerGetbible  = (int) $params->get('provider_getbible', 1);
-        $providerApiBible  = (int) $params->get('provider_api_bible', 0);
-        $apiBibleKey       = (string) $params->get('api_bible_api_key', '');
+        $params             = ScriptureParamsHelper::getParams();
+        $token              = Session::getFormToken();
+        $providerGetbible   = (int) $params->get('provider_getbible', 1);
+        $providerApiBible   = (int) $params->get('provider_api_bible', 0);
+        $apiBibleKey        = (string) $params->get('api_bible_api_key', '');
         $providerBibleBrain = (int) $params->get('provider_biblebrain', 0);
-        $bibleBrainKey     = (string) $params->get('biblebrain_api_key', '');
-        $gdprMode          = (int) $params->get('gdpr_mode', 0);
-        $defaultVersion    = (string) $params->get('default_version', 'kjv');
-        $cacheDays         = (int) $params->get('cache_days', 30);
-        $adminLang        = 'en-GB';
+        $bibleBrainKey      = (string) $params->get('biblebrain_api_key', '');
+        $gdprMode           = (int) $params->get('gdpr_mode', 0);
+        $defaultVersion     = (string) $params->get('default_version', 'kjv');
+        $cacheDays          = (int) $params->get('cache_days', 30);
+        $adminLang          = 'en-GB';
 
         try {
             $adminLang = Factory::getApplication()->getLanguage()->getTag();
