@@ -136,6 +136,11 @@ return new class () implements InstallerScriptInterface {
             );
         }
 
+        // Download the core public-domain English translations so that
+        // consumers have a working local Bible out of the box.  Failures
+        // are warn-and-continue — users can retry from the scripture admin.
+        $this->downloadCoreTranslations();
+
         $version = (string) $adapter->getManifest()->version;
         Log::add(
             'lib_cwmscripture v' . $version . ' ' . $type . ' completed successfully.',
@@ -144,6 +149,54 @@ return new class () implements InstallerScriptInterface {
         );
 
         return true;
+    }
+
+    /**
+     * Download a curated set of public-domain translations during install.
+     *
+     * @return  void
+     *
+     * @since  1.1.0
+     */
+    private function downloadCoreTranslations(): void
+    {
+        $coreTranslations = ['kjv', 'web', 'asv'];
+
+        if (!class_exists(\CWM\Library\Scripture\Importer\BibleImporter::class)) {
+            Log::add(
+                'lib_cwmscripture: BibleImporter not available; skipping core translation downloads',
+                Log::WARNING,
+                'cwmscripture.install'
+            );
+
+            return;
+        }
+
+        foreach ($coreTranslations as $abbr) {
+            try {
+                $count = \CWM\Library\Scripture\Importer\BibleImporter::downloadAndImport($abbr);
+
+                if ($count > 0) {
+                    Log::add(
+                        'lib_cwmscripture: imported ' . $count . ' verses for "' . $abbr . '"',
+                        Log::INFO,
+                        'cwmscripture.install'
+                    );
+                } else {
+                    Log::add(
+                        'lib_cwmscripture: import returned no verses for "' . $abbr . '" — remote fetch may have failed',
+                        Log::WARNING,
+                        'cwmscripture.install'
+                    );
+                }
+            } catch (\Throwable $e) {
+                Log::add(
+                    'lib_cwmscripture: failed to import "' . $abbr . '": ' . $e->getMessage(),
+                    Log::WARNING,
+                    'cwmscripture.install'
+                );
+            }
+        }
     }
 
     /**
