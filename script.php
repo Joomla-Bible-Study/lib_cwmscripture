@@ -136,10 +136,10 @@ return new class () implements InstallerScriptInterface {
             );
         }
 
-        // Download the core public-domain English translations so that
-        // consumers have a working local Bible out of the box.  Failures
-        // are warn-and-continue — users can retry from the scripture admin.
-        $this->downloadCoreTranslations();
+        // Core translation downloads used to happen synchronously here,
+        // which added ~40s to every install.  They're now deferred to a
+        // one-shot Joomla task scheduled by plg_task_cwmscripture during
+        // its own postflight — see plg_task_cwmscripture/script.php.
 
         $version = (string) $adapter->getManifest()->version;
         Log::add(
@@ -149,79 +149,6 @@ return new class () implements InstallerScriptInterface {
         );
 
         return true;
-    }
-
-    /**
-     * Download a curated set of public-domain translations during install.
-     *
-     * @return  void
-     *
-     * @since  1.1.0
-     */
-    private function downloadCoreTranslations(): void
-    {
-        $coreTranslations = ['kjv', 'web', 'asv'];
-
-        // Three back-to-back downloads easily exceed PHP's default 30s web
-        // request limit; lift it so postflight can finish cleanly.
-        @set_time_limit(0);
-
-        // Joomla's PSR-4 autoload cache is rebuilt on the next request, not
-        // during the current install, so CWM\Library\Scripture\* is not yet
-        // registered with the classloader.  Pull in the importer (and its
-        // direct dependencies) by absolute path so postflight can use them.
-        $libSrc = JPATH_LIBRARIES . '/cwmscripture/src';
-
-        foreach (
-            [
-                '/Bible/BibleProviderInterface.php',
-                '/Bible/BibleProviderFactory.php',
-                '/Bible/BiblePassageResult.php',
-                '/Importer/BibleImporter.php',
-            ] as $relative
-        ) {
-            $path = $libSrc . $relative;
-
-            if (file_exists($path)) {
-                require_once $path;
-            }
-        }
-
-        if (!class_exists(\CWM\Library\Scripture\Importer\BibleImporter::class, false)) {
-            Log::add(
-                'lib_cwmscripture: BibleImporter not loadable during postflight — skipping core translation downloads',
-                Log::WARNING,
-                'cwmscripture.install'
-            );
-
-            return;
-        }
-
-        foreach ($coreTranslations as $abbr) {
-            try {
-                $count = \CWM\Library\Scripture\Importer\BibleImporter::downloadAndImport($abbr);
-
-                if ($count > 0) {
-                    Log::add(
-                        'lib_cwmscripture: imported ' . $count . ' verses for "' . $abbr . '"',
-                        Log::INFO,
-                        'cwmscripture.install'
-                    );
-                } else {
-                    Log::add(
-                        'lib_cwmscripture: import returned no verses for "' . $abbr . '" — remote fetch may have failed',
-                        Log::WARNING,
-                        'cwmscripture.install'
-                    );
-                }
-            } catch (\Throwable $e) {
-                Log::add(
-                    'lib_cwmscripture: failed to import "' . $abbr . '": ' . $e->getMessage(),
-                    Log::WARNING,
-                    'cwmscripture.install'
-                );
-            }
-        }
     }
 
     /**
