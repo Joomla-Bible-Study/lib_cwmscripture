@@ -162,9 +162,34 @@ return new class () implements InstallerScriptInterface {
     {
         $coreTranslations = ['kjv', 'web', 'asv'];
 
-        if (!class_exists(\CWM\Library\Scripture\Importer\BibleImporter::class)) {
+        // Three back-to-back downloads easily exceed PHP's default 30s web
+        // request limit; lift it so postflight can finish cleanly.
+        @set_time_limit(0);
+
+        // Joomla's PSR-4 autoload cache is rebuilt on the next request, not
+        // during the current install, so CWM\Library\Scripture\* is not yet
+        // registered with the classloader.  Pull in the importer (and its
+        // direct dependencies) by absolute path so postflight can use them.
+        $libSrc = JPATH_LIBRARIES . '/cwmscripture/src';
+
+        foreach (
+            [
+                '/Bible/BibleProviderInterface.php',
+                '/Bible/BibleProviderFactory.php',
+                '/Bible/BiblePassageResult.php',
+                '/Importer/BibleImporter.php',
+            ] as $relative
+        ) {
+            $path = $libSrc . $relative;
+
+            if (file_exists($path)) {
+                require_once $path;
+            }
+        }
+
+        if (!class_exists(\CWM\Library\Scripture\Importer\BibleImporter::class, false)) {
             Log::add(
-                'lib_cwmscripture: BibleImporter not available; skipping core translation downloads',
+                'lib_cwmscripture: BibleImporter not loadable during postflight — skipping core translation downloads',
                 Log::WARNING,
                 'cwmscripture.install'
             );
