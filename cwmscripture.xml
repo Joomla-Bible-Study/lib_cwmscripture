@@ -7,7 +7,7 @@
     <author>CWM Team</author>
     <authorEmail>info@christianwebministries.org</authorEmail>
     <authorUrl>https://www.christianwebministries.org</authorUrl>
-	<copyright>Copyright © 2026 CWM Team All rights reserved</copyright>
+	<copyright>(C) 2026 CWM Team All rights reserved</copyright>
 	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
 	<libraryname>cwmscripture</libraryname>
     <namespace path="src">CWM\Library\Scripture</namespace>
