@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Joomla update changelog for lib_cwmscripture.
+
+    New entries are inserted at the top by `composer changelog -- <version>`,
+    which fetches the GitHub release notes for the tag and converts headings
+    (### Fixes, ### Features, ### Changes, etc.) into Joomla changelog types.
+
+    Hosted at:
+    https://raw.githubusercontent.com/Joomla-Bible-Study/lib_cwmscripture/main/build/lib_cwmscripture-changelog.xml
+
+    Wired into ARS via cwm-build.config.json -> ars.changelogUrl.
+-->
+<changelogs>
+
+</changelogs>

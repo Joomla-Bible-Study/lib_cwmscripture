@@ -1,0 +1,32 @@
+{
+    "extension": {
+        "type": "library",
+        "name": "lib_cwmscripture"
+    },
+    "manifests": {
+        "extensions": [
+            { "type": "library", "path": "cwmscripture.xml" }
+        ]
+    },
+    "build": {
+        "command": "npm run build && php build/build-package.php",
+        "outputGlob": "build/dist/lib_cwmscripture-*.zip"
+    },
+    "ars": {
+        "endpoint": "https://www.christianwebministries.org",
+        "categoryId": 0,
+        "updateStreamId": 0,
+        "environments": ["45", "46", "48", "49", "50"],
+        "tokenItem": "CWM ARS API Token",
+        "tokenVault": "CWM",
+        "changelogUrl": "https://raw.githubusercontent.com/Joomla-Bible-Study/lib_cwmscripture/main/build/lib_cwmscripture-changelog.xml"
+    },
+    "github": {
+        "owner": "Joomla-Bible-Study",
+        "repo": "lib_cwmscripture",
+        "releaseBranch": "main"
+    },
+    "changelog": {
+        "file": "build/lib_cwmscripture-changelog.xml"
+    }
+}
