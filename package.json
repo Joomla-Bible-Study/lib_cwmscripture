@@ -24,9 +24,9 @@
   },
   "scripts": {
     "build": "npm run build:js && npm run build:css",
-    "build:js": "rollup -c build/rollup.config.js",
-    "build:css": "node build/build-css.js",
-    "watch": "rollup -c build/rollup.config.js -w",
-    "lint:js": "eslint --max-warnings=0 ."
+    "build:js": "SOURCE_DIR=build/media_source/js OUTPUT_DIR=media/lib_cwmscripture/js rollup -c vendor/cwm/build-tools/templates/rollup.config.js",
+    "build:css": "SOURCE_DIR=build/media_source/css OUTPUT_DIR=media/lib_cwmscripture/css node vendor/cwm/build-tools/templates/build-css.js",
+    "watch": "SOURCE_DIR=build/media_source/js OUTPUT_DIR=media/lib_cwmscripture/js rollup -c vendor/cwm/build-tools/templates/rollup.config.js -w",
+    "lint:js": "eslint -c build/eslint.config.mjs --max-warnings=0 ."
   }
 }
