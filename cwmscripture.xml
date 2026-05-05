@@ -15,15 +15,9 @@
 
 	<changelogurl>https://raw.githubusercontent.com/Joomla-Bible-Study/lib_cwmscripture/main/build/lib_cwmscripture-changelog.xml</changelogurl>
 
-	<!--
-		<updateservers> goes here once the lib has its own ARS update stream.
-		Create a stream of type 'libraries' under category 5 in admin, then
-		add:
-
-		<updateservers>
-		    <server type="extension" name="CWM Scripture Library">https://www.christianwebministries.org/index.php?option=com_ars&amp;view=update&amp;format=xml&amp;id=LIB_STREAM_ID</server>
-		</updateservers>
-	-->
+	<updateservers>
+		<server type="extension" name="CWM Scripture Library">https://www.christianwebministries.org/index.php?option=com_ars&amp;view=update&amp;format=xml&amp;id=5</server>
+	</updateservers>
 
     <files folder="lib_cwmscripture">
         <folder>src</folder>
