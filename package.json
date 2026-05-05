@@ -9,8 +9,8 @@
     "url": "https://github.com/Joomla-Bible-Study/lib_cwmscripture.git"
   },
   "engines": {
-    "node": ">=20.0.0",
-    "npm": ">=10.1.0"
+    "node": ">=24.0.0",
+    "npm": ">=11.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
