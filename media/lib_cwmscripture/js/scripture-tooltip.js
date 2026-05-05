@@ -13,7 +13,10 @@
      */
 
     document.addEventListener('DOMContentLoaded', () => {
-        const scriptureOpts = Joomla.getOptions('cwmscripture.options') || {};
+        // Check both the library key and Proclaim's key for the AJAX URL
+        const scriptureOpts = Joomla.getOptions('cwmscripture.options')
+            || Joomla.getOptions('com_proclaim.scripture')
+            || {};
         const ajaxBaseUrl = scriptureOpts.ajaxUrl || '';
 
         if (!ajaxBaseUrl) {
