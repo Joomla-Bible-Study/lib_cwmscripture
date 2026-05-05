@@ -19,8 +19,7 @@
         "environments": ["45", "46", "48", "49", "50"],
         "tokenItem": "CWM ARS API Token",
         "tokenVault": "CWM",
-        "itemDescription": "CWM Scripture Library — shared Bible provider library used by the CWM Scripture Links plugin and Proclaim. Provides scripture lookup, caching, rendering, and translation management.",
-        "changelogUrl": "https://raw.githubusercontent.com/Joomla-Bible-Study/lib_cwmscripture/main/build/lib_cwmscripture-changelog.xml"
+        "itemDescription": "CWM Scripture Library — shared Bible provider library used by the CWM Scripture Links plugin and Proclaim. Provides scripture lookup, caching, rendering, and translation management."
     },
     "github": {
         "owner": "Joomla-Bible-Study",
@@ -28,6 +27,7 @@
         "releaseBranch": "main"
     },
     "changelog": {
-        "file": "build/lib_cwmscripture-changelog.xml"
+        "file": "build/lib_cwmscripture-changelog.xml",
+        "url":  "https://raw.githubusercontent.com/Joomla-Bible-Study/lib_cwmscripture/main/build/lib_cwmscripture-changelog.xml"
     }
 }
