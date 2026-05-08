@@ -43,7 +43,7 @@
     "ext-mbstring": "*"
   },
   "require-dev": {
-    "cwm/build-tools": "^0.3.2@alpha",
+    "cwm/build-tools": "^0.4@alpha",
     "friendsofphp/php-cs-fixer": "^3.0",
     "phpunit/phpunit": "^11.0"
   },
@@ -61,7 +61,15 @@
     "ars-list":              "cwm-ars-list",
     "changelog":             "cwm-changelog",
     "sync-languages":        "cwm-sync-languages",
-    "sync-configs":          "cwm-sync-configs"
+    "sync-configs":          "cwm-sync-configs",
+
+    "setup":                 "cwm-setup",
+    "link":                  "cwm-link",
+    "link-check":            "cwm-link-check",
+    "clean":                 "cwm-clean",
+    "verify":                "cwm-verify",
+    "joomla-install":        "cwm-joomla-install",
+    "joomla-latest":         "cwm-joomla-latest"
   },
   "autoload-dev": {
     "psr-4": {
