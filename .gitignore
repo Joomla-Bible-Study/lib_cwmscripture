@@ -14,6 +14,9 @@ Thumbs.db
 # PHP CS Fixer cache
 .php-cs-fixer.cache
 
+# Local dev env (cwm-build-tools build.properties)
+build.properties
+
 # Build outputs (generated from build/media_source/ via npm run build)
 media/lib_cwmscripture/js/*.min.js
 media/lib_cwmscripture/js/*.min.js.map
