@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "fa47295981ffe02f2302190d4dc7189d",
+    "content-hash": "bf612cc94594bcb38ff0961108683d1d",
     "packages": [],
     "packages-dev": [
         {
@@ -294,6 +294,83 @@
             "time": "2024-05-06T16:37:16+00:00"
         },
         {
+            "name": "cwm/build-tools",
+            "version": "v0.4.0-alpha",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Joomla-Bible-Study/cwm-build-tools.git",
+                "reference": "70b7c726f2132258309f977c92160a46df074860"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Joomla-Bible-Study/cwm-build-tools/zipball/70b7c726f2132258309f977c92160a46df074860",
+                "reference": "70b7c726f2132258309f977c92160a46df074860",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "ext-simplexml": "*",
+                "ext-zip": "*",
+                "php": "^8.3"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^3.0",
+                "phpunit/phpunit": "^11.0"
+            },
+            "bin": [
+                "bin/cwm-release",
+                "bin/cwm-bump",
+                "bin/cwm-package",
+                "bin/cwm-sync-configs",
+                "bin/cwm-sync-languages",
+                "bin/cwm-ars-publish",
+                "bin/cwm-ars-list",
+                "bin/cwm-ars-create-stream",
+                "bin/cwm-changelog",
+                "bin/cwm-init",
+                "bin/cwm-setup",
+                "bin/cwm-link",
+                "bin/cwm-link-check",
+                "bin/cwm-clean",
+                "bin/cwm-verify",
+                "bin/cwm-joomla-install",
+                "bin/cwm-joomla-latest"
+            ],
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "CWM\\BuildTools\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "CWM\\BuildTools\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "GPL-2.0-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "CWM Team",
+                    "homepage": "https://www.christianwebministries.org"
+                }
+            ],
+            "description": "Shared build, release, and CI tooling for CWM Joomla extensions",
+            "keywords": [
+                "ars",
+                "build",
+                "cwm",
+                "joomla",
+                "release"
+            ],
+            "support": {
+                "source": "https://github.com/Joomla-Bible-Study/cwm-build-tools/tree/v0.4.0-alpha",
+                "issues": "https://github.com/Joomla-Bible-Study/cwm-build-tools/issues"
+            },
+            "time": "2026-05-07T20:27:34+00:00"
+        },
+        {
             "name": "ergebnis/agent-detector",
             "version": "1.1.1",
             "source": {
@@ -472,16 +549,16 @@
         },
         {
             "name": "friendsofphp/php-cs-fixer",
-            "version": "v3.95.1",
+            "version": "v3.95.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHP-CS-Fixer/PHP-CS-Fixer.git",
-                "reference": "a9727678fbd12997f1d9de8f4a37824ed9df1065"
+                "reference": "4ba5ab77108583d2a89ed48e1a5c01e62cc1d3f4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHP-CS-Fixer/PHP-CS-Fixer/zipball/a9727678fbd12997f1d9de8f4a37824ed9df1065",
-                "reference": "a9727678fbd12997f1d9de8f4a37824ed9df1065",
+                "url": "https://api.github.com/repos/PHP-CS-Fixer/PHP-CS-Fixer/zipball/4ba5ab77108583d2a89ed48e1a5c01e62cc1d3f4",
+                "reference": "4ba5ab77108583d2a89ed48e1a5c01e62cc1d3f4",
                 "shasum": ""
             },
             "require": {
@@ -565,7 +642,7 @@
             ],
             "support": {
                 "issues": "https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/issues",
-                "source": "https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/tree/v3.95.1"
+                "source": "https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/tree/v3.95.0"
             },
             "funding": [
                 {
@@ -573,7 +650,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-04-12T17:00:09+00:00"
+            "time": "2026-04-11T17:30:38+00:00"
         },
         {
             "name": "myclabs/deep-copy",
@@ -4461,7 +4538,9 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {},
+    "stability-flags": {
+        "cwm/build-tools": 15
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {

@@ -17,6 +17,9 @@ Thumbs.db
 build/.source_cache.json
 build/.translation_cache.json
 
+# Local dev env (cwm-build-tools build.properties)
+build.properties
+
 # Build outputs (generated from build/media_source/ via npm run build)
 media/lib_cwmscripture/js/*.min.js
 media/lib_cwmscripture/js/*.min.js.map

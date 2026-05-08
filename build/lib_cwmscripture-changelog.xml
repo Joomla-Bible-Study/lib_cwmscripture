@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Joomla update changelog for lib_cwmscripture.
+
+    New entries are inserted at the top by `composer changelog -- <version>`,
+    which fetches the GitHub release notes for the tag and converts headings
+    (### Fixes, ### Features, ### Changes, etc.) into Joomla changelog types.
+
+    Hosted at:
+    https://raw.githubusercontent.com/Joomla-Bible-Study/lib_cwmscripture/main/build/lib_cwmscripture-changelog.xml
+
+    Joomla reads this file via the `<changelogurl>` element in the
+    library manifest (cwmscripture.xml) when checking for updates.
+    The URL is also recorded in cwm-build.config.json under
+    `changelog.url` for tooling reference; modern Akeeba ARS does
+    not expose a changelog field on its update streams, so the
+    manifest element is the load-bearing wiring.
+-->
+<changelogs>
+
+</changelogs>

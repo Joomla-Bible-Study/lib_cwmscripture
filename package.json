@@ -9,24 +9,24 @@
     "url": "https://github.com/Joomla-Bible-Study/lib_cwmscripture.git"
   },
   "engines": {
-    "node": ">=20.0.0",
-    "npm": ">=10.1.0"
+    "node": ">=24.0.0",
+    "npm": ">=11.0.0"
   },
   "devDependencies": {
-    "@eslint/js": "^9.17.0",
+    "@eslint/js": "^10.0.1",
     "@rollup/plugin-node-resolve": "^16.0.3",
     "@rollup/plugin-terser": "^1.0.0",
     "csso": "^5.0.5",
-    "eslint": "^10.0.1",
-    "globals": "^15.14.0",
-    "rollup": "^4.58.0",
+    "eslint": "^10.3.0",
+    "globals": "^17.6.0",
+    "rollup": "^4.60.3",
     "rollup-plugin-gzip": "^4.1.1"
   },
   "scripts": {
     "build": "npm run build:js && npm run build:css",
-    "build:js": "rollup -c build/rollup.config.js",
-    "build:css": "node build/build-css.js",
-    "watch": "rollup -c build/rollup.config.js -w",
-    "lint:js": "eslint --max-warnings=0 ."
+    "build:js": "SOURCE_DIR=build/media_source/js OUTPUT_DIR=media/lib_cwmscripture/js rollup -c vendor/cwm/build-tools/templates/rollup.config.js",
+    "build:css": "SOURCE_DIR=build/media_source/css OUTPUT_DIR=media/lib_cwmscripture/css node vendor/cwm/build-tools/templates/build-css.js",
+    "watch": "SOURCE_DIR=build/media_source/js OUTPUT_DIR=media/lib_cwmscripture/js rollup -c vendor/cwm/build-tools/templates/rollup.config.js -w",
+    "lint:js": "eslint -c build/eslint.config.mjs --max-warnings=0 ."
   }
 }
