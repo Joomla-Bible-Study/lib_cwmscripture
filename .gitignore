@@ -11,8 +11,11 @@
 .DS_Store
 Thumbs.db
 
-# PHP CS Fixer cache
+# Tool caches
 .php-cs-fixer.cache
+.phpunit.cache/
+build/.source_cache.json
+build/.translation_cache.json
 
 # Build outputs (generated from build/media_source/ via npm run build)
 media/lib_cwmscripture/js/*.min.js
