@@ -43,7 +43,7 @@
     "ext-mbstring": "*"
   },
   "require-dev": {
-    "cwm/build-tools": "^0.4@alpha",
+    "cwm/build-tools": "^0.5@alpha",
     "friendsofphp/php-cs-fixer": "^3.0",
     "phpunit/phpunit": "^11.0"
   },
@@ -52,11 +52,10 @@
     "lint:fix":              "php-cs-fixer fix",
     "test":                  "phpunit",
     "test:unit":             "phpunit --testsuite unit",
-    "build:package":         "php build/build-package.php",
-    "build:package:verbose": "php build/build-package.php --verbose",
+    "build:package":         "cwm-build",
+    "build:package:verbose": "cwm-build -v",
     "release":               "cwm-release",
     "bump-version":          "cwm-bump",
-    "package":               "cwm-package",
     "ars-publish":           "cwm-ars-publish",
     "ars-list":              "cwm-ars-list",
     "changelog":             "cwm-changelog",
