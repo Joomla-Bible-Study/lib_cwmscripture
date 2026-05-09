@@ -53,11 +53,6 @@
             "uri": "media/lib_cwmscripture/css/translations-manager.css"
         },
         {
-            "name": "lib_cwmscripture.translations-manager",
-            "type": "script",
-            "uri": "media/lib_cwmscripture/js/translations-manager.js"
-        },
-        {
             "name": "lib_cwmscripture.bible-translations",
             "type": "script",
             "uri": "media/lib_cwmscripture/js/bible-translations.js",

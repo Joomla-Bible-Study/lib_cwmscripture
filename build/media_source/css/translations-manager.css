@@ -48,11 +48,6 @@ body.admin.com_plugins {
 }
 
 /* Translations table */
-#cwm-translations-manager {
-    margin-top: 0.5rem;
-}
-
-#cwm-translations-table th,
 #translations-list th {
     white-space: nowrap;
     font-size: 0.85rem;
@@ -60,32 +55,13 @@ body.admin.com_plugins {
     letter-spacing: 0.03em;
 }
 
-#cwm-translations-table td,
 #translations-list td {
     vertical-align: middle;
 }
 
-#cwm-translations-table code,
 #translations-list code {
     font-size: 0.9em;
     padding: 0.15em 0.4em;
     background: rgba(0, 0, 0, 0.06);
     border-radius: 3px;
-}
-
-.cwm-tm-loading {
-    opacity: 0.5;
-    pointer-events: none;
-}
-
-.cwm-tm-actions {
-    white-space: nowrap;
-}
-
-.cwm-tm-actions .btn {
-    min-width: 90px;
-}
-
-#cwm-tm-status {
-    margin-bottom: 1rem;
 }
