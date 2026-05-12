@@ -1,5 +1,8 @@
 # lib_cwmscripture
 
+[![CI](https://github.com/Joomla-Bible-Study/lib_cwmscripture/actions/workflows/ci.yml/badge.svg)](https://github.com/Joomla-Bible-Study/lib_cwmscripture/actions/workflows/ci.yml)
+[![License: GPL v2](https://img.shields.io/badge/License-GPLv2-blue.svg)](LICENSE)
+
 A Joomla 5.2+ library extension that provides Bible scripture retrieval, parsing, rendering, and translation management. It serves as the shared scripture engine for the [CWM Proclaim](https://www.christianwebministries.org) component and the `plg_content_scripturelinks` plugin.
 
 ## Requirements
@@ -7,7 +10,7 @@ A Joomla 5.2+ library extension that provides Bible scripture retrieval, parsing
 - Joomla 5.2+
 - PHP 8.3+
 - MySQL 5.7+ / MariaDB 10.2+ (InnoDB, utf8mb4)
-- Node.js 20+ / npm 10.1+ (for building frontend assets)
+- Node.js 24+ / npm 11+ (for building frontend assets)
 
 ## Installation
 
@@ -28,6 +31,28 @@ The installer creates three database tables (safe to run alongside an existing P
 A default catalog of 20 public-domain translations is seeded on install.
 
 ## Development
+
+### Dev Environment Setup
+
+The build/release pipeline is provided by [cwm-build-tools](https://github.com/Joomla-Bible-Study/cwm-build-tools), pulled in as a Composer dev dependency. After cloning:
+
+```bash
+composer install                # Install PHP deps (incl. cwm-build-tools)
+npm ci                          # Install Node deps
+cp build.properties.tmpl build.properties   # Local Joomla install paths (gitignored)
+composer setup                  # Interactive wizard to populate build.properties
+```
+
+`build.properties` declares one or more local Joomla installs (e.g. `j5`, `j6`) with their paths, URLs, and DB/admin credentials. Once configured:
+
+```bash
+composer link                   # Symlink src/, media/, language/ into each Joomla install
+composer link-check             # Verify symlinks are healthy
+composer joomla-install         # Install a fresh Joomla into a configured install dir
+composer joomla-latest          # Download the latest Joomla release tarball
+composer verify                 # Run all CI checks locally (lint + tests + build)
+composer clean                  # Remove built assets and caches
+```
 
 ### Building Frontend Assets
 
@@ -68,6 +93,22 @@ The resulting ZIP can be:
 1. Installed directly via Joomla Extension Manager
 2. Included in a `pkg_*.zip` package alongside other extensions (e.g. `pkg_cwmscripture`)
 3. Referenced by other build scripts (Proclaim, ScriptureLinks)
+
+### Release Workflow
+
+Releases are driven end-to-end by `cwm-build-tools`. The typical flow:
+
+```bash
+composer bump-version -- 1.2.0  # Bump version in manifest, composer.json, package.json
+composer changelog -- 1.2.0     # Pull GitHub release notes into build/lib_cwmscripture-changelog.xml
+composer release -- 1.2.0       # Full pipeline: bump → build → tag → GitHub release → ARS publish
+composer ars-publish            # Publish the built ZIP to Akeeba Release System (standalone)
+composer ars-list               # List existing ARS releases
+```
+
+> **Note:** Use `composer bump-version`, not `composer bump` — the latter is a built-in Composer 2.4+ command that bumps `composer.json` constraints and will silently override a user-defined script of the same name.
+
+The `<changelogurl>` in `cwmscripture.xml` points to `build/lib_cwmscripture-changelog.xml`, which Joomla reads during update checks.
 
 ### Version Checking for Consumers
 
@@ -211,6 +252,15 @@ echo $renderer->renderTextPassage($result, ScriptureRenderer::MODE_VISIBLE);
 ## Logging
 
 All provider activity is logged to `administrator/logs/cwmscripture.bible.php` using Joomla's logging system under the `cwmscripture.bible` category.
+
+## Contributing
+
+Bug reports and pull requests are welcome on [GitHub Issues](https://github.com/Joomla-Bible-Study/lib_cwmscripture/issues). Before submitting a PR:
+
+1. Run `composer verify` to execute the full CI suite locally (lint + tests + build)
+2. Follow Joomla Coding Standards (enforced by `composer lint`)
+3. Add PHPDoc `@since` tags to new public/protected methods
+4. Keep the `_JEXEC` guard at the top of all PHP files
 
 ## License
 
