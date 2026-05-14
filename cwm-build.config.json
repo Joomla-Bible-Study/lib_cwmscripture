@@ -36,6 +36,14 @@
         "tokenVault": "CWM",
         "itemDescription": "CWM Scripture Library — shared Bible provider library used by the CWM Scripture Links plugin and Proclaim. Provides scripture lookup, caching, rendering, and translation management."
     },
+    "versionTracking": {
+        "packageJson": "package.json",
+        "substituteTokens": {
+            "token":      "__DEPLOY_VERSION__",
+            "paths":      ["src/"],
+            "extensions": ["php"]
+        }
+    },
     "github": {
         "owner": "Joomla-Bible-Study",
         "repo": "lib_cwmscripture",
