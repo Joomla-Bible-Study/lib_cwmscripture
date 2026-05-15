@@ -43,9 +43,16 @@
     "ext-mbstring": "*"
   },
   "require-dev": {
-    "cwm/build-tools": "^1.0",
+    "cwm/build-tools": "^1.1",
     "friendsofphp/php-cs-fixer": "^3.0",
     "phpunit/phpunit": "^11.0"
+  },
+  "extra": {
+    "cwm-build-tools": {
+      "joomlaLinks": [
+        { "type": "library", "name": "cwmscripture" }
+      ]
+    }
   },
   "scripts": {
     "lint":                  "php-cs-fixer fix --dry-run --diff",
