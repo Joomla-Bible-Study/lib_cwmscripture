@@ -57,7 +57,7 @@
 /* Bible icon before the text */
 .scripture-dropdown-toggle::before {
     content: "\f02d";
-    font-family: "Font Awesome 6 Free", "Font Awesome 5 Free", FontAwesome;
+    font-family: "Font Awesome 6 Free", "Font Awesome 5 Free", FontAwesome, sans-serif;
     font-weight: 900;
     font-size: 0.7rem;
 }
@@ -65,7 +65,7 @@
 /* Chevron after the text */
 .scripture-dropdown-toggle::after {
     content: "\f078";
-    font-family: "Font Awesome 6 Free", "Font Awesome 5 Free", FontAwesome;
+    font-family: "Font Awesome 6 Free", "Font Awesome 5 Free", FontAwesome, sans-serif;
     font-weight: 900;
     font-size: 0.55rem;
     transition: transform 0.2s ease;
@@ -163,7 +163,7 @@
 
 .scripture-dropdown-item.active::before {
     content: "\f00c";
-    font-family: "Font Awesome 6 Free", "Font Awesome 5 Free", FontAwesome;
+    font-family: "Font Awesome 6 Free", "Font Awesome 5 Free", FontAwesome, sans-serif;
     font-weight: 900;
     font-size: 0.65rem;
     margin-right: 0.4rem;
