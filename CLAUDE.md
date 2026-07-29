@@ -74,6 +74,25 @@ SQL files in `sql/`: `install.mysql.utf8.sql`, `uninstall.mysql.utf8.sql`, `upda
 - All PHP files are guarded with `\defined('_JEXEC') or die;`
 - Logging uses Joomla's `Log` class with category `cwmscripture.bible` → file `cwmscripture.bible.php`
 
+## Provider Gotchas
+
+### GetBible URL encoding
+
+The GetBible v2 endpoint is `https://query.getbible.net/v2/{translation}/{reference}` where `{reference}` looks like `Luke 7:36-38`. The colon between chapter and verse must be left literal — GetBible does **not** accept `%3A`.
+
+```php
+// WRONG — urlencode() converts spaces to + and breaks colons differently than rawurlencode
+$ref = urlencode($reference);
+
+// WRONG — rawurlencode() correctly encodes spaces as %20 but also encodes the colon to %3A
+$ref = rawurlencode($reference);
+
+// CORRECT — rawurlencode for the rest, then put the colon back
+$ref = str_replace('%3A', ':', rawurlencode($reference));
+```
+
+Use this pattern in `GetBibleProvider` when building request URLs. Other providers (API.Bible) accept either form, so this is GetBible-specific.
+
 ## Code Style
 
 - Joomla Coding Standards (PHPCS with PSR1.Files.SideEffects suppressed for `_JEXEC` guard)
