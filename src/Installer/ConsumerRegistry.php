@@ -73,6 +73,7 @@ class ConsumerRegistry
      */
     public const FIRST_PARTY = [
         ['element' => 'com_proclaim',   'type' => 'component', 'folder' => '',        'name' => 'Proclaim (com_proclaim)'],
+        ['element' => 'com_livingword', 'type' => 'component', 'folder' => '',        'name' => 'Living Word (com_livingword)'],
         ['element' => 'scripturelinks', 'type' => 'plugin',    'folder' => 'content', 'name' => 'Scripture Links (plg_content_scripturelinks)'],
         ['element' => 'cwmscripture',   'type' => 'plugin',    'folder' => 'task',    'name' => 'Scripture task plugin (plg_task_cwmscripture)'],
     ];
