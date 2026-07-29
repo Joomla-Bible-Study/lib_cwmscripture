@@ -74,6 +74,31 @@ SQL files in `sql/`: `install.mysql.utf8.sql`, `uninstall.mysql.utf8.sql`, `upda
 - All PHP files are guarded with `\defined('_JEXEC') or die;`
 - Logging uses Joomla's `Log` class with category `cwmscripture.bible` → file `cwmscripture.bible.php`
 
+## Installer Gotchas
+
+### Never declare `<uninstall><sql>` in the manifest
+
+Joomla's `LibraryAdapter::checkExtensionInFilesystem()` **uninstalls the installed
+library before installing the new one** on every upgrade. Anything in
+`<uninstall><sql>` therefore runs on updates, not just on removal. This library
+used to point that block at `DROP TABLE` statements, so every upgrade destroyed
+`#__bsms_bible_verses` / `#__bsms_bible_translations` — every locally downloaded
+translation, gone, with the Local Translations panel coming back empty.
+
+Consequences to keep in mind:
+
+- Table removal belongs in `script.php::uninstall()`, which can check
+  `$adapter->getParent()->isPackageUninstall()` (true during the upgrade cycle)
+  and refuse to drop tables that `com_proclaim` / `plg_content_scripturelinks`
+  still share.
+- `sql/uninstall.mysql.utf8.sql` is kept as a statement-free no-op: sites still
+  carrying an older manifest reference it by path, and `parseSQLFiles()` resolves
+  it against the *installed* extension root.
+- After the internal uninstall the route is `update`, so the manifest's
+  `<install><sql>` never runs — `script.php::ensureTables()` is what recreates
+  the tables on an upgraded site.
+- `tests/unit/ManifestTest.php` guards all of the above.
+
 ## Provider Gotchas
 
 ### GetBible URL encoding
