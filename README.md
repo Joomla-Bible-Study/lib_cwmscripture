@@ -249,6 +249,40 @@ $renderer = new ScriptureRenderer();
 echo $renderer->renderTextPassage($result, ScriptureRenderer::MODE_VISIBLE);
 ```
 
+### Registering as a consumer
+
+**If your extension uses this library, register it.** Joomla has no dependency tracking for libraries — nothing records that your extension needs lib_cwmscripture, and `blockChildUninstall` only protects extensions shipped inside the same package. Without registering, your extension is invisible to the library's uninstall guard, which means an administrator can remove the library out from under you, and the shared `#__bsms_*` tables will be judged orphaned and **dropped** — destroying any downloaded translations.
+
+Register from your install script and unregister on uninstall:
+
+```php
+use CWM\Library\Scripture\Installer\ConsumerRegistry;
+
+public function postflight(string $type, InstallerAdapter $adapter): bool
+{
+    ConsumerRegistry::register('com_foo', 'component', name: 'Foo');
+
+    return true;
+}
+
+public function uninstall(InstallerAdapter $adapter): bool
+{
+    ConsumerRegistry::unregister('com_foo', 'component');
+
+    return true;
+}
+```
+
+For a plugin, pass the group as `$folder`:
+
+```php
+ConsumerRegistry::register('mything', 'plugin', 'content', 'My Thing');
+```
+
+`register()` is safe to call on every install and update — re-registering refreshes the row. Unregistering is good manners but not load-bearing: the registry cross-checks every entry against `#__extensions` and prunes rows whose extension is gone, so a consumer that never unregisters cannot pin the tables forever.
+
+Proclaim, `plg_content_scripturelinks` and `plg_task_cwmscripture` are recognised without registering.
+
 ## Logging
 
 All provider activity is logged to `administrator/logs/cwmscripture.bible.php` using Joomla's logging system under the `cwmscripture.bible` category.

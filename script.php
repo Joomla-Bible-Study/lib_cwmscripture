@@ -20,6 +20,7 @@
 \defined('_JEXEC') or die;
 // phpcs:enable PSR1.Files.SideEffects
 
+use CWM\Library\Scripture\Installer\ConsumerRegistry;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Installer\InstallerAdapter;
 use Joomla\CMS\Installer\InstallerScriptInterface;
@@ -256,7 +257,14 @@ return new class () implements InstallerScriptInterface {
 
             $db = Factory::getContainer()->get(DatabaseInterface::class);
 
-            foreach (['#__bsms_scripture_cache', '#__bsms_bible_verses', '#__bsms_bible_translations'] as $table) {
+            $tables = [
+                '#__bsms_scripture_consumers',
+                '#__bsms_scripture_cache',
+                '#__bsms_bible_verses',
+                '#__bsms_bible_translations',
+            ];
+
+            foreach ($tables as $table) {
                 $db->setQuery('DROP TABLE IF EXISTS ' . $db->quoteName($table));
                 $db->execute();
             }
@@ -284,6 +292,15 @@ return new class () implements InstallerScriptInterface {
      * exist, so this drives both the uninstall guard in preflight() and the
      * table-retention check in dropTablesIfOrphaned().
      *
+     * Delegates to ConsumerRegistry, which merges the first-party extensions
+     * with third parties that registered themselves. Joomla tracks no library
+     * dependencies of its own, so an unregistered third party is invisible here
+     * — that is what the registry exists to fix.
+     *
+     * The class is required directly when the autoloader has not picked up the
+     * library namespace yet. If it cannot be loaded at all we fall back to the
+     * first-party list, which is worse but never wrong about Proclaim.
+     *
      * @return  string[]  Human-readable names; empty when nothing depends on the library
      *
      * @throws  \Throwable  When #__extensions cannot be queried — callers decide
@@ -292,14 +309,33 @@ return new class () implements InstallerScriptInterface {
      */
     private function getInstalledConsumers(): array
     {
+        if (!class_exists(ConsumerRegistry::class)) {
+            $path = JPATH_LIBRARIES . '/cwmscripture/src/Installer/ConsumerRegistry.php';
+
+            if (is_file($path)) {
+                require_once $path;
+            }
+        }
+
+        if (class_exists(ConsumerRegistry::class)) {
+            return ConsumerRegistry::installed();
+        }
+
+        Log::add(
+            'lib_cwmscripture: ConsumerRegistry unavailable — falling back to the first-party list, '
+            . 'third-party consumers will not be seen.',
+            Log::WARNING,
+            'cwmscripture.install'
+        );
+
+        $db    = Factory::getContainer()->get(DatabaseInterface::class);
+        $found = [];
+
         $known = [
             ['type' => 'component', 'element' => 'com_proclaim',   'label' => 'Proclaim (com_proclaim)'],
             ['type' => 'plugin',    'element' => 'scripturelinks', 'label' => 'Scripture Links (plg_content_scripturelinks)'],
             ['type' => 'plugin',    'element' => 'cwmscripture',   'label' => 'Scripture task plugin (plg_task_cwmscripture)'],
         ];
-
-        $db    = Factory::getContainer()->get(DatabaseInterface::class);
-        $found = [];
 
         foreach ($known as $consumer) {
             $query = $db->getQuery(true)
