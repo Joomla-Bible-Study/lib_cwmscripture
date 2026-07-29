@@ -170,23 +170,74 @@ class ConsumerRegistry
      */
     public static function installed(): array
     {
+        return self::installedExcluding([]);
+    }
+
+    /**
+     * Installed consumers, ignoring the ones the caller is itself removing.
+     *
+     * This is what a package uninstall script needs: "once my own children are
+     * gone, is anything still using the library?" Without it a package would
+     * have to hardcode which other extensions might exist, which is exactly the
+     * blind spot the registry exists to remove — a registered third party would
+     * be missed and its tables dropped.
+     *
+     * @param   array<int, array{element: string, type: string, folder?: string}>  $exclude  Consumers to ignore
+     *
+     * @return  string[]  Human-readable names of everything else still installed
+     *
+     * @throws  \Throwable  When `#__extensions` cannot be queried — callers decide
+     *
+     * @since  1.1.6
+     */
+    public static function installedExcluding(array $exclude): array
+    {
         $db    = self::db();
         $found = [];
 
         foreach (array_merge(self::FIRST_PARTY, self::registered($db)) as $consumer) {
-            if (self::isInstalled($db, $consumer)) {
-                $found[] = $consumer['name'];
+            if (!self::isInstalled($db, $consumer)) {
+                // Registered but no longer present — drop the stale row.
+                if (!\in_array($consumer, self::FIRST_PARTY, true)) {
+                    self::unregister($consumer['element'], $consumer['type'], $consumer['folder']);
+                }
 
                 continue;
             }
 
-            // Registered but no longer present — drop the stale row.
-            if (!\in_array($consumer, self::FIRST_PARTY, true)) {
-                self::unregister($consumer['element'], $consumer['type'], $consumer['folder']);
+            if (self::matchesAny($consumer, $exclude)) {
+                continue;
             }
+
+            $found[] = $consumer['name'];
         }
 
         return array_values(array_unique($found));
+    }
+
+    /**
+     * Does this consumer match any of the given descriptors?
+     *
+     * @param   array  $consumer  Consumer descriptor
+     * @param   array  $list      Descriptors to match against
+     *
+     * @return  bool
+     *
+     * @since  1.1.6
+     */
+    private static function matchesAny(array $consumer, array $list): bool
+    {
+        foreach ($list as $candidate) {
+            if (
+                ($candidate['element'] ?? '') === $consumer['element']
+                && ($candidate['type'] ?? '') === $consumer['type']
+                && ($candidate['folder'] ?? '') === ($consumer['folder'] ?? '')
+            ) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
