@@ -55,6 +55,10 @@ return new class () implements InstallerScriptInterface {
      */
     public function preflight(string $type, InstallerAdapter $adapter): bool
     {
+        if ($type === 'uninstall' && !$this->allowUninstall($adapter)) {
+            return false;
+        }
+
         if (version_compare(PHP_VERSION, $this->minimumPhp, '<')) {
             Log::add(
                 'lib_cwmscripture requires PHP ' . $this->minimumPhp . '+. Found: ' . PHP_VERSION,
@@ -222,7 +226,7 @@ return new class () implements InstallerScriptInterface {
      *
      * @return  void
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.1.6
      */
     private function dropTablesIfOrphaned(InstallerAdapter $adapter): void
     {
@@ -237,32 +241,20 @@ return new class () implements InstallerScriptInterface {
                 return;
             }
 
-            $db = Factory::getContainer()->get(DatabaseInterface::class);
+            $consumers = $this->getInstalledConsumers();
 
-            // Consumers of the shared tables: com_proclaim and the scripture plugins.
-            $query = $db->getQuery(true)
-                ->select('COUNT(*)')
-                ->from($db->quoteName('#__extensions'))
-                ->where(
-                    '(' . $db->quoteName('type') . ' = ' . $db->quote('component')
-                    . ' AND ' . $db->quoteName('element') . ' = ' . $db->quote('com_proclaim') . ')'
-                    . ' OR (' . $db->quoteName('type') . ' = ' . $db->quote('plugin')
-                    . ' AND ' . $db->quoteName('element') . ' = ' . $db->quote('scripturelinks') . ')'
-                    . ' OR (' . $db->quoteName('type') . ' = ' . $db->quote('plugin')
-                    . ' AND ' . $db->quoteName('element') . ' = ' . $db->quote('cwmscripture') . ')'
-                );
-            $db->setQuery($query);
-
-            if ((int) $db->loadResult() > 0) {
+            if ($consumers !== []) {
                 Log::add(
                     'lib_cwmscripture: scripture tables are still shared with an installed '
-                    . 'extension — keeping them.',
+                    . 'extension (' . implode(', ', $consumers) . ') — keeping them.',
                     Log::INFO,
                     'cwmscripture.install'
                 );
 
                 return;
             }
+
+            $db = Factory::getContainer()->get(DatabaseInterface::class);
 
             foreach (['#__bsms_scripture_cache', '#__bsms_bible_verses', '#__bsms_bible_translations'] as $table) {
                 $db->setQuery('DROP TABLE IF EXISTS ' . $db->quoteName($table));
@@ -280,6 +272,106 @@ return new class () implements InstallerScriptInterface {
                 Log::WARNING,
                 'cwmscripture.install'
             );
+        }
+    }
+
+    /**
+     * List the installed extensions that depend on this library.
+     *
+     * These consume the `CWM\Library\Scripture` classes and share the
+     * `#__bsms_bible_*` / `#__bsms_scripture_cache` tables. Removing the library
+     * while any of them is present leaves them calling classes that no longer
+     * exist, so this drives both the uninstall guard in preflight() and the
+     * table-retention check in dropTablesIfOrphaned().
+     *
+     * @return  string[]  Human-readable names; empty when nothing depends on the library
+     *
+     * @throws  \Throwable  When #__extensions cannot be queried — callers decide
+     *
+     * @since  1.1.6
+     */
+    private function getInstalledConsumers(): array
+    {
+        $known = [
+            ['type' => 'component', 'element' => 'com_proclaim',   'label' => 'Proclaim (com_proclaim)'],
+            ['type' => 'plugin',    'element' => 'scripturelinks', 'label' => 'Scripture Links (plg_content_scripturelinks)'],
+            ['type' => 'plugin',    'element' => 'cwmscripture',   'label' => 'Scripture task plugin (plg_task_cwmscripture)'],
+        ];
+
+        $db    = Factory::getContainer()->get(DatabaseInterface::class);
+        $found = [];
+
+        foreach ($known as $consumer) {
+            $query = $db->getQuery(true)
+                ->select('COUNT(*)')
+                ->from($db->quoteName('#__extensions'))
+                ->where($db->quoteName('type') . ' = ' . $db->quote($consumer['type']))
+                ->where($db->quoteName('element') . ' = ' . $db->quote($consumer['element']));
+            $db->setQuery($query);
+
+            if ((int) $db->loadResult() > 0) {
+                $found[] = $consumer['label'];
+            }
+        }
+
+        return $found;
+    }
+
+    /**
+     * Refuse a standalone uninstall while something still depends on the library.
+     *
+     * Returning false from preflight aborts the uninstall: InstallerAdapter
+     * wraps triggerManifestScript('preflight') in a try/catch and bails on the
+     * RuntimeException it throws for a false return.
+     *
+     * The `isPackageUninstall()` check is essential, not cosmetic. Joomla
+     * implements a library update as uninstall-then-install, so preflight fires
+     * with $type === 'uninstall' on every upgrade too; without the check this
+     * guard would make the library permanently un-updatable, since Proclaim is
+     * always installed. The upgrade cycle and genuine package removals both set
+     * that flag, so both are allowed through.
+     *
+     * Fails open: if #__extensions cannot be read we allow the uninstall rather
+     * than trap the administrator. The irreplaceable thing — downloaded
+     * translations — is protected separately by dropTablesIfOrphaned(); files
+     * can always be reinstalled.
+     *
+     * @param   InstallerAdapter  $adapter  The installer adapter
+     *
+     * @return  bool  False to abort the uninstall
+     *
+     * @since  1.1.6
+     */
+    private function allowUninstall(InstallerAdapter $adapter): bool
+    {
+        try {
+            if ($adapter->getParent()->isPackageUninstall()) {
+                return true;
+            }
+
+            $consumers = $this->getInstalledConsumers();
+
+            if ($consumers === []) {
+                return true;
+            }
+
+            Log::add(
+                'lib_cwmscripture cannot be uninstalled: it is still required by '
+                . implode(', ', $consumers)
+                . '. Uninstall those first, then remove this library.',
+                Log::ERROR,
+                'jerror'
+            );
+
+            return false;
+        } catch (\Throwable $e) {
+            Log::add(
+                'lib_cwmscripture: dependency check skipped — ' . $e->getMessage(),
+                Log::WARNING,
+                'cwmscripture.install'
+            );
+
+            return true;
         }
     }
 
