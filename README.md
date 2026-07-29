@@ -253,6 +253,16 @@ echo $renderer->renderTextPassage($result, ScriptureRenderer::MODE_VISIBLE);
 
 All provider activity is logged to `administrator/logs/cwmscripture.bible.php` using Joomla's logging system under the `cwmscripture.bible` category.
 
+## Accessibility
+
+All CWM-authored code must meet **WCAG 2.2 Level AA**, and this library owns its own conformance.
+
+Proclaim's E2E suite scans every admin and site view with `@axe-core/playwright`. That scan covers this library's rendered output wherever it appears — the scripture fields on the message form, and formatted references in site views. When it flags markup rendered by lib_cwmscripture, **the fix lands in this repository**: Proclaim will not carry workarounds or scan exclusions for CWM-owned code. Its exclusion list is reserved for genuinely third-party widgets (TinyMCE, CodeMirror, Choices.js), each with an upstream report.
+
+This means accessibility regressions in `ScriptureRenderer` output, the form fields in `src/Field/`, and the frontend assets in `media/lib_cwmscripture/` are this repo's responsibility to fix, not Proclaim's to work around.
+
+Whether this repo grows a scan of its own — rather than relying on coverage-through-Proclaim — is this repo's decision to make if and when it has standalone rendering worth gating.
+
 ## Contributing
 
 Bug reports and pull requests are welcome on [GitHub Issues](https://github.com/Joomla-Bible-Study/lib_cwmscripture/issues). Before submitting a PR:
@@ -261,6 +271,7 @@ Bug reports and pull requests are welcome on [GitHub Issues](https://github.com/
 2. Follow Joomla Coding Standards (enforced by `composer lint`)
 3. Add PHPDoc `@since` tags to new public/protected methods
 4. Keep the `_JEXEC` guard at the top of all PHP files
+5. Keep rendered markup WCAG 2.2 AA conformant (see [Accessibility](#accessibility))
 
 ## License
 
