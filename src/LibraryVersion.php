@@ -42,12 +42,16 @@ use Joomla\Database\DatabaseInterface;
 class LibraryVersion
 {
     /**
-     * The library version (read from the manifest at build time).
+     * The library version.
+     *
+     * Must be kept in sync with `<version>` in cwmscripture.xml by hand — the
+     * release tooling only rewrites the manifest, so this constant does not
+     * update itself despite shipping alongside it. See issue #15.
      *
      * @var  string
      * @since  1.0.0
      */
-    public const VERSION = '1.1.3';
+    public const VERSION = '1.1.5';
 
     /**
      * Check if the library extension is installed in Joomla.

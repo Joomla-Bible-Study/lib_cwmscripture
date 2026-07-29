@@ -52,7 +52,7 @@ class ScriptureRenderer
      *
      * @return  WebAssetManager  The asset manager, ready to resolve library assets
      *
-     * @since  1.0.1
+     * @since  1.1.5
      */
     public static function getAssetManager(): WebAssetManager
     {
@@ -72,7 +72,7 @@ class ScriptureRenderer
      *
      * @return  void
      *
-     * @since  1.0.1
+     * @since  1.1.5
      */
     public static function loadSwitcherAssets(): void
     {
