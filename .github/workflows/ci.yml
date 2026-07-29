@@ -1,5 +1,20 @@
 name: CI
 
+# The lint, test and build steps live in cwm-build-tools so every CWM
+# extension runs the same pipeline and a fix lands everywhere at once. What
+# stays here is what is genuinely this repository's own: when CI runs, and
+# the one value that differs from the shared defaults.
+#
+# The reusable workflow is .github/workflows/joomla-library-ci.yml in
+# Joomla-Bible-Study/cwm-build-tools. To see what the inputs do, or to change
+# a step, edit it there.
+#
+# It orders npm after `composer install` on purpose: the rollup and build-css
+# templates the asset build depends on ship inside vendor/cwm/build-tools, so
+# `npm run build` cannot run before Composer has put them there — and it has
+# to run before packaging or the zip carries stale media. That ordering is
+# why libraries get their own workflow rather than a flag on the package one.
+
 on:
   push:
     branches: [ "main", "master", "development" ]
@@ -15,62 +30,16 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-env:
-  NODE_OPTIONS: --disable-warning=DEP0040
-
 jobs:
-  php-checks:
+  ci:
     name: PHP Lint & Tests
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.3'
-          extensions: mbstring, json, xml, zip, curl
-          coverage: none
-          tools: composer:v2
-
-      - name: Setup Node
-        uses: actions/setup-node@v6
-        with:
-          node-version: '24'
-          cache: 'npm'
-
-      - name: Install npm dependencies
-        run: npm ci
-
-      - name: Get Composer cache directory
-        id: composer-cache
-        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
-
-      - name: Cache Composer dependencies
-        uses: actions/cache@v5
-        with:
-          path: ${{ steps.composer-cache.outputs.dir }}
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
-          restore-keys: ${{ runner.os }}-composer-
-
-      - name: Install Composer dependencies
-        run: composer install --no-interaction --prefer-dist
-
-      - name: Build minified assets
-        # Runs after composer install so the shared rollup/build-css
-        # templates under vendor/cwm/build-tools/ are available.
-        run: npm run build
-
-      - name: Check PHP syntax
-        run: find src tests -type f -name '*.php' -print0 | xargs -0 -n 1 -P 8 php -l > /dev/null
-
-      - name: Run PHP CS Fixer (dry-run)
-        run: composer lint
-
-      - name: Run PHPUnit
-        run: composer test
-
-      - name: Build library package
-        run: composer build:package
+    # `v1` is a moving tag on cwm-build-tools, re-pointed at each release —
+    # the CI equivalent of the `^1.9.0` Composer constraint in composer.json.
+    uses: Joomla-Bible-Study/cwm-build-tools/.github/workflows/joomla-library-ci.yml@v1
+    with:
+      # Everything else is a shared default and deliberately left unset:
+      # PHP 8.3, Node 24, no submodules, npm asset build on, and `php -l`
+      # over src/ and tests/ because this project has no lint:syntax script.
+      # Those defaults were drawn from this repository's own pipeline, so
+      # leaving them implicit is what keeps it in step with the others.
+      build-command: 'composer build:package'
