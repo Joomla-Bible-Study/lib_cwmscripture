@@ -98,3 +98,4 @@ Use this pattern in `GetBibleProvider` when building request URLs. Other provide
 - Joomla Coding Standards (PHPCS with PSR1.Files.SideEffects suppressed for `_JEXEC` guard)
 - PHPDoc `@since` tags on all public/protected methods
 - Named arguments used in constructor calls (e.g. `new BiblePassageResult(text: ..., reference: ...)`)
+- Rendered markup must meet WCAG 2.2 AA. Proclaim's `@axe-core/playwright` suite scans this library's output, and violations are fixed here — Proclaim will not carry exclusions for CWM-owned code. See the Accessibility section in `README.md`.
