@@ -249,37 +249,100 @@ $renderer = new ScriptureRenderer();
 echo $renderer->renderTextPassage($result, ScriptureRenderer::MODE_VISIBLE);
 ```
 
-### Registering as a consumer
+### Depending on this library
 
-**If your extension uses this library, register it.** Joomla has no dependency tracking for libraries — nothing records that your extension needs lib_cwmscripture, and `blockChildUninstall` only protects extensions shipped inside the same package. Without registering, your extension is invisible to the library's uninstall guard, which means an administrator can remove the library out from under you, and the shared `#__bsms_*` tables will be judged orphaned and **dropped** — destroying any downloaded translations.
+Joomla has **no dependency tracking for libraries**. Nothing records that your extension needs lib_cwmscripture, and `blockChildUninstall` only protects extensions shipped inside the same package. So the library cannot know you exist unless you tell it.
 
-Register from your install script and unregister on uninstall:
+If you don't, two things go wrong: an administrator can uninstall the library out from under you, and the shared `#__bsms_*` tables get judged orphaned and **dropped** — destroying every locally downloaded translation, yours included.
+
+Registering fixes both. Once you are on the register:
+
+- Uninstalling the library is **refused** while your extension is installed, with a message naming it.
+- The shared tables are **never dropped** while you are still there — not by the library, not by `pkg_proclaim`, not by `pkg_cwmscripture`.
+- When the last consumer goes, the tables are cleaned up automatically.
+
+#### Complete install script
 
 ```php
 use CWM\Library\Scripture\Installer\ConsumerRegistry;
+use CWM\Library\Scripture\LibraryVersion;
+use Joomla\CMS\Factory;
+use Joomla\CMS\Installer\InstallerAdapter;
+use Joomla\CMS\Installer\InstallerScriptInterface;
 
-public function postflight(string $type, InstallerAdapter $adapter): bool
-{
-    ConsumerRegistry::register('com_foo', 'component', name: 'Foo');
+return new class () implements InstallerScriptInterface {
+    public function preflight(string $type, InstallerAdapter $adapter): bool
+    {
+        // Refuse to install against a library that is missing or too old.
+        if ($type !== 'uninstall' && !LibraryVersion::satisfies('1.1.6')) {
+            Factory::getApplication()->enqueueMessage(
+                'This extension requires lib_cwmscripture 1.1.6 or later.',
+                'error'
+            );
 
-    return true;
-}
+            return false;
+        }
 
-public function uninstall(InstallerAdapter $adapter): bool
-{
-    ConsumerRegistry::unregister('com_foo', 'component');
+        return true;
+    }
 
-    return true;
-}
+    public function postflight(string $type, InstallerAdapter $adapter): bool
+    {
+        // Safe to call on install AND update — re-registering just refreshes the row.
+        ConsumerRegistry::register('com_foo', 'component', name: 'Foo');
+
+        return true;
+    }
+
+    public function uninstall(InstallerAdapter $adapter): bool
+    {
+        ConsumerRegistry::unregister('com_foo', 'component');
+
+        return true;
+    }
+
+    public function install(InstallerAdapter $adapter): bool
+    {
+        return true;
+    }
+
+    public function update(InstallerAdapter $adapter): bool
+    {
+        return true;
+    }
+};
 ```
 
-For a plugin, pass the group as `$folder`:
+For a plugin, pass the group as the third argument:
 
 ```php
 ConsumerRegistry::register('mything', 'plugin', 'content', 'My Thing');
+ConsumerRegistry::unregister('mything', 'plugin', 'content');
 ```
 
-`register()` is safe to call on every install and update — re-registering refreshes the row. Unregistering is good manners but not load-bearing: the registry cross-checks every entry against `#__extensions` and prunes rows whose extension is gone, so a consumer that never unregisters cannot pin the tables forever.
+#### Rules that matter
+
+**Register in `postflight`, not `preflight`.** On a fresh install the library's namespace may not be autoloadable until the extension is stored; `postflight` runs after that.
+
+**Register on update too.** `postflight` fires for both, and `register()` is idempotent — it refreshes the existing row rather than duplicating it. Calling it every time is the intended usage.
+
+**Unregistering is good manners, not load-bearing.** The registry cross-checks every entry against `#__extensions` and prunes rows whose extension is gone. A consumer that never unregisters cannot pin the tables forever — but unregister anyway, so the state is correct immediately rather than at the next check.
+
+**Never `DROP` the shared tables yourself.** `#__bsms_bible_translations`, `#__bsms_bible_verses`, `#__bsms_scripture_cache` and `#__bsms_scripture_consumers` belong to the library. It removes them when the last consumer goes.
+
+**Never declare them in `<uninstall><sql>`.** Joomla's `LibraryAdapter` uninstalls the installed extension before writing the new one, so uninstall SQL runs on **every update**, not just on removal. That is exactly how this library once destroyed people's downloaded Bibles. Put any teardown in `script.php::uninstall()` instead, and see the Installer Gotchas section of `CLAUDE.md`.
+
+**Handle a refused uninstall gracefully.** If an admin tries to remove the library while you are registered, Joomla aborts with an error naming your extension. That is the guard working. To remove the library, uninstall the consumers first.
+
+#### What happens on uninstall
+
+| Situation | Result |
+|---|---|
+| Library upgrade | Always allowed — the guard exempts the installer's internal upgrade cycle |
+| Uninstall library, your extension registered | **Refused**, message names your extension |
+| Uninstall library, nothing registered or installed | Allowed; shared tables dropped |
+| Remove `pkg_proclaim` / `pkg_cwmscripture`, you still registered | Package goes, **tables kept** for you |
+| Remove the package, nothing else registered | Package goes, tables dropped |
 
 Proclaim, `plg_content_scripturelinks` and `plg_task_cwmscripture` are recognised without registering.
 
