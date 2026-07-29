@@ -14,6 +14,7 @@ namespace CWM\Library\Scripture\Renderer;
 use CWM\Library\Scripture\Bible\BiblePassageResult;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
+use Joomla\CMS\WebAsset\WebAssetManager;
 
 // phpcs:disable PSR1.Files.SideEffects
 \defined('_JEXEC') or die;
@@ -40,6 +41,47 @@ class ScriptureRenderer
     public const MODE_POPUP   = 3;
 
     /**
+     * Get the web asset manager with this library's registry file registered.
+     *
+     * Joomla only auto-loads registry files for core, the active template and the
+     * active extension — a library's `joomla.asset.json` is never discovered on its
+     * own. Without this, `useStyle()`/`useScript()` on a `lib_cwmscripture.*` name
+     * throws UnknownAssetException unless some other extension happened to register
+     * the file earlier in the request. `addExtensionRegistryFile()` is idempotent,
+     * so calling it on every render is safe.
+     *
+     * @return  WebAssetManager  The asset manager, ready to resolve library assets
+     *
+     * @since  1.0.1
+     */
+    public static function getAssetManager(): WebAssetManager
+    {
+        $wa = Factory::getApplication()->getDocument()->getWebAssetManager();
+        $wa->getRegistry()->addExtensionRegistryFile('lib_cwmscripture');
+
+        return $wa;
+    }
+
+    /**
+     * Register and enqueue the version switcher assets.
+     *
+     * Consumers that embed switcher HTML (via the `$switcherHtml` argument of
+     * {@see self::renderTextPassage()}) must call this so the switcher is backed by
+     * its JS and CSS. Bundling both `use*()` calls behind one method keeps callers
+     * from enqueueing the script while forgetting the registry file or the style.
+     *
+     * @return  void
+     *
+     * @since  1.0.1
+     */
+    public static function loadSwitcherAssets(): void
+    {
+        $wa = self::getAssetManager();
+        $wa->useScript('lib_cwmscripture.scripture-switcher');
+        $wa->useStyle('lib_cwmscripture.scripture-switcher-css');
+    }
+
+    /**
      * Render a text-based scripture passage.
      *
      * @param   BiblePassageResult  $result       The passage result
@@ -57,7 +99,7 @@ class ScriptureRenderer
         bool $showIcon = true,
         string $switcherHtml = ''
     ): string {
-        $wa = Factory::getApplication()->getDocument()->getWebAssetManager();
+        $wa = self::getAssetManager();
         $wa->useStyle('lib_cwmscripture.scripture-text');
 
         $copyrightHtml = '';
