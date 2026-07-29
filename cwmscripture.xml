@@ -36,11 +36,19 @@
             <file driver="mysql" charset="utf8">sql/install.mysql.utf8.sql</file>
         </sql>
     </install>
-    <uninstall>
-        <sql>
-            <file driver="mysql" charset="utf8">sql/uninstall.mysql.utf8.sql</file>
-        </sql>
-    </uninstall>
+    <!--
+        No <uninstall><sql> block, deliberately.
+
+        Joomla's LibraryAdapter uninstalls the existing library before it
+        installs a new one (checkExtensionInFilesystem() -> uninstall()), so
+        anything listed here runs on every single UPDATE, not just on removal.
+        Pointing it at DROP TABLE statements wiped every locally downloaded
+        translation each time the library was upgraded.
+
+        Table removal now lives in script.php::uninstall(), which can tell a
+        real uninstall from the installer's internal upgrade cycle and refuses
+        to drop tables that Proclaim / ScriptureLinks still share.
+    -->
     <update>
         <schemas>
             <schemapath type="mysql">sql/updates/mysql</schemapath>

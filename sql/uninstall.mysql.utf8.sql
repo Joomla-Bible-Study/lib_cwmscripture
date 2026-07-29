@@ -1,17 +1,20 @@
 --
 -- CWM Scripture Library - Uninstall SQL (intentionally empty)
 --
--- Joomla runs a library's uninstall SQL on every update, not only on a real
--- uninstall. The DROP TABLE statements this file used to hold therefore wiped
--- every downloaded Bible translation each time lib_cwmscripture was upgraded,
--- so they have been removed. plg_system_proclaim neutralises this file on
+-- This file used to DROP the three bible tables. It must never do that again:
+-- Joomla's LibraryAdapter uninstalls the installed library before writing the
+-- new one, so this file ran on every UPDATE and destroyed every locally
+-- downloaded translation (#__bsms_bible_verses can hold hundreds of MB the
+-- site owner downloaded by hand). plg_system_proclaim neutralises this file on
 -- sight for the same reason.
 --
--- Nothing currently drops the tables. script.php::uninstall() is a no-op, so a
--- genuine uninstall leaves #__bsms_bible_translations, #__bsms_bible_verses and
--- #__bsms_scripture_cache behind. That is deliberate for now: the tables are
--- shared with Proclaim, so removal has to be conditional on Proclaim not being
--- installed rather than unconditional. Tracked in issue #17.
+-- The manifest no longer references this file at all; it is kept as a no-op so
+-- that sites still carrying an older manifest -- which does reference it -- run
+-- nothing instead of failing to find it.
+--
+-- Real table removal lives in script.php::uninstall(), which only drops when
+-- the library is genuinely being removed and no consumer (com_proclaim,
+-- plg_content_scripturelinks) still shares the tables.
 --
 -- Do not reintroduce DROP TABLE statements here.
 --

@@ -182,6 +182,11 @@ return new class () implements InstallerScriptInterface {
     /**
      * Called on uninstall.
      *
+     * The bible tables are NOT removed by manifest SQL — see the comment where
+     * the <uninstall> block used to live in cwmscripture.xml. Joomla's
+     * LibraryAdapter uninstalls the old library on every update, so manifest
+     * uninstall SQL ran on upgrades too and wiped every downloaded translation.
+     *
      * @param   InstallerAdapter  $adapter  The installer adapter
      *
      * @return  bool
@@ -190,7 +195,92 @@ return new class () implements InstallerScriptInterface {
      */
     public function uninstall(InstallerAdapter $adapter): bool
     {
+        $this->dropTablesIfOrphaned($adapter);
+
         return true;
+    }
+
+    /**
+     * Drop the bible tables, but only when this is a genuine, final removal.
+     *
+     * Two guards, both of which must pass:
+     *
+     *   1. The installer must not be in a package/upgrade uninstall.
+     *      LibraryAdapter::checkExtensionInFilesystem() uninstalls the current
+     *      library before installing the new one and flags that inner
+     *      Installer with setPackageUninstall(true) — that is the upgrade path
+     *      that used to destroy people's downloaded Bibles.
+     *   2. No extension that shares these tables may still be installed. The
+     *      three #__bsms_bible_* / #__bsms_scripture_cache tables are shared
+     *      with com_proclaim and plg_content_scripturelinks; removing the
+     *      library while either is present must leave their data alone.
+     *
+     * The conservative outcome is orphaned tables, which cost disk but nothing
+     * else, and which a later standalone uninstall cleans up.
+     *
+     * @param   InstallerAdapter  $adapter  The installer adapter
+     *
+     * @return  void
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    private function dropTablesIfOrphaned(InstallerAdapter $adapter): void
+    {
+        try {
+            if ($adapter->getParent()->isPackageUninstall()) {
+                Log::add(
+                    'lib_cwmscripture: package/upgrade uninstall — keeping the bible tables.',
+                    Log::INFO,
+                    'cwmscripture.install'
+                );
+
+                return;
+            }
+
+            $db = Factory::getContainer()->get(DatabaseInterface::class);
+
+            // Consumers of the shared tables: com_proclaim and the scripture plugins.
+            $query = $db->getQuery(true)
+                ->select('COUNT(*)')
+                ->from($db->quoteName('#__extensions'))
+                ->where(
+                    '(' . $db->quoteName('type') . ' = ' . $db->quote('component')
+                    . ' AND ' . $db->quoteName('element') . ' = ' . $db->quote('com_proclaim') . ')'
+                    . ' OR (' . $db->quoteName('type') . ' = ' . $db->quote('plugin')
+                    . ' AND ' . $db->quoteName('element') . ' = ' . $db->quote('scripturelinks') . ')'
+                    . ' OR (' . $db->quoteName('type') . ' = ' . $db->quote('plugin')
+                    . ' AND ' . $db->quoteName('element') . ' = ' . $db->quote('cwmscripture') . ')'
+                );
+            $db->setQuery($query);
+
+            if ((int) $db->loadResult() > 0) {
+                Log::add(
+                    'lib_cwmscripture: scripture tables are still shared with an installed '
+                    . 'extension — keeping them.',
+                    Log::INFO,
+                    'cwmscripture.install'
+                );
+
+                return;
+            }
+
+            foreach (['#__bsms_scripture_cache', '#__bsms_bible_verses', '#__bsms_bible_translations'] as $table) {
+                $db->setQuery('DROP TABLE IF EXISTS ' . $db->quoteName($table));
+                $db->execute();
+            }
+
+            Log::add(
+                'lib_cwmscripture: removed the scripture tables (no consumer left).',
+                Log::INFO,
+                'cwmscripture.install'
+            );
+        } catch (\Throwable $e) {
+            Log::add(
+                'lib_cwmscripture: table cleanup skipped — ' . $e->getMessage(),
+                Log::WARNING,
+                'cwmscripture.install'
+            );
+        }
     }
 
     /**
