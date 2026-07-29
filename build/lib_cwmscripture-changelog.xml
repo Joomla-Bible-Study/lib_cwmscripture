@@ -19,6 +19,28 @@
 <changelogs>
 
     <!-- ============================================================ -->
+    <!-- 1.1.5                                                    -->
+    <!-- ============================================================ -->
+    <changelog>
+        <element>lib_cwmscripture</element>
+        <type>library</type>
+        <version>1.1.5</version>
+        <date>2026-07-29</date>
+        <note>
+            <item>chore: migrate to cwm-build-tools v0.5.x by @bcordis in https://github.com/Joomla-Bible-Study/lib_cwmscripture/pull/6</item>
+            <item>chore(deps): adopt cwm/build-tools ^1.9.0 and resync the shared config by @bcordis in https://github.com/Joomla-Bible-Study/lib_cwmscripture/pull/9</item>
+            <item>ci: call the shared joomla-library-ci workflow by @bcordis in https://github.com/Joomla-Bible-Study/lib_cwmscripture/pull/11</item>
+            <item>docs: note GetBible colon URL-encoding gotcha by @bcordis in https://github.com/Joomla-Bible-Study/lib_cwmscripture/pull/7</item>
+            <item>build(deps-dev): Bump brace-expansion from 5.0.5 to 5.0.7 by @dependabot[bot] in https://github.com/Joomla-Bible-Study/lib_cwmscripture/pull/8</item>
+            <item>docs: record the WCAG 2.2 AA ownership policy in-repo by @bcordis in https://github.com/Joomla-Bible-Study/lib_cwmscripture/pull/12</item>
+            <item>fix(assets): register the library asset registry file before enqueueing by @bcordis in https://github.com/Joomla-Bible-Study/lib_cwmscripture/pull/14</item>
+            <item>chore: correct @since tags and sync version declarations to 1.1.5 by @bcordis in https://github.com/Joomla-Bible-Study/lib_cwmscripture/pull/16</item>
+            <item>fix(sql): stop dropping Bible tables on every update by @bcordis in https://github.com/Joomla-Bible-Study/lib_cwmscripture/pull/18</item>
+            <item>chore: track .claude/settings.json, ignore settings.local.json by @bcordis in https://github.com/Joomla-Bible-Study/lib_cwmscripture/pull/19</item>
+        </note>
+    </changelog>
+
+    <!-- ============================================================ -->
     <!-- 1.1.4                                                    -->
     <!-- ============================================================ -->
     <changelog>
