@@ -63,3 +63,6 @@ build.properties
 /media/cwmscripture/css/*.min.css
 /media/cwmscripture/css/*.min.css.map
 # === cwm-build-tools: end extension paths ===
+
+# Claude Code local (personal) settings — project settings.json is tracked
+.claude/settings.local.json
