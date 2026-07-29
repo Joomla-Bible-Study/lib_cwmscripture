@@ -19,6 +19,21 @@
 <changelogs>
 
     <!-- ============================================================ -->
+    <!-- 1.1.6                                                    -->
+    <!-- ============================================================ -->
+    <changelog>
+        <element>lib_cwmscripture</element>
+        <type>library</type>
+        <version>1.1.6</version>
+        <date>2026-07-29</date>
+        <note>
+            <item>fix(installer): never run uninstall SQL on upgrade; drop tables only when orphaned by @bcordis in https://github.com/Joomla-Bible-Study/lib_cwmscripture/pull/22</item>
+            <item>feat(installer): uninstall dependency guard + third-party consumer registry by @bcordis in https://github.com/Joomla-Bible-Study/lib_cwmscripture/pull/23</item>
+            <item>chore: sync version declarations to 1.1.6 by @bcordis in https://github.com/Joomla-Bible-Study/lib_cwmscripture/pull/24</item>
+        </note>
+    </changelog>
+
+    <!-- ============================================================ -->
     <!-- 1.1.5                                                    -->
     <!-- ============================================================ -->
     <changelog>
