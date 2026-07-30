@@ -2,8 +2,8 @@
 <!--
     Joomla update changelog for lib_cwmscripture.
 
-    New entries are inserted at the top by `composer changelog -- <version>`,
-    which fetches the GitHub release notes for the tag and converts headings
+    New entries are inserted at the top by the `composer changelog` script (pass
+    the version after a bare double dash), which fetches the GitHub release notes for the tag and converts headings
     (### Fixes, ### Features, ### Changes, etc.) into Joomla changelog types.
 
     Hosted at:
@@ -17,6 +17,29 @@
     manifest element is the load-bearing wiring.
 -->
 <changelogs>
+
+    <!-- ============================================================ -->
+    <!-- 1.1.7                                                    -->
+    <!-- ============================================================ -->
+    <changelog>
+        <element>lib_cwmscripture</element>
+        <type>library</type>
+        <version>1.1.7</version>
+        <date>2026-07-30</date>
+        <fix>
+            <item>ensureTables() checks each expected table instead of returning as soon as #__bsms_bible_translations exists, so it can create a table introduced in a later version. #__bsms_scripture_consumers previously reached upgraded sites only via Joomla&#x27;s schema replay; the uninstall guard&#x27;s own storage no longer depends on that.</item>
+            <item>installedExcluding() loads the scanner defensively. Both package installers reach ConsumerRegistry through require_once because the namespace is not autoloadable mid-install, and a plain static call would have thrown &quot;class not found&quot; into their catch-all — silently disabling the scan in exactly the situation it exists for.</item>
+            <item>The manifest and LibraryVersion::VERSION are bumped together rather than drifting apart (#15).</item>
+        </fix>
+        <addition>
+            <item>Two-line consumer registration. src/consumer.php is a self-bootstrapping entry point, so an install script declaring a dependency on this library no longer needs a use statement, class_exists() guards, JLoader wrangling or a try/catch. See the README section &quot;Depending on this library&quot;.</item>
+            <item>Consumers are detected even when they never register. ConsumerScanner walks the installed extension roots for references to CWM\Library\Scripture; anything mentioning it is a consumer by definition, since those classes cannot resolve otherwise. Registration is now optional politeness rather than the thing your data depends on. The scan runs only in the uninstall guard, bounded, skipping vendor and node_modules.</item>
+        </addition>
+        <change>
+            <item>Documented and enforced by test: update SQL is replayed in full on every upgrade. LibraryAdapter recreates the #__extensions row, so parseSchemaUpdates() finds no recorded #__schemas version and runs every file from 0.0.0. Library migrations must therefore be idempotent — a bare ALTER TABLE ADD COLUMN fails on the second upgrade and aborts the install.</item>
+            <item>README&#x27;s &quot;Depending on this library&quot; rewritten around the entry point.</item>
+        </change>
+    </changelog>
 
     <!-- ============================================================ -->
     <!-- 1.1.6                                                    -->
