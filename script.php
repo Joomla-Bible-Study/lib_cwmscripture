@@ -463,12 +463,36 @@ return new class () implements InstallerScriptInterface {
             $tables = $db->getTableList();
             $prefix = $db->getPrefix();
 
-            // Check if the primary table exists
-            if (\in_array($prefix . 'bsms_bible_translations', $tables, true)) {
+            // Every table the install SQL creates. Checked individually, not via a
+            // single sentinel: this method used to return as soon as
+            // bsms_bible_translations existed, which meant it could never create a
+            // table added in a later version. #__bsms_scripture_consumers (new in
+            // 1.1.6) then existed on upgraded sites only because Joomla replays the
+            // schema updates, and the uninstall guard's own storage should not
+            // depend on that — see the "Update SQL is replayed" note in CLAUDE.md.
+            // ManifestTest keeps this list in step with the install SQL.
+            $expected = [
+                'bsms_bible_translations',
+                'bsms_bible_verses',
+                'bsms_scripture_cache',
+                'bsms_scripture_consumers',
+            ];
+
+            $missing = [];
+
+            foreach ($expected as $table) {
+                if (!\in_array($prefix . $table, $tables, true)) {
+                    $missing[] = $table;
+                }
+            }
+
+            if ($missing === []) {
                 return;
             }
 
-            // Tables missing — run install SQL
+            // Something is missing — replay the install SQL. It is entirely
+            // CREATE TABLE IF NOT EXISTS / INSERT IGNORE, so the tables that do
+            // exist are untouched and their rows survive.
             $sqlFile = $adapter->getParent()->getPath('source') . '/lib_cwmscripture/sql/install.mysql.utf8.sql';
 
             if (!file_exists($sqlFile)) {
@@ -506,7 +530,11 @@ return new class () implements InstallerScriptInterface {
                 }
             }
 
-            Log::add('lib_cwmscripture: Created missing tables from install SQL', Log::INFO, 'cwmscripture.install');
+            Log::add(
+                'lib_cwmscripture: replayed install SQL for missing table(s): ' . implode(', ', $missing),
+                Log::INFO,
+                'cwmscripture.install'
+            );
         } catch (\Throwable $e) {
             Log::add('lib_cwmscripture: ensureTables failed: ' . $e->getMessage(), Log::WARNING, 'cwmscripture.install');
         }

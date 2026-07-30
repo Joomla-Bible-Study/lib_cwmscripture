@@ -57,6 +57,103 @@ class ManifestTest extends TestCase
         );
     }
 
+    /**
+     * Update SQL runs from scratch on every upgrade, so it has to be idempotent.
+     *
+     * LibraryAdapter's upgrade deletes the #__extensions row and stores a new one
+     * (checkExtensionInFilesystem -> uninstall -> storeExtension), and
+     * InstallerAdapter::parseQueries() passes that *new* extension_id to
+     * parseSchemaUpdates(). No #__schemas row exists for it yet, so Joomla replays
+     * every file in sql/updates/mysql, not just the ones newer than the installed
+     * version. A bare ALTER TABLE ADD COLUMN would therefore fail on the second
+     * upgrade — and take the install down with it, since parseQueries() throws.
+     */
+    public function testUpdateSqlIsIdempotent(): void
+    {
+        $files = glob(self::root() . '/sql/updates/mysql/*.sql') ?: [];
+
+        $this->assertNotEmpty($files, 'Expected update SQL files to exist.');
+
+        foreach ($files as $file) {
+            $sql  = (string) file_get_contents($file);
+            $name = basename($file);
+
+            // Strip comments so prose about DROP/ALTER does not trip the checks.
+            $statements = preg_replace('/^\s*--.*$/m', '', $sql) ?? $sql;
+
+            $this->assertSame(
+                preg_match_all('/\bCREATE\s+TABLE\b/i', $statements),
+                preg_match_all('/\bCREATE\s+TABLE\s+IF\s+NOT\s+EXISTS\b/i', $statements),
+                "{$name}: every CREATE TABLE must be IF NOT EXISTS — this file is replayed on every upgrade."
+            );
+
+            $this->assertSame(
+                preg_match_all('/\bDROP\s+TABLE\b/i', $statements),
+                preg_match_all('/\bDROP\s+TABLE\s+IF\s+EXISTS\b/i', $statements),
+                "{$name}: every DROP TABLE must be IF EXISTS."
+            );
+
+            $this->assertSame(
+                0,
+                preg_match_all('/\bALTER\s+TABLE\b(?![^;]*\bIF\s+(?:NOT\s+)?EXISTS\b)/i', $statements),
+                "{$name}: a bare ALTER TABLE is not replay-safe. Guard it with IF NOT EXISTS "
+                . '(MariaDB) or move the change into script.php, which can check information_schema first.'
+            );
+        }
+    }
+
+    /**
+     * ensureTables() must know about every table the install SQL creates.
+     *
+     * It is the only mechanism that can add a table to a site whose bible tables
+     * already exist — Joomla's schema replay is the other, and CLAUDE.md explains
+     * why that is not something to lean on. A table added to the install SQL but
+     * not to the list would simply never appear on upgraded sites.
+     */
+    public function testEnsureTablesCoversEveryInstalledTable(): void
+    {
+        $sql = (string) file_get_contents(self::root() . '/sql/install.mysql.utf8.sql');
+
+        preg_match_all(
+            '/CREATE\s+TABLE\s+IF\s+NOT\s+EXISTS\s+`#__(\w+)`/i',
+            $sql,
+            $matches
+        );
+
+        $created = $matches[1] ?? [];
+
+        $this->assertNotEmpty($created, 'Expected the install SQL to create tables.');
+
+        $script = (string) file_get_contents(self::root() . '/script.php');
+
+        // The list is a literal in script.php on purpose: an install script should
+        // not depend on the autoloader to know its own schema.
+        preg_match(
+            '/\$expected\s*=\s*\[(.*?)\];/s',
+            $script,
+            $listMatch
+        );
+
+        $this->assertNotEmpty(
+            $listMatch[1] ?? '',
+            'Could not find the $expected table list in script.php::ensureTables().'
+        );
+
+        preg_match_all("/'(\w+)'/", $listMatch[1], $listed);
+
+        $expected = $listed[1] ?? [];
+
+        sort($created);
+        sort($expected);
+
+        $this->assertSame(
+            $created,
+            $expected,
+            'script.php::ensureTables() and the install SQL disagree about which tables exist. '
+            . 'A table only in the SQL never reaches upgraded sites; one only in the list is dead weight.'
+        );
+    }
+
     public function testInstallSqlIsRerunnable(): void
     {
         $sql = (string) file_get_contents(self::root() . '/sql/install.mysql.utf8.sql');

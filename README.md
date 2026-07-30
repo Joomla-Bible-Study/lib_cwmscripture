@@ -261,72 +261,68 @@ Registering fixes both. Once you are on the register:
 - The shared tables are **never dropped** while you are still there — not by the library, not by `pkg_proclaim`, not by `pkg_cwmscripture`.
 - When the last consumer goes, the tables are cleaned up automatically.
 
-#### Complete install script
+#### The whole integration
+
+Two lines in `postflight`, two in `uninstall`:
 
 ```php
-use CWM\Library\Scripture\Installer\ConsumerRegistry;
-use CWM\Library\Scripture\LibraryVersion;
-use Joomla\CMS\Factory;
-use Joomla\CMS\Installer\InstallerAdapter;
-use Joomla\CMS\Installer\InstallerScriptInterface;
-
-return new class () implements InstallerScriptInterface {
-    public function preflight(string $type, InstallerAdapter $adapter): bool
-    {
-        // Refuse to install against a library that is missing or too old.
-        if ($type !== 'uninstall' && !LibraryVersion::satisfies('1.1.6')) {
-            Factory::getApplication()->enqueueMessage(
-                'This extension requires lib_cwmscripture 1.1.6 or later.',
-                'error'
-            );
-
-            return false;
-        }
-
-        return true;
+public function postflight(string $type, InstallerAdapter $adapter): bool
+{
+    if (is_file($helper = JPATH_LIBRARIES . '/cwmscripture/src/consumer.php')) {
+        (require $helper)->register('com_foo', 'component', name: 'Foo');
     }
 
-    public function postflight(string $type, InstallerAdapter $adapter): bool
-    {
-        // Safe to call on install AND update — re-registering just refreshes the row.
-        ConsumerRegistry::register('com_foo', 'component', name: 'Foo');
+    return true;
+}
 
-        return true;
+public function uninstall(InstallerAdapter $adapter): bool
+{
+    if (is_file($helper = JPATH_LIBRARIES . '/cwmscripture/src/consumer.php')) {
+        (require $helper)->unregister('com_foo', 'component');
     }
 
-    public function uninstall(InstallerAdapter $adapter): bool
-    {
-        ConsumerRegistry::unregister('com_foo', 'component');
-
-        return true;
-    }
-
-    public function install(InstallerAdapter $adapter): bool
-    {
-        return true;
-    }
-
-    public function update(InstallerAdapter $adapter): bool
-    {
-        return true;
-    }
-};
+    return true;
+}
 ```
 
-For a plugin, pass the group as the third argument:
+That is the entire integration. No `use` statement, no `class_exists()`, no autoloader wrangling, no try/catch — the entry point handles all of it:
+
+- **Autoloading.** `CWM\Library\Scripture\*` is routinely *not* resolvable inside an install script. Joomla builds its PSR-4 map at request start, and during a package install this library lands in the same request one step ahead of you, so the map predates it. The entry point registers the namespace from its own directory, and falls back to loading the class file directly.
+- **Version tolerance.** Libraries before 1.1.7 have no entry point; the `is_file()` guard skips it. Libraries before 1.1.6 have no registry; the call no-ops.
+- **Errors.** Nothing in there throws. Registry bookkeeping must never fail somebody's install.
+
+For a plugin, pass the group — it is part of the registry key, so a plugin registered without it never matches on lookup:
 
 ```php
-ConsumerRegistry::register('mything', 'plugin', 'content', 'My Thing');
-ConsumerRegistry::unregister('mything', 'plugin', 'content');
+(require $helper)->register('mything', 'plugin', 'content', 'My Thing');
+(require $helper)->unregister('mything', 'plugin', 'content');
 ```
+
+##### Use `require`, not `require_once`
+
+A package install runs several consumers in one request. `require_once` returns `true` instead of the object on every call after the first, so the second consumer fatals on `true->register()`. The file declares no named symbols, so requiring it repeatedly is free.
+
+#### If you do nothing at all
+
+You are still protected. `ConsumerScanner` walks the installed extension directories looking for references to the `CWM\Library\Scripture` namespace, and anything that mentions it is treated as a consumer — you cannot resolve those classes without depending on the library, so the reference is proof.
+
+This exists because the failure it prevents already happened: CWMLivingWord shipped consuming this library while appearing in neither the registry nor the first-party list, and a library uninstall would have dropped the tables under it.
+
+The scan runs only in the uninstall guard, never per request. Registering is still worth two lines, because it gives you:
+
+- a display name in the refusal message, rather than `com_foo (detected)`
+- immunity to the scan's file budget, which a pathologically large install could exhaust
+- protection when your reference to the namespace is dynamic enough that a string search misses it
 
 #### Rules that matter
 
-**Register in `postflight`, not `preflight`.** On a fresh install the library's namespace may not be autoloadable until the extension is stored; `postflight` runs after that.
+**Register in `postflight`, not `preflight`.** On a fresh install the library's namespace may not be autoloadable until the extension is stored; `postflight` runs after that. The entry point copes either way, but `postflight` is where the registry write can actually succeed.
 
 **Register on update too.** `postflight` fires for both, and `register()` is idempotent — it refreshes the existing row rather than duplicating it. Calling it every time is the intended usage.
 
 **Unregistering is good manners, not load-bearing.** The registry cross-checks every entry against `#__extensions` and prunes rows whose extension is gone. A consumer that never unregisters cannot pin the tables forever — but unregister anyway, so the state is correct immediately rather than at the next check.
+
+**Prefer the entry point over `ConsumerRegistry` directly.** The class is public and still works, but calling it means you own the autoloading and the error handling. The only reason to reach for it is code that already runs with the namespace resolved — a scheduled task, say, not an install script.
 
 **Never `DROP` the shared tables yourself.** `#__bsms_bible_translations`, `#__bsms_bible_verses`, `#__bsms_scripture_cache` and `#__bsms_scripture_consumers` belong to the library. It removes them when the last consumer goes.
 

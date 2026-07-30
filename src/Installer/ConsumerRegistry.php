@@ -29,29 +29,31 @@ use Joomla\Database\DatabaseInterface;
  * worse, the shared `#__bsms_*` tables would be judged orphaned and dropped,
  * destroying downloaded translations the third party still needs.
  *
- * Any extension using the `CWM\Library\Scripture` classes should therefore
- * register itself from its install script:
+ * Registering is therefore worth doing, and the supported way is the two-line
+ * helper the library installs beside itself — it needs no autoloading and no
+ * error handling from the caller:
  *
- *   use CWM\Library\Scripture\Installer\ConsumerRegistry;
- *
- *   public function postflight(string $type, InstallerAdapter $adapter): bool
- *   {
- *       ConsumerRegistry::register('com_foo', 'component', name: 'Foo');
- *
- *       return true;
+ *   // postflight
+ *   if (is_file($f = JPATH_LIBRARIES . '/cwmscripture/src/consumer.php')) {
+ *       (require $f)->register('com_foo', 'component', name: 'Foo');
  *   }
  *
- *   public function uninstall(InstallerAdapter $adapter): bool
- *   {
- *       ConsumerRegistry::unregister('com_foo', 'component');
- *
- *       return true;
+ *   // uninstall
+ *   if (is_file($f = JPATH_LIBRARIES . '/cwmscripture/src/consumer.php')) {
+ *       (require $f)->unregister('com_foo', 'component');
  *   }
  *
- * Unregistering is good manners but not load-bearing: {@see self::installed()}
- * cross-checks every entry against `#__extensions` and prunes rows whose
- * extension is gone, so a consumer that never unregisters cannot pin the tables
- * forever.
+ * Neither call is load-bearing, by design:
+ *
+ * - Not registering is survivable — {@see ConsumerScanner} finds extensions that
+ *   reference this library's namespace on disk, so an author who never read any
+ *   of this is still protected.
+ * - Not unregistering is survivable — {@see self::installedExcluding()}
+ *   cross-checks every entry against `#__extensions` and prunes rows whose
+ *   extension is gone, so a stale row cannot pin the tables forever.
+ *
+ * What registering buys over being detected is a display name in the refusal
+ * message, and immunity to the scan's budget limit on very large installs.
  *
  * @since  1.1.6
  */
@@ -196,7 +198,13 @@ class ConsumerRegistry
         $db    = self::db();
         $found = [];
 
-        foreach (array_merge(self::FIRST_PARTY, self::registered($db)) as $consumer) {
+        // Three sources, in ascending order of trust: the hardcoded list, the
+        // registry, and the filesystem. The scan is last because it is the only
+        // one that cannot be wrong about intent — an extension referencing our
+        // namespace is using us whether or not anyone registered it.
+        $sources = array_merge(self::FIRST_PARTY, self::registered($db), self::detected());
+
+        foreach ($sources as $consumer) {
             if (!self::isInstalled($db, $consumer)) {
                 // Registered but no longer present — drop the stale row.
                 if (!\in_array($consumer, self::FIRST_PARTY, true)) {
@@ -214,6 +222,42 @@ class ConsumerRegistry
         }
 
         return array_values(array_unique($found));
+    }
+
+    /**
+     * Consumers found on disk, resilient to this class having been hand-loaded.
+     *
+     * Install scripts routinely reach this class with `require_once` because the
+     * namespace is not autoloadable during an install — `pkg_proclaim`'s and
+     * `pkg_cwmscripture`'s scripts both do. In that state a plain
+     * `ConsumerScanner::detect()` throws "class not found", and the caller's
+     * catch-all turns a working scan into a silent no-op. So load the sibling
+     * file the same way, and degrade to registry-plus-first-party if it is
+     * genuinely absent rather than taking the caller down.
+     *
+     * @return  array<int, array{element: string, type: string, folder: string, name: string}>
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    private static function detected(): array
+    {
+        if (!class_exists(ConsumerScanner::class)) {
+            $path = __DIR__ . '/ConsumerScanner.php';
+
+            if (is_file($path)) {
+                require_once $path;
+            }
+        }
+
+        if (!class_exists(ConsumerScanner::class)) {
+            return [];
+        }
+
+        try {
+            return ConsumerScanner::detect();
+        } catch (\Throwable) {
+            return [];
+        }
     }
 
     /**
