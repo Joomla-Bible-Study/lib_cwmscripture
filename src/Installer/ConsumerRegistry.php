@@ -237,7 +237,7 @@ class ConsumerRegistry
      *
      * @return  array<int, array{element: string, type: string, folder: string, name: string}>
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.1.7
      */
     private static function detected(): array
     {

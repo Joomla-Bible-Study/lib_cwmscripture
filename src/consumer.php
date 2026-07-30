@@ -48,7 +48,7 @@
  * @license    GNU General Public License version 2 or later; see LICENSE.txt
  * @link       https://www.christianwebministries.org
  *
- * @since      __DEPLOY_VERSION__
+ * @since      1.1.7
  */
 
 // phpcs:disable PSR1.Files.SideEffects
@@ -69,7 +69,7 @@ return new class () {
      *
      * @return  bool  True when registered; false when the library is too old or the write failed
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.1.7
      */
     public function register(
         string $element,
@@ -94,7 +94,7 @@ return new class () {
      *
      * @return  bool  True when the row is gone
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.1.7
      */
     public function unregister(string $element, string $type = 'component', string $folder = ''): bool
     {
@@ -109,7 +109,7 @@ return new class () {
      *
      * @return  class-string|null  The class name, or null when unavailable
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.1.7
      */
     private function registry(): ?string
     {

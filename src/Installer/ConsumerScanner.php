@@ -34,7 +34,7 @@ namespace CWM\Library\Scripture\Installer;
  * thousand files, which is fine for a one-off interactive action and would not
  * be fine per request.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  1.1.7
  */
 class ConsumerScanner
 {
@@ -42,7 +42,7 @@ class ConsumerScanner
      * Namespace that proves consumption. An extension referencing it must be
      * loading classes from this library.
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.1.7
      */
     private const NEEDLE = 'CWM\\Library\\Scripture';
 
@@ -50,7 +50,7 @@ class ConsumerScanner
      * Upper bound on files read, so a pathological install cannot hang an
      * uninstall. Generous: a large Joomla site is a few thousand PHP files.
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.1.7
      */
     private const MAX_FILES = 25000;
 
@@ -58,7 +58,7 @@ class ConsumerScanner
      * Directory names never worth searching — third-party dependency trees and
      * build output, none of which identify a Joomla extension.
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.1.7
      */
     private const SKIP_DIRS = ['node_modules', 'vendor', '.git', 'cache', 'tmp', 'logs'];
 
@@ -67,7 +67,7 @@ class ConsumerScanner
      *
      * @return  array<int, array{glob: string, type: string, grouped: bool}>
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.1.7
      */
     private static function roots(): array
     {
@@ -93,7 +93,7 @@ class ConsumerScanner
      *
      * @return  array<int, array{element: string, type: string, folder: string, name: string}>
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.1.7
      */
     public static function detect(): array
     {
@@ -149,7 +149,7 @@ class ConsumerScanner
      *
      * @return  bool
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.1.7
      */
     private static function references(string $dir, int &$budget): bool
     {
@@ -197,7 +197,7 @@ class ConsumerScanner
      *
      * @return  string
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.1.7
      */
     private static function label(string $element, string $type, string $folder): string
     {
