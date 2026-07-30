@@ -44,9 +44,16 @@ class LibraryVersion
     /**
      * The library version.
      *
-     * Must be kept in sync with `<version>` in cwmscripture.xml by hand — the
-     * release tooling only rewrites the manifest, so this constant does not
-     * update itself despite shipping alongside it. See issue #15.
+     * Written by `cwm-bump` alongside the manifest, via the
+     * `versionTracking.sourceFiles` entry in cwm-build.config.json (needs
+     * cwm/build-tools >= 1.13). It used to require a hand edit and drifted a
+     * release behind, which mattered because satisfies() and needsUpgrade()
+     * read it — consumers gating on a minimum version were told this library
+     * was older than it was. See issue #15.
+     *
+     * Do not edit by hand: bump through `composer bump-version` so the manifest,
+     * package.json and this constant move together. tests/unit/VersionDeclarationsTest.php
+     * fails if they diverge.
      *
      * @var  string
      * @since  1.0.0
