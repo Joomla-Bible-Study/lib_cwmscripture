@@ -33,6 +33,15 @@
             { "source": "build/media_source/css", "output": "media/lib_cwmscripture/css" }
         ]
     },
+    "_versionTracking_comment": "Deep-merged on top of the `library` profile, which already supplies packageJson and the __DEPLOY_VERSION__ substitution. sourceFiles adds the one declaration nothing used to write: LibraryVersion::VERSION is a hardcoded constant, and satisfies()/needsUpgrade() read it, so when it drifted (1.1.3 against a 1.1.4 manifest) consumers gating on a minimum version were told this library was older than it was. See issue #15. Needs cwm/build-tools >= 1.13; on anything older the key is ignored and the constant silently stops being written, which is why composer.json requires ^1.13.0.",
+    "versionTracking": {
+        "sourceFiles": [
+            {
+                "path": "src/LibraryVersion.php",
+                "pattern": "public const VERSION = '{version}';"
+            }
+        ]
+    },
     "ars": {
         "endpoint": "https://www.christianwebministries.org",
         "categoryId": 6,
