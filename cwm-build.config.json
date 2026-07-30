@@ -26,7 +26,12 @@
         "preBuild": {
             "mode": "ensure-minified",
             "dirs": ["media/lib_cwmscripture/js", "media/lib_cwmscripture/css"]
-        }
+        },
+        "_verifyMediaSources_comment": "Fails the build when media/ holds output no source can reproduce. This repo is why the check exists: translations-manager.min.js and its .gz/.map shipped in every release for months after the source became bible-translations.es6.js — minified output is gitignored, so nothing ever removed it (issue #25). Needs cwm/build-tools >= 1.12; on anything older the key is ignored and the check silently does not run, which is why composer.json requires ^1.12.0.",
+        "verifyMediaSources": [
+            { "source": "build/media_source/js",  "output": "media/lib_cwmscripture/js" },
+            { "source": "build/media_source/css", "output": "media/lib_cwmscripture/css" }
+        ]
     },
     "ars": {
         "endpoint": "https://www.christianwebministries.org",
