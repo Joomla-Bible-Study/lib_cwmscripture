@@ -99,6 +99,39 @@ Consequences to keep in mind:
   the tables on an upgraded site.
 - `tests/unit/ManifestTest.php` guards all of the above.
 
+### Update SQL is replayed on every upgrade
+
+`sql/updates/mysql/*.sql` is **not** applied incrementally for this extension.
+The upgrade deletes the `#__extensions` row and stores a new one, so when
+`InstallerAdapter::parseQueries()` calls `parseSchemaUpdates()` with that new
+`extension_id`, no `#__schemas` row exists for it yet and Joomla runs *every*
+file, every time.
+
+Consequence: library migrations must be idempotent. `CREATE TABLE IF NOT EXISTS`
+and `INSERT IGNORE` are fine; a bare `ALTER TABLE ADD COLUMN` fails on the second
+upgrade and takes the whole install with it, because `parseQueries()` throws on a
+failed update. Put anything conditional in `script.php`, which can consult
+`information_schema` first. `ManifestTest::testUpdateSqlIsIdempotent()` enforces
+this.
+
+(Do not conclude from this that `<update><schemas>` is dead for libraries — it is
+the live path, and it is what creates `#__bsms_scripture_consumers` on sites
+upgrading from 1.1.5. `ensureTables()` cannot do it: that returns early whenever
+`#__bsms_bible_translations` already exists.)
+
+### Consumers integrate through `src/consumer.php`, not the class
+
+Install scripts cannot rely on `CWM\Library\Scripture\*` being autoloadable —
+Joomla builds its PSR-4 map at request start, and in a package install this
+library lands in the same request one step ahead of the consumer. `src/consumer.php`
+exists so consumers do not each reinvent the workaround: it self-registers the
+namespace, tolerates older library versions, and swallows its own errors.
+
+It lives in `src/` because the packager ships directories only; a loose file at
+the library root would be silently omitted from the zip. Callers must use
+`require`, not `require_once` — several consumers run in one request, and
+`require_once` returns `true` to all but the first.
+
 ## Provider Gotchas
 
 ### GetBible URL encoding
