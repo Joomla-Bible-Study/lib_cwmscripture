@@ -19,6 +19,24 @@
 <changelogs>
 
     <!-- ============================================================ -->
+    <!-- 1.1.8                                                    -->
+    <!-- ============================================================ -->
+    <changelog>
+        <element>lib_cwmscripture</element>
+        <type>library</type>
+        <version>1.1.8</version>
+        <date>2026-08-01</date>
+        <note>
+            <item>build: fail the build when media output has no source by @bcordis in https://github.com/Joomla-Bible-Study/lib_cwmscripture/pull/27</item>
+            <item>test: fail when the three version declarations disagree by @bcordis in https://github.com/Joomla-Bible-Study/lib_cwmscripture/pull/28</item>
+            <item>build: let cwm-bump write LibraryVersion::VERSION by @bcordis in https://github.com/Joomla-Bible-Study/lib_cwmscripture/pull/29</item>
+            <item>fix(update): add task=stream to the ARS update server URL by @bcordis in https://github.com/Joomla-Bible-Study/lib_cwmscripture/pull/30</item>
+            <item>chore(deps): update cwm/build-tools to v1.13.1 by @bcordis in https://github.com/Joomla-Bible-Study/lib_cwmscripture/pull/31</item>
+            <item>chore(ci): enable Dependabot version updates by @bcordis in https://github.com/Joomla-Bible-Study/lib_cwmscripture/pull/32</item>
+        </note>
+    </changelog>
+
+    <!-- ============================================================ -->
     <!-- 1.1.7                                                    -->
     <!-- ============================================================ -->
     <changelog>
