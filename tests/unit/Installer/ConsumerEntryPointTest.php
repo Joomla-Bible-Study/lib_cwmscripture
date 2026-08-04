@@ -81,13 +81,13 @@ class ConsumerEntryPointTest extends TestCase
         $consumer = require self::root() . self::ENTRY;
 
         $register = new \ReflectionMethod($consumer, 'register');
-        $names    = array_map(static fn($p) => $p->getName(), $register->getParameters());
+        $names    = array_map(static fn ($p) => $p->getName(), $register->getParameters());
 
         // Consumers pass `name:` as a named argument, so this is not just ordering.
         $this->assertSame(['element', 'type', 'folder', 'name'], $names);
 
         $unregister = new \ReflectionMethod($consumer, 'unregister');
-        $unnames    = array_map(static fn($p) => $p->getName(), $unregister->getParameters());
+        $unnames    = array_map(static fn ($p) => $p->getName(), $unregister->getParameters());
 
         $this->assertSame(
             ['element', 'type', 'folder'],
