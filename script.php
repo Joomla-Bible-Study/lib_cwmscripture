@@ -141,10 +141,10 @@ return new class () implements InstallerScriptInterface {
             );
         }
 
-        // Core translation downloads used to happen synchronously here,
-        // which added ~40s to every install.  They're now deferred to a
-        // one-shot Joomla task scheduled by plg_task_cwmscripture during
-        // its own postflight — see plg_task_cwmscripture/script.php.
+        // Core translation downloads are deferred to a one-shot Joomla task
+        // that plg_task_cwmscripture schedules in its own postflight — see
+        // plg_task_cwmscripture/script.php. Doing them inline here adds roughly
+        // 40 seconds to every install.
 
         $version = (string) $adapter->getManifest()->version;
         Log::add(
@@ -187,10 +187,10 @@ return new class () implements InstallerScriptInterface {
     /**
      * Called on uninstall.
      *
-     * The bible tables are NOT removed by manifest SQL — see the comment where
-     * the <uninstall> block used to live in cwmscripture.xml. Joomla's
-     * LibraryAdapter uninstalls the old library on every update, so manifest
-     * uninstall SQL ran on upgrades too and wiped every downloaded translation.
+     * The bible tables are NOT removed by manifest SQL, and cwmscripture.xml
+     * carries no <uninstall> block for that reason: Joomla's LibraryAdapter
+     * uninstalls the existing library on every update, so manifest uninstall
+     * SQL runs on upgrades too and would wipe every downloaded translation.
      *
      * @param   InstallerAdapter  $adapter  The installer adapter
      *
@@ -213,8 +213,8 @@ return new class () implements InstallerScriptInterface {
      *   1. The installer must not be in a package/upgrade uninstall.
      *      LibraryAdapter::checkExtensionInFilesystem() uninstalls the current
      *      library before installing the new one and flags that inner
-     *      Installer with setPackageUninstall(true) — that is the upgrade path
-     *      that used to destroy people's downloaded Bibles.
+     *      Installer with setPackageUninstall(true) — the upgrade path that
+     *      would otherwise destroy people's downloaded Bibles.
      *   2. No extension that shares these tables may still be installed. The
      *      three #__bsms_bible_* / #__bsms_scripture_cache tables are shared
      *      with com_proclaim and plg_content_scripturelinks; removing the
@@ -463,14 +463,14 @@ return new class () implements InstallerScriptInterface {
             $tables = $db->getTableList();
             $prefix = $db->getPrefix();
 
-            // Every table the install SQL creates. Checked individually, not via a
-            // single sentinel: this method used to return as soon as
-            // bsms_bible_translations existed, which meant it could never create a
-            // table added in a later version. #__bsms_scripture_consumers (new in
-            // 1.1.6) then existed on upgraded sites only because Joomla replays the
-            // schema updates, and the uninstall guard's own storage should not
-            // depend on that — see the "Update SQL is replayed" note in CLAUDE.md.
-            // ManifestTest keeps this list in step with the install SQL.
+            // Every table the install SQL creates, checked individually rather
+            // than through a single sentinel. Returning as soon as
+            // bsms_bible_translations exists would mean a table introduced in a
+            // later version is never created here: #__bsms_scripture_consumers
+            // (new in 1.1.6) would then reach upgraded sites only because Joomla
+            // replays the schema updates, and the uninstall guard's own storage
+            // must not depend on that — see the "Update SQL is replayed" note in
+            // CLAUDE.md. ManifestTest keeps this list in step with the install SQL.
             $expected = [
                 'bsms_bible_translations',
                 'bsms_bible_verses',

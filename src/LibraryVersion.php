@@ -46,10 +46,9 @@ class LibraryVersion
      *
      * Written by `cwm-bump` alongside the manifest, via the
      * `versionTracking.sourceFiles` entry in cwm-build.config.json (needs
-     * cwm/build-tools >= 1.13). It used to require a hand edit and drifted a
-     * release behind, which mattered because satisfies() and needsUpgrade()
-     * read it — consumers gating on a minimum version were told this library
-     * was older than it was. See issue #15.
+     * cwm/build-tools >= 1.13). Keeping it in step matters because satisfies()
+     * and needsUpgrade() read it: a stale value tells consumers gating on a
+     * minimum version that this library is older than it is.
      *
      * Do not edit by hand: bump through `composer bump-version` so the manifest,
      * package.json and this constant move together. tests/unit/VersionDeclarationsTest.php
