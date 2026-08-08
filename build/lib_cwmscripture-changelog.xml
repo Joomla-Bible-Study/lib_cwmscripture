@@ -19,6 +19,20 @@
 <changelogs>
 
     <!-- ============================================================ -->
+    <!-- 1.1.9                                                    -->
+    <!-- ============================================================ -->
+    <changelog>
+        <element>lib_cwmscripture</element>
+        <type>library</type>
+        <version>1.1.9</version>
+        <date>2026-08-08</date>
+        <note>
+            <item>chore: PSR-12 formatting fixes (trailing newline, fn spacing) by @bcordis in https://github.com/Joomla-Bible-Study/lib_cwmscripture/pull/36</item>
+            <item>docs: state behaviour in the install-script docblocks by @bcordis in https://github.com/Joomla-Bible-Study/lib_cwmscripture/pull/38</item>
+        </note>
+    </changelog>
+
+    <!-- ============================================================ -->
     <!-- 1.1.8                                                    -->
     <!-- ============================================================ -->
     <changelog>
