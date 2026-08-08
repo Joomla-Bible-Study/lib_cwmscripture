@@ -57,7 +57,7 @@ class LibraryVersion
      * @var  string
      * @since  1.0.0
      */
-    public const VERSION = '1.1.8';
+    public const VERSION = '1.1.9';
 
     /**
      * Check if the library extension is installed in Joomla.
