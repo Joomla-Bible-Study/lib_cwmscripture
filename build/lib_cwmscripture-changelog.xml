@@ -19,19 +19,16 @@
 <changelogs>
 
     <!-- ============================================================ -->
-    <!-- 1.1.10-rc1                                               -->
+    <!-- 1.1.10                                                   -->
     <!-- ============================================================ -->
     <changelog>
         <element>lib_cwmscripture</element>
         <type>library</type>
-        <version>1.1.10-rc1</version>
+        <version>1.1.10</version>
         <date>2026-08-10</date>
         <fix>
             <item>Bible book names now show as names rather than internal codes on sites that do not have Proclaim installed. The names lived in Proclaim's language file, so Scripture Links and Living Word had nothing to read them from and displayed entries like "JBS_BBK_JOHN 3" by @bcordis in https://github.com/Joomla-Bible-Study/lib_cwmscripture/pull/40</item>
         </fix>
-        <note>
-            <item>Release candidate. Pinned by Proclaim for testing and not published to the update server, so no site is offered it.</item>
-        </note>
     </changelog>
 
     <!-- ============================================================ -->
