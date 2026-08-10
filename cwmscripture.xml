@@ -2,8 +2,8 @@
 <extension version="5.2" type="library" method="upgrade">
     <name>lib_cwmscripture</name>
 	<description>LIB_CWMSCRIPTURE_DESCRIPTION</description>
-	<version>1.1.9</version>
-	<creationDate>2026-08-08</creationDate>
+	<version>1.1.10-rc1</version>
+	<creationDate>2026-08-10</creationDate>
     <author>CWM Team</author>
     <authorEmail>info@christianwebministries.org</authorEmail>
     <authorUrl>https://www.christianwebministries.org</authorUrl>
