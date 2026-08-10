@@ -178,7 +178,7 @@ class ScriptureHelper
      * would skip the load entirely and put every book back to a raw key.
      *
      * @var bool
-     * @since __DEPLOY_VERSION__
+     * @since 1.1.10
      */
     private static bool $languageLoadAttempted = false;
 
@@ -341,7 +341,7 @@ class ScriptureHelper
      *
      * @return  void
      *
-     * @since   __DEPLOY_VERSION__
+     * @since   1.1.10
      */
     private static function loadLanguage(): void
     {
