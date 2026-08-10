@@ -11,6 +11,7 @@
 
 namespace CWM\Library\Scripture\Helper;
 
+use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 
 // phpcs:disable PSR1.Files.SideEffects
@@ -168,6 +169,20 @@ class ScriptureHelper
     private static ?array $translatedBookCache = null;
 
     /**
+     * Whether loadLanguage() has already run this request.
+     *
+     * Guards the call, not the outcome — false means "not asked yet, ask now",
+     * which is why it must start false. Named for the attempt rather than the
+     * state because "languageLoaded = false" reads like a language that failed
+     * to load, and invites someone to helpfully flip the default to true, which
+     * would skip the load entirely and put every book back to a raw key.
+     *
+     * @var bool
+     * @since __DEPLOY_VERSION__
+     */
+    private static bool $languageLoadAttempted = false;
+
+    /**
      * Parse a human-readable scripture reference into a ScriptureReference object.
      *
      * @param   string  $text  The reference text to parse
@@ -306,7 +321,43 @@ class ScriptureHelper
             return '';
         }
 
+        self::loadLanguage();
+
         return Text::_($key);
+    }
+
+    /**
+     * Load this library's own language file.
+     *
+     * The book keys used to resolve only because com_proclaim's admin language
+     * file happened to be loaded — by its site dispatcher, its system plugin or
+     * its service provider, none of which this library can see or rely on. On a
+     * site running ScriptureLinks or Living Word without Proclaim there was
+     * nothing to load them at all, and every book came out as a raw key (#39).
+     *
+     * Joomla's Language::load() is itself idempotent and tracks what it has
+     * already read, but it is called on a path that runs once per book in
+     * getAllBooks(), so the flag saves 73 no-op calls rather than 73 file reads.
+     *
+     * @return  void
+     *
+     * @since   __DEPLOY_VERSION__
+     */
+    private static function loadLanguage(): void
+    {
+        if (self::$languageLoadAttempted) {
+            return;
+        }
+
+        self::$languageLoadAttempted = true;
+
+        try {
+            Factory::getApplication()->getLanguage()
+                ->load('lib_cwmscripture', JPATH_LIBRARIES . '/cwmscripture');
+        } catch (\Throwable) {
+            // No application (CLI), or the file is missing: Text::_() then
+            // returns the key, which is exactly what happened before.
+        }
     }
 
     /**
@@ -318,6 +369,8 @@ class ScriptureHelper
      */
     public static function getAllBooks(): array
     {
+        self::loadLanguage();
+
         $books = [];
 
         foreach (self::BOOK_KEYS as $key => $booknumber) {
@@ -355,6 +408,8 @@ class ScriptureHelper
         if (self::$translatedBookCache !== null) {
             return self::$translatedBookCache;
         }
+
+        self::loadLanguage();
 
         self::$translatedBookCache = [];
 
