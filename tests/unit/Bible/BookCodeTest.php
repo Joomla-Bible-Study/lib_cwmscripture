@@ -30,7 +30,7 @@ class BookCodeTest extends TestCase
      */
     private static function provider(): AbstractBibleProvider
     {
-        return new class extends AbstractBibleProvider {
+        return new class () extends AbstractBibleProvider {
             public static function resolve(string $name): string
             {
                 return self::resolveBookCode($name);
