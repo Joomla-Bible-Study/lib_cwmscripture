@@ -46,32 +46,6 @@ class BibleBrainProvider extends AbstractBibleProvider implements AudioProviderI
     private const API_BASE = 'https://4.dbt.io/api';
 
     /**
-     * USFM book codes indexed by standard book number (1-66).
-     *
-     * These match the Bible Brain API's expected book identifiers.
-     *
-     * @var  array<int, string>
-     * @since  1.2.0
-     */
-    private const USFM_CODES = [
-        1  => 'GEN', 2 => 'EXO', 3 => 'LEV', 4 => 'NUM', 5 => 'DEU',
-        6  => 'JOS', 7 => 'JDG', 8 => 'RUT', 9 => '1SA', 10 => '2SA',
-        11 => '1KI', 12 => '2KI', 13 => '1CH', 14 => '2CH', 15 => 'EZR',
-        16 => 'NEH', 17 => 'EST', 18 => 'JOB', 19 => 'PSA', 20 => 'PRO',
-        21 => 'ECC', 22 => 'SNG', 23 => 'ISA', 24 => 'JER', 25 => 'LAM',
-        26 => 'EZK', 27 => 'DAN', 28 => 'HOS', 29 => 'JOL', 30 => 'AMO',
-        31 => 'OBA', 32 => 'JON', 33 => 'MIC', 34 => 'NAM', 35 => 'HAB',
-        36 => 'ZEP', 37 => 'HAG', 38 => 'ZEC', 39 => 'MAL',
-        40 => 'MAT', 41 => 'MRK', 42 => 'LUK', 43 => 'JHN',
-        44 => 'ACT', 45 => 'ROM', 46 => '1CO', 47 => '2CO',
-        48 => 'GAL', 49 => 'EPH', 50 => 'PHP', 51 => 'COL',
-        52 => '1TH', 53 => '2TH', 54 => '1TI', 55 => '2TI',
-        56 => 'TIT', 57 => 'PHM', 58 => 'HEB', 59 => 'JAS',
-        60 => '1PE', 61 => '2PE', 62 => '1JN', 63 => '2JN',
-        64 => '3JN', 65 => 'JUD', 66 => 'REV',
-    ];
-
-    /**
      * Common translation abbreviation to Bible Brain Bible ID mapping.
      *
      * Bible Brain uses compound IDs like "ENGKJV" (language + version).
@@ -416,7 +390,7 @@ class BibleBrainProvider extends AbstractBibleProvider implements AudioProviderI
      */
     public static function getUsfmCodes(): array
     {
-        return self::USFM_CODES;
+        return self::BOOK_CODES;
     }
 
     /**
@@ -588,7 +562,7 @@ class BibleBrainProvider extends AbstractBibleProvider implements AudioProviderI
         $verseStart = !empty($m[3]) ? (int) $m[3] : 0;
         $verseEnd   = !empty($m[5]) ? (int) $m[5] : 0;
 
-        $usfmCode = $this->resolveBookToUsfm($bookName);
+        $usfmCode = self::resolveBookCode($bookName);
 
         if (empty($usfmCode)) {
             return null;
@@ -600,35 +574,6 @@ class BibleBrainProvider extends AbstractBibleProvider implements AudioProviderI
             'verse_start' => $verseStart,
             'verse_end'   => $verseEnd,
         ];
-    }
-
-    /**
-     * Resolve a book name to its USFM code.
-     *
-     * @param   string  $bookName  Book name (e.g. "Genesis", "1 John", "Psalms")
-     *
-     * @return  string  USFM code or empty string
-     *
-     * @since  1.2.0
-     */
-    private function resolveBookToUsfm(string $bookName): string
-    {
-        $normalized = strtolower(trim($bookName));
-
-        foreach (self::BOOK_NAMES as $num => $name) {
-            if (strtolower($name) === $normalized) {
-                return self::USFM_CODES[$num] ?? '';
-            }
-        }
-
-        // Try partial match for abbreviations
-        foreach (self::BOOK_NAMES as $num => $name) {
-            if (str_starts_with(strtolower($name), $normalized)) {
-                return self::USFM_CODES[$num] ?? '';
-            }
-        }
-
-        return '';
     }
 
     /**
