@@ -53,30 +53,6 @@ class ApiBibleProvider extends AbstractBibleProvider
     private const FUMS_BASE = 'https://fums.api.bible/f3';
 
     /**
-     * OSIS book codes indexed by standard book number (1-66).
-     *
-     * @var  array<int, string>
-     * @since  1.0.0
-     */
-    private const OSIS_CODES = [
-        1  => 'GEN', 2 => 'EXO', 3 => 'LEV', 4 => 'NUM', 5 => 'DEU',
-        6  => 'JOS', 7 => 'JDG', 8 => 'RUT', 9 => '1SA', 10 => '2SA',
-        11 => '1KI', 12 => '2KI', 13 => '1CH', 14 => '2CH', 15 => 'EZR',
-        16 => 'NEH', 17 => 'EST', 18 => 'JOB', 19 => 'PSA', 20 => 'PRO',
-        21 => 'ECC', 22 => 'SNG', 23 => 'ISA', 24 => 'JER', 25 => 'LAM',
-        26 => 'EZK', 27 => 'DAN', 28 => 'HOS', 29 => 'JOL', 30 => 'AMO',
-        31 => 'OBA', 32 => 'JON', 33 => 'MIC', 34 => 'NAM', 35 => 'HAB',
-        36 => 'ZEP', 37 => 'HAG', 38 => 'ZEC', 39 => 'MAL',
-        40 => 'MAT', 41 => 'MRK', 42 => 'LUK', 43 => 'JHN',
-        44 => 'ACT', 45 => 'ROM', 46 => '1CO', 47 => '2CO',
-        48 => 'GAL', 49 => 'EPH', 50 => 'PHP', 51 => 'COL',
-        52 => '1TH', 53 => '2TH', 54 => '1TI', 55 => '2TI',
-        56 => 'TIT', 57 => 'PHM', 58 => 'HEB', 59 => 'JAS',
-        60 => '1PE', 61 => '2PE', 62 => '1JN', 63 => '2JN',
-        64 => '3JN', 65 => 'JUD', 66 => 'REV',
-    ];
-
-    /**
      * The API key for authentication.
      *
      * @var  string
@@ -244,7 +220,7 @@ class ApiBibleProvider extends AbstractBibleProvider
      */
     public static function getOsisCodes(): array
     {
-        return self::OSIS_CODES;
+        return self::BOOK_CODES;
     }
 
     /**
@@ -270,7 +246,7 @@ class ApiBibleProvider extends AbstractBibleProvider
         $chapterEnd  = !empty($m[4]) ? (int) $m[4] : $chapter;
         $verseEnd    = !empty($m[5]) ? (int) $m[5] : null;
 
-        $osisCode = $this->resolveBookToOsis($bookName);
+        $osisCode = self::resolveBookCode($bookName);
 
         if (empty($osisCode)) {
             return '';
@@ -283,28 +259,6 @@ class ApiBibleProvider extends AbstractBibleProvider
         }
 
         return $passageId;
-    }
-
-    /**
-     * Resolve a book name to its OSIS code.
-     *
-     * @param   string  $bookName  Book name
-     *
-     * @return  string  OSIS code or empty string
-     *
-     * @since  1.0.0
-     */
-    private function resolveBookToOsis(string $bookName): string
-    {
-        $normalized = strtolower(trim($bookName));
-
-        foreach (self::BOOK_NAMES as $num => $name) {
-            if (strtolower($name) === $normalized) {
-                return self::OSIS_CODES[$num] ?? '';
-            }
-        }
-
-        return '';
     }
 
     /**
