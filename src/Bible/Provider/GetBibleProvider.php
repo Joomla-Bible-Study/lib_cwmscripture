@@ -13,6 +13,7 @@ namespace CWM\Library\Scripture\Bible\Provider;
 
 use CWM\Library\Scripture\Bible\AbstractBibleProvider;
 use CWM\Library\Scripture\Bible\BiblePassageResult;
+use CWM\Library\Scripture\Helper\ScriptureHelper;
 use Joomla\CMS\Log\Log;
 
 // phpcs:disable PSR1.Files.SideEffects
@@ -42,6 +43,36 @@ class GetBibleProvider extends AbstractBibleProvider
     /**
      * @inheritDoc
      */
+    /**
+     * Replace a reference's book name with the English one the API expects.
+     *
+     * ⚠️ Unlike the other providers, GetBible takes a book *name* on the wire
+     * ("Luke 7:36-38"), and the reference arrives carrying whatever name the
+     * site displays. A Czech site sent "Žalm 23:1", which the API does not
+     * recognise, so passages came back empty on all thirteen translated
+     * languages (#1688).
+     *
+     * Anything the library cannot identify is passed through untouched, so a
+     * name this build has never heard of still reaches the API as typed.
+     *
+     * @param   string  $reference  Reference with the site's own book name
+     *
+     * @return  string  The same reference with an English book name
+     *
+     * @since   1.1.11
+     */
+    protected static function anglicizeBookName(string $reference): string
+    {
+        if (!preg_match('/^\s*(.+?)\s+(\d.*)$/', $reference, $m)) {
+            return $reference;
+        }
+
+        $standard = AbstractBibleProvider::proclaimToStandard(ScriptureHelper::getBookNumber($m[1]));
+        $english  = AbstractBibleProvider::getBookName($standard);
+
+        return $english === '' ? $reference : $english . ' ' . $m[2];
+    }
+
     public function getPassage(string $reference, string $translation): BiblePassageResult
     {
         $cached = $this->readCache('getbible', $translation, $reference);
@@ -50,7 +81,7 @@ class GetBibleProvider extends AbstractBibleProvider
             return $cached;
         }
 
-        $apiRef = str_replace('+', ' ', $reference);
+        $apiRef = self::anglicizeBookName(str_replace('+', ' ', $reference));
 
         // Fix same-chapter redundant prefix: "Luke 12:54-12:56" -> "Luke 12:54-56"
         $apiRef = preg_replace_callback(

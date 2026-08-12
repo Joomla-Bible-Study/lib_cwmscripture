@@ -13,6 +13,7 @@ namespace CWM\Library\Scripture\Bible\Provider;
 
 use CWM\Library\Scripture\Bible\AbstractBibleProvider;
 use CWM\Library\Scripture\Bible\BiblePassageResult;
+use CWM\Library\Scripture\Helper\ScriptureHelper;
 use Joomla\CMS\Log\Log;
 
 // phpcs:disable PSR1.Files.SideEffects
@@ -225,6 +226,20 @@ class LocalProvider extends AbstractBibleProvider
     protected function resolveBookNumber(string $name): int
     {
         $normalized = strtolower(trim($name));
+
+        // ⚠️ Both tables below are English, and the reference arrives carrying
+        // whatever name the site displays -- "Žalm" on a Czech site. This is the
+        // bundled always-available provider, so before #1688 a translated site
+        // queried `book = 0`, found nothing, and had no fallback left to try.
+        $proclaimBook = ScriptureHelper::getBookNumber($name);
+
+        if ($proclaimBook > 0) {
+            $standard = AbstractBibleProvider::proclaimToStandard($proclaimBook);
+
+            if ($standard > 0) {
+                return $standard;
+            }
+        }
 
         foreach (self::BOOK_NAMES as $number => $bookName) {
             if (strtolower($bookName) === $normalized) {
