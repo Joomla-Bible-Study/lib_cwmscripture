@@ -18,8 +18,8 @@
     "@rollup/plugin-terser": "^1.0.0",
     "csso": "^5.0.5",
     "eslint": "^10.8.0",
-    "globals": "^17.8.0",
-    "rollup": "^4.62.3",
+    "globals": "^17.9.0",
+    "rollup": "^4.62.4",
     "rollup-plugin-gzip": "^4.1.1"
   },
   "scripts": {
