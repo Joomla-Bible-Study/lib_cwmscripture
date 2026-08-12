@@ -11,6 +11,7 @@
 
 namespace CWM\Library\Scripture\Bible;
 
+use CWM\Library\Scripture\Helper\ScriptureHelper;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Log\Log;
 use Joomla\Database\DatabaseInterface;
@@ -259,12 +260,23 @@ abstract class AbstractBibleProvider implements BibleProviderInterface
     /**
      * Resolve a book name, or an unambiguous abbreviation of one, to its code.
      *
-     * Exact match first. Falling back to a prefix match is what makes typed
+     * ⚠️ BOOK_NAMES is English, and callers hand this the name a site displays.
+     * `ScriptureHelper::getBookName()` returns `Text::_()` of the book's key, so
+     * on any of the thirteen translated languages that name arrives as "Žalm" or
+     * "Juan" and matched nothing here — every remote provider then had no code
+     * to send and returned an empty passage (#1688).
+     *
+     * ScriptureHelper is asked first: it holds the 187-entry abbreviation table
+     * and a map of the *translated* names, both exact-match. Only when it has no
+     * answer does the English table below run, so a site whose language pack is
+     * missing behaves exactly as it did before.
+     *
+     * Exact match before prefix match. The prefix pass is what makes typed
      * abbreviations work, but it must only answer when exactly one book matches:
      * five books begin "Jo", and returning whichever came first in the table
      * meant "Jo" silently resolved to Joshua and never John (#1688).
      *
-     * @param   string  $bookName  A book name or abbreviation
+     * @param   string  $bookName  A book name or abbreviation, in any language
      *
      * @return  string  Book code, or an empty string when unknown or ambiguous
      *
@@ -276,6 +288,16 @@ abstract class AbstractBibleProvider implements BibleProviderInterface
 
         if ($normalized === '') {
             return '';
+        }
+
+        $proclaimBook = ScriptureHelper::getBookNumber($bookName);
+
+        if ($proclaimBook > 0) {
+            $code = self::bookCodeForProclaim($proclaimBook);
+
+            if ($code !== '') {
+                return $code;
+            }
         }
 
         foreach (self::BOOK_NAMES as $num => $name) {

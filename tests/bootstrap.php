@@ -14,17 +14,27 @@ if (!\defined('_JEXEC')) {
     \define('_JEXEC', 1);
 }
 
-// Stub Joomla\CMS\Language\Text if not available
+// Stub Joomla\CMS\Language\Text if not available.
+//
+// $strings lets a test stand in a real language pack. Without it every key
+// translates to itself, so the book names the library sees are English-shaped
+// and the localised path -- the one #1688 is about -- cannot be exercised at
+// all. Empty by default, so existing tests see the previous behaviour.
+//
+// eval() here and below is a fixed literal declaring a stub class in a
+// namespace, the existing way this file substitutes for an absent CMS. No
+// input reaches it.
 if (!class_exists(\Joomla\CMS\Language\Text::class)) {
     // Create a minimal namespace structure
     eval('
         namespace Joomla\CMS\Language;
         class Text {
+            public static array $strings = [];
             public static function _(string $key): string {
-                return $key;
+                return self::$strings[$key] ?? $key;
             }
             public static function sprintf(string $key, ...$args): string {
-                return vsprintf($key, $args);
+                return vsprintf(self::$strings[$key] ?? $key, $args);
             }
         }
     ');
