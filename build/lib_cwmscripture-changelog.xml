@@ -19,6 +19,22 @@
 <changelogs>
 
     <!-- ============================================================ -->
+    <!-- 1.1.11                                                   -->
+    <!-- ============================================================ -->
+    <changelog>
+        <element>lib_cwmscripture</element>
+        <type>library</type>
+        <version>1.1.11</version>
+        <date>2026-08-12</date>
+        <note>
+            <item>fix: one book-code table, and an abbreviation can no longer resolve to the wrong book (#1688) by @bcordis in https://github.com/Joomla-Bible-Study/lib_cwmscripture/pull/43</item>
+            <item>style: write the anonymous class with explicit parentheses (#1688) by @bcordis in https://github.com/Joomla-Bible-Study/lib_cwmscripture/pull/44</item>
+            <item>chore(deps-dev): Bump the npm-minor-and-patch group with 2 updates by @dependabot[bot] in https://github.com/Joomla-Bible-Study/lib_cwmscripture/pull/42</item>
+            <item>fix: resolve book names in the site&#x27;s own language, not only English (#1688) by @bcordis in https://github.com/Joomla-Bible-Study/lib_cwmscripture/pull/45</item>
+        </note>
+    </changelog>
+
+    <!-- ============================================================ -->
     <!-- 1.1.10                                                   -->
     <!-- ============================================================ -->
     <changelog>
