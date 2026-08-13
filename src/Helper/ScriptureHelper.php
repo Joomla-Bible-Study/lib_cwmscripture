@@ -161,26 +161,31 @@ class ScriptureHelper
     ];
 
     /**
-     * Cache for translated book names to booknumber.
+     * Cache for translated book names to booknumber, per language tag.
      *
-     * @var array<string, int>|null
+     * Keyed by tag because a multilingual site can render more than one language
+     * in a single request; a single flat map would answer the second language
+     * from the first one's names.
+     *
+     * @var array<string, array<string, int>>
      * @since 1.0.0
      */
-    private static ?array $translatedBookCache = null;
+    private static array $translatedBookCache = [];
 
     /**
-     * Whether loadLanguage() has already run this request.
+     * Which language tags loadLanguage() has already been asked for.
      *
-     * Guards the call, not the outcome — false means "not asked yet, ask now",
-     * which is why it must start false. Named for the attempt rather than the
-     * state because "languageLoaded = false" reads like a language that failed
-     * to load, and invites someone to helpfully flip the default to true, which
-     * would skip the load entirely and put every book back to a raw key.
+     * Guards the call, not the outcome — an absent tag means "not asked yet, ask
+     * now", which is why tags must not be pre-seeded. Named for the attempt
+     * rather than the state because "languageLoaded = false" reads like a
+     * language that failed to load, and invites someone to helpfully flip the
+     * default, which would skip the load entirely and put every book back to a
+     * raw key.
      *
-     * @var bool
+     * @var array<string, bool>
      * @since 1.1.10
      */
-    private static bool $languageLoadAttempted = false;
+    private static array $languageLoadAttempted = [];
 
     /**
      * Parse a human-readable scripture reference into a ScriptureReference object.
@@ -289,7 +294,11 @@ class ScriptureHelper
      */
     public static function getBookNumber(string $name): int
     {
-        $lower = strtolower(trim($name));
+        // mb_strtolower, not strtolower: the latter folds ASCII only, so a
+        // Cyrillic or Greek book name would have to arrive in exactly the casing
+        // the language file uses to match. getTranslatedBookMap() folds the same
+        // way — the two must always agree.
+        $lower = mb_strtolower(trim($name), 'UTF-8');
 
         if (isset(self::ABBREVIATIONS[$lower])) {
             return self::ABBREVIATIONS[$lower];
@@ -345,11 +354,13 @@ class ScriptureHelper
      */
     private static function loadLanguage(): void
     {
-        if (self::$languageLoadAttempted) {
+        $tag = self::activeLanguageTag();
+
+        if (isset(self::$languageLoadAttempted[$tag])) {
             return;
         }
 
-        self::$languageLoadAttempted = true;
+        self::$languageLoadAttempted[$tag] = true;
 
         try {
             Factory::getApplication()->getLanguage()
@@ -357,6 +368,26 @@ class ScriptureHelper
         } catch (\Throwable) {
             // No application (CLI), or the file is missing: Text::_() then
             // returns the key, which is exactly what happened before.
+        }
+    }
+
+    /**
+     * The language tag the caches are keyed by.
+     *
+     * Returns `*` when there is no application to ask (CLI), which is also the
+     * bucket the untranslated fallback lands in — one bucket for "no language",
+     * rather than a cache that never hits.
+     *
+     * @return  string  Language tag, e.g. `en-GB`
+     *
+     * @since   __DEPLOY_VERSION__
+     */
+    private static function activeLanguageTag(): string
+    {
+        try {
+            return Factory::getApplication()->getLanguage()->getTag() ?: '*';
+        } catch (\Throwable) {
+            return '*';
         }
     }
 
@@ -399,25 +430,34 @@ class ScriptureHelper
     /**
      * Build the translated book name to booknumber lookup map.
      *
+     * Cached per language tag: the same request can render two languages, and a
+     * map built under the first would resolve the second one's names to nothing.
+     *
      * @return  array<string, int>
      *
      * @since  1.0.0
      */
     private static function getTranslatedBookMap(): array
     {
-        if (self::$translatedBookCache !== null) {
-            return self::$translatedBookCache;
+        $tag = self::activeLanguageTag();
+
+        if (isset(self::$translatedBookCache[$tag])) {
+            return self::$translatedBookCache[$tag];
         }
 
         self::loadLanguage();
 
-        self::$translatedBookCache = [];
+        $map = [];
 
         foreach (self::BOOK_KEYS as $key => $booknumber) {
-            $translated                             = strtolower(Text::_($key));
-            self::$translatedBookCache[$translated] = $booknumber;
+            // Folded with mb_strtolower to match getBookNumber(); plain
+            // strtolower would leave non-Latin names in whatever case the
+            // language file used and only match that exact casing.
+            $map[mb_strtolower(Text::_($key), 'UTF-8')] = $booknumber;
         }
 
-        return self::$translatedBookCache;
+        self::$translatedBookCache[$tag] = $map;
+
+        return $map;
     }
 }

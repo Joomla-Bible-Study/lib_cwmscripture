@@ -76,9 +76,11 @@ class LocalisedBookNameTest extends TestCase
         // assert against the first language's map.
         $ref = new \ReflectionClass(ScriptureHelper::class);
 
-        foreach (['translatedBookCache' => null, 'languageLoadAttempted' => false] as $prop => $value) {
+        // Both are keyed by language tag now, so an empty array is the reset —
+        // it clears every bucket, not just the active one.
+        foreach (['translatedBookCache', 'languageLoadAttempted'] as $prop) {
             if ($ref->hasProperty($prop)) {
-                $ref->getProperty($prop)->setValue(null, $value);
+                $ref->getProperty($prop)->setValue(null, []);
             }
         }
     }
@@ -149,6 +151,45 @@ class LocalisedBookNameTest extends TestCase
             "\"$name\" is what a $tag site displays, so it is what the provider is handed. Resolving it against "
             . 'the English table alone returns nothing and the passage comes back empty.'
         );
+    }
+
+    #[TestDox('a non-Latin book name resolves whatever its case')]
+    public function testNonLatinNamesFoldCorrectly(): void
+    {
+        // ru-RU ships no book names yet, so this is the pack a contributor would
+        // add. strtolower() folds ASCII only and left Cyrillic untouched, so the
+        // map stored one casing and only that exact casing ever matched.
+        $this->useLanguage(['JBS_BBK_JOHN' => 'Иоанна']);
+
+        foreach (['Иоанна', 'ИОАННА', 'иоанна'] as $variant) {
+            $this->assertSame(
+                'JHN',
+                self::provider()::resolve($variant),
+                "\"$variant\" is the same book name in a different case and must resolve to JHN"
+            );
+        }
+    }
+
+    #[TestDox('the translated-name cache is keyed by language tag')]
+    public function testTranslatedCacheIsKeyedByTag(): void
+    {
+        $this->useLanguage(self::PACKS['cs-CZ']);
+        self::provider()::resolve('Žalm');
+
+        $cache = (new \ReflectionClass(ScriptureHelper::class))
+            ->getProperty('translatedBookCache')
+            ->getValue();
+
+        // The unit environment has no application to switch languages on, so
+        // this asserts the shape rather than two live tags: a flat map would put
+        // "žalm" at the top level, and every bucket must be a name => number map.
+        $this->assertNotEmpty($cache);
+        $this->assertArrayNotHasKey('žalm', $cache, 'names belong inside a tag bucket, not at the top level');
+
+        foreach ($cache as $map) {
+            $this->assertIsArray($map);
+            $this->assertContains(143, $map, 'the bucket should hold the name => booknumber map');
+        }
     }
 
     #[TestDox('English names still resolve when a language pack is loaded')]

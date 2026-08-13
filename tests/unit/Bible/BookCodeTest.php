@@ -156,9 +156,46 @@ class BookCodeTest extends TestCase
         $this->assertSame('JHN', $p::byProclaim(143));
         $this->assertSame('GEN', $p::byProclaim(101));
 
-        // The deuterocanon (167-173) has no entry in the canonical 66, so it
-        // resolves to nothing rather than to a neighbouring book.
-        $this->assertSame('', $p::byProclaim(167));
+        // The deuterocanon has no standard number, so it is answered from its
+        // own table keyed by Proclaim number rather than through
+        // proclaimToStandard(), which stops at 166.
+        $this->assertSame('TOB', $p::byProclaim(167));
+        $this->assertSame('BAR', $p::byProclaim(173));
+
+        // Still nothing either side of the range.
+        $this->assertSame('', $p::byProclaim(166 + 8));
+        $this->assertSame('', $p::byProclaim(0));
+    }
+
+    #[TestDox('every deuterocanonical book maps to its USFM code')]
+    public function testDeuterocanonCodes(): void
+    {
+        $p = self::provider();
+
+        // Order matters and is not alphabetical: Maccabees sits between Judith
+        // and Wisdom in BOOK_KEYS, so a mapping written from the OSIS list in
+        // issue #1688 would shift four of these seven onto the wrong book.
+        $expected = [
+            167 => 'TOB',
+            168 => 'JDT',
+            169 => '1MA',
+            170 => '2MA',
+            171 => 'WIS',
+            172 => 'SIR',
+            173 => 'BAR',
+        ];
+
+        foreach ($expected as $proclaimBook => $code) {
+            $this->assertSame(
+                $code,
+                $p::byProclaim($proclaimBook),
+                "Proclaim book $proclaimBook should resolve to $code"
+            );
+        }
+
+        // USFM, not OSIS: one table serves both providers, and they agree on the
+        // canon but not here — OSIS writes 1Macc where USFM writes 1MA.
+        $this->assertNotSame('1Macc', $p::byProclaim(169));
     }
 
     #[TestDox('every canonical book has a code, and no code is duplicated')]
