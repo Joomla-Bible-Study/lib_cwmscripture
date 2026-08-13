@@ -19,6 +19,7 @@ namespace CWM\Library\Scripture\Tests\Bible;
 
 use CWM\Library\Scripture\Bible\AbstractBibleProvider;
 use CWM\Library\Scripture\Bible\BiblePassageResult;
+use CWM\Library\Scripture\Book\BookCodes;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\TestCase;
@@ -216,5 +217,27 @@ class BookCodeTest extends TestCase
             \count(array_unique($codes)),
             'Two books share a code, so one of them can never be addressed.'
         );
+    }
+
+    #[TestDox('the whole name table is reachable without reflection')]
+    public function testBookNamesIsPubliclyAccessible(): void
+    {
+        // The delegate exists because there was no supported way to read the
+        // table: BOOK_NAMES was protected, so CWMLivingWord scanned it by
+        // reflection and moving it into BookCodes broke that consumer silently
+        // (CWMLivingWord#118). A public call is the whole point — if this ever
+        // stops being callable from outside the hierarchy, the gap is back.
+        $names = AbstractBibleProvider::bookNames();
+
+        $this->assertCount(66, $names);
+        $this->assertSame(BookCodes::names(), $names);
+        $this->assertSame('Genesis', $names[1]);
+        $this->assertSame('John', $names[43]);
+        $this->assertSame('Revelation', $names[66]);
+
+        // Same table getBookName() answers from, one book at a time.
+        foreach ($names as $number => $name) {
+            $this->assertSame($name, AbstractBibleProvider::getBookName($number));
+        }
     }
 }

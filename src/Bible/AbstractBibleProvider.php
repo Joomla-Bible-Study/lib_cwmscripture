@@ -211,6 +211,31 @@ abstract class AbstractBibleProvider implements BibleProviderInterface
     }
 
     /**
+     * Every English book name, keyed by standard book number.
+     *
+     * `getBookName()` answers for one book, and until `BookCodes` existed
+     * nothing returned the table. A consumer that wanted to scan it had only
+     * one option — reflection against `BOOK_NAMES`, then a `protected` constant
+     * — and CWMLivingWord took it, which is how moving the constant into
+     * `BookCodes` broke a consumer with no deprecation signal (CWMLivingWord#118).
+     *
+     * `BookCodes::names()` is the canonical accessor and new code should call it
+     * directly. This delegate exists so the whole book API stays reachable from
+     * one class, matching `bookCode()`, `getBookName()` and the rest.
+     *
+     * ⚠️ English. To resolve a name a site displays, use `resolveBookCode()`,
+     * which consults the translated names and abbreviations first (#1688).
+     *
+     * @return  array<int, string>
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public static function bookNames(): array
+    {
+        return BookCodes::names();
+    }
+
+    /**
      * Read a cached passage from the scripture_cache table.
      *
      * @param   string  $provider     Provider name
