@@ -13,6 +13,8 @@ namespace CWM\Library\Scripture\Bible\Provider;
 
 use CWM\Library\Scripture\Bible\AbstractBibleProvider;
 use CWM\Library\Scripture\Bible\BiblePassageResult;
+use CWM\Library\Scripture\Helper\ScriptureHelper;
+use CWM\Library\Scripture\Helper\ScriptureReference;
 use Joomla\CMS\Log\Log;
 use Joomla\Http\HttpFactory;
 
@@ -114,6 +116,96 @@ class ApiBibleProvider extends AbstractBibleProvider
             );
         }
 
+        return $this->fetchByPassageId($passageId, $bibleId, $reference, $translation);
+    }
+
+    /**
+     * Fetch a passage from an already-structured reference.
+     *
+     * Overrides the base implementation, which renders the reference to a name
+     * and hands it to getPassage() — the round trip #1688 is about. Here the
+     * book code comes straight off the book number.
+     *
+     * The rendered reference is still used as the cache key and display
+     * fallback, so entries written through either entry point match.
+     *
+     * @param   ScriptureReference  $ref          Parsed reference
+     * @param   string              $translation  Translation abbreviation
+     *
+     * @return  BiblePassageResult
+     *
+     * @since   __DEPLOY_VERSION__
+     */
+    public function getPassageFor(ScriptureReference $ref, string $translation): BiblePassageResult
+    {
+        $reference = ScriptureHelper::formatReference(
+            $ref->booknumber,
+            $ref->chapterBegin,
+            $ref->verseBegin,
+            $ref->chapterEnd,
+            $ref->verseEnd
+        );
+
+        if (empty($this->apiKey)) {
+            Log::add('ApiBible: No API key configured', Log::WARNING, 'cwmscripture.bible');
+
+            return new BiblePassageResult(reference: $reference, translation: $translation);
+        }
+
+        $cached = $this->readCache('api_bible', $translation, $reference);
+
+        if ($cached) {
+            return $cached;
+        }
+
+        $bibleId = $this->getBibleId($translation);
+
+        if (empty($bibleId)) {
+            Log::add(
+                'ApiBible: No Bible ID for translation "' . $translation . '"',
+                Log::WARNING,
+                'cwmscripture.bible'
+            );
+
+            return new BiblePassageResult(reference: $reference, translation: $translation);
+        }
+
+        $passageId = $this->buildPassageIdFor($ref);
+
+        if (empty($passageId)) {
+            Log::add(
+                'ApiBible: Could not build a passage id for book ' . $ref->booknumber,
+                Log::WARNING,
+                'cwmscripture.bible'
+            );
+
+            return new BiblePassageResult(reference: $reference, translation: $translation);
+        }
+
+        return $this->fetchByPassageId($passageId, $bibleId, $reference, $translation);
+    }
+
+    /**
+     * Request a passage id and turn the response into a result.
+     *
+     * Shared by both entry points so there is one fetch: they differ only in how
+     * they arrive at the passage id, not in what they do with it.
+     *
+     * @param   string  $passageId    OSIS/USFM passage id, e.g. `JHN.3.16`
+     * @param   string  $bibleId      api.bible Bible id
+     * @param   string  $reference    Human-readable reference, used for cache and display
+     * @param   string  $translation  Translation abbreviation
+     *
+     * @return  BiblePassageResult
+     *
+     * @since   __DEPLOY_VERSION__
+     */
+    private function fetchByPassageId(
+        string $passageId,
+        string $bibleId,
+        string $reference,
+        string $translation
+    ): BiblePassageResult {
         $url  = self::API_BASE . '/bibles/' . urlencode($bibleId)
             . '/passages/' . urlencode($passageId)
             . '?content-type=text&include-verse-numbers=true';
@@ -252,10 +344,76 @@ class ApiBibleProvider extends AbstractBibleProvider
             return '';
         }
 
-        $passageId = $osisCode . '.' . $chapter . '.' . $verseStart;
+        return self::passageIdFromParts($osisCode, $chapter, $verseStart, $chapterEnd, $verseEnd);
+    }
+
+    /**
+     * Build a passage id from an already-structured reference.
+     *
+     * The structured counterpart to buildPassageId(). That method has to recover
+     * the book from a name, which is why it keeps resolveBookCode() and its
+     * single-match prefix pass — typed abbreviations like "Joh" are real input
+     * there. A ScriptureReference already carries the number, so the code comes
+     * straight from it and no name is involved.
+     *
+     * Returns '' for a reference with no verse, matching buildPassageId(), whose
+     * regex requires one. api.bible can address a whole chapter, so that is a
+     * capability worth adding — but as a deliberate change, not as a side effect
+     * of this one.
+     *
+     * @param   ScriptureReference  $ref  Parsed reference
+     *
+     * @return  string  Passage id, or '' when the book or chapter is unknown
+     *
+     * @since   __DEPLOY_VERSION__
+     */
+    public function buildPassageIdFor(ScriptureReference $ref): string
+    {
+        $code = self::bookCodeForProclaim($ref->booknumber);
+
+        if ($code === '' || $ref->chapterBegin === 0 || $ref->verseBegin === 0) {
+            return '';
+        }
+
+        $chapterEnd = $ref->chapterEnd > 0 ? $ref->chapterEnd : $ref->chapterBegin;
+        $verseEnd   = $ref->verseEnd > 0 ? $ref->verseEnd : null;
+
+        return self::passageIdFromParts(
+            $code,
+            $ref->chapterBegin,
+            $ref->verseBegin,
+            $chapterEnd,
+            $verseEnd
+        );
+    }
+
+    /**
+     * Assemble the passage id string.
+     *
+     * Held in one place so the two builders can differ in how they resolve the
+     * book without also drifting on the format api.bible expects.
+     *
+     * @param   string    $code         Book code
+     * @param   int       $chapter      Starting chapter
+     * @param   int       $verseStart   Starting verse
+     * @param   int       $chapterEnd   Ending chapter
+     * @param   int|null  $verseEnd     Ending verse, or null for a single verse
+     *
+     * @return  string
+     *
+     * @since   __DEPLOY_VERSION__
+     */
+    private static function passageIdFromParts(
+        string $code,
+        int $chapter,
+        int $verseStart,
+        int $chapterEnd,
+        ?int $verseEnd
+    ): string {
+        $passageId = $code . '.' . $chapter . '.' . $verseStart;
 
         if ($verseEnd !== null && ($chapterEnd > $chapter || $verseEnd > $verseStart)) {
-            $passageId .= '-' . $osisCode . '.' . $chapterEnd . '.' . $verseEnd;
+            $passageId .= '-' . $code . '.' . $chapterEnd . '.' . $verseEnd;
         }
 
         return $passageId;
