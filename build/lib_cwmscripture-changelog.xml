@@ -19,6 +19,19 @@
 <changelogs>
 
     <!-- ============================================================ -->
+    <!-- 1.1.16                                                   -->
+    <!-- ============================================================ -->
+    <changelog>
+        <element>lib_cwmscripture</element>
+        <type>library</type>
+        <version>1.1.16</version>
+        <date>2026-08-13</date>
+        <note>
+            <item>fix: restore the rest of the provider API the 1.1.13 refactor deleted by @bcordis in https://github.com/Joomla-Bible-Study/lib_cwmscripture/pull/63</item>
+        </note>
+    </changelog>
+
+    <!-- ============================================================ -->
     <!-- 1.1.15                                                   -->
     <!-- ============================================================ -->
     <changelog>
