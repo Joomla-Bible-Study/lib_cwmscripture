@@ -126,3 +126,18 @@ if (!class_exists(\Joomla\Registry\Registry::class)) {
         }
     ');
 }
+
+// Stub Joomla\CMS\Form\Field\GroupedlistField.
+//
+// BibleTranslationField extends it, so without this the class cannot be
+// reflected and any contract test covering the whole library has to skip it --
+// which is the one thing such a test must not do quietly.
+if (!class_exists(\Joomla\CMS\Form\Field\GroupedlistField::class)) {
+    eval('
+        namespace Joomla\CMS\Form\Field;
+        class GroupedlistField {
+            protected $type = "Groupedlist";
+            protected function getGroups() { return []; }
+        }
+    ');
+}

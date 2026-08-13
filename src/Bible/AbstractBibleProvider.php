@@ -33,6 +33,17 @@ use Joomla\Http\HttpFactory;
 abstract class AbstractBibleProvider implements BibleProviderInterface
 {
     /**
+     * How many times httpGet() attempts a request before giving up.
+     *
+     * Counts the first attempt, so 3 means one try and two retries.
+     *
+     * @var  int
+     *
+     * @since  1.0.0
+     */
+    private const int HTTP_MAX_RETRIES = 3;
+
+    /**
      * Whether the cwmscripture.bible log category has been registered.
      *
      * @var  bool
