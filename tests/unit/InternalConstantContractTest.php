@@ -30,7 +30,7 @@ use PHPUnit\Framework\TestCase;
  * — `private const array BOOK_KEYS` — so it reports live constants as missing
  * and would have had to be silenced with exactly the blind spot this guards.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  1.1.17
  */
 class InternalConstantContractTest extends TestCase
 {
