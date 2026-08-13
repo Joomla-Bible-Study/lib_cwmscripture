@@ -202,6 +202,27 @@ abstract class AbstractBibleProvider implements BibleProviderInterface
     ];
 
     /**
+     * Book codes for the deuterocanon, keyed by *Proclaim* number (167-173).
+     *
+     * Keyed by Proclaim number rather than folded into BOOK_CODES because there
+     * is no standard number for these: 1-66 is the canonical index, and
+     * PROCLAIM_TO_STANDARD deliberately stops at 166 so LocalProvider keeps
+     * querying `#__bsms_bible_verses.book` over the canon it actually holds.
+     *
+     * These are USFM codes, matching BOOK_CODES. USFM and OSIS agree on the
+     * canonical 66 — which is why one table serves both providers — but they do
+     * not agree here: OSIS writes `1Macc` where USFM writes `1MA`. Adding OSIS
+     * spellings to a USFM table would break both providers for these books.
+     *
+     * @var array<int, string>
+     * @since __DEPLOY_VERSION__
+     */
+    protected const DEUTEROCANON_CODES = [
+        167 => 'TOB', 168 => 'JDT', 169 => '1MA', 170 => '2MA',
+        171 => 'WIS', 172 => 'SIR', 173 => 'BAR',
+    ];
+
+    /**
      * Convert Proclaim book number (101-166) to standard (1-66).
      *
      * @param   int  $proclaimBook  Proclaim book number
@@ -254,6 +275,12 @@ abstract class AbstractBibleProvider implements BibleProviderInterface
      */
     public static function bookCodeForProclaim(int $proclaimBook): string
     {
+        // The deuterocanon is checked first: it has no standard number, so
+        // proclaimToStandard() answers 0 for 167-173 and would lose the book.
+        if (isset(self::DEUTEROCANON_CODES[$proclaimBook])) {
+            return self::DEUTEROCANON_CODES[$proclaimBook];
+        }
+
         return self::bookCode(self::proclaimToStandard($proclaimBook));
     }
 
