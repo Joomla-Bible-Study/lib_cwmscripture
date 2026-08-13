@@ -380,7 +380,7 @@ class ScriptureHelper
      *
      * @return  string  Language tag, e.g. `en-GB`
      *
-     * @since   __DEPLOY_VERSION__
+     * @since   1.1.12
      */
     private static function activeLanguageTag(): string
     {

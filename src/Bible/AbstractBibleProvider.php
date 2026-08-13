@@ -215,7 +215,7 @@ abstract class AbstractBibleProvider implements BibleProviderInterface
      * spellings to a USFM table would break both providers for these books.
      *
      * @var array<int, string>
-     * @since __DEPLOY_VERSION__
+     * @since 1.1.12
      */
     protected const DEUTEROCANON_CODES = [
         167 => 'TOB', 168 => 'JDT', 169 => '1MA', 170 => '2MA',
