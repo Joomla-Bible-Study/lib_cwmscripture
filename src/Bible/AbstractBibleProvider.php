@@ -31,6 +31,48 @@ use Joomla\Http\HttpFactory;
 abstract class AbstractBibleProvider implements BibleProviderInterface
 {
     /**
+     * Whether the cwmscripture.bible log category has been registered.
+     *
+     * @var  bool
+     *
+     * @since  1.0.0
+     */
+    private static bool $loggerRegistered = false;
+
+    /**
+     * Register the Joomla logger for the cwmscripture.bible category.
+     *
+     * Call once before any Log::add() calls. Safe to call multiple times.
+     *
+     * ⚠️ Removed by accident in 1.1.13, restored in 1.1.15. It is public API —
+     * Proclaim calls it from two site helpers and the ScriptureLinks content
+     * plugin calls it twice — so its removal fataled any front-end page that
+     * rendered scripture (Proclaim#1789 investigation). It also silently
+     * stopped this class's own logging: the Log::add() calls below still name
+     * the cwmscripture.bible category, and Joomla discards entries for a
+     * category no logger is registered for, so two releases of scripture
+     * diagnostics went nowhere.
+     *
+     * Do not remove without deprecating it first and giving consumers a
+     * release to move.
+     *
+     * @return  void
+     *
+     * @since  1.0.0
+     */
+    public static function registerLogger(): void
+    {
+        if (!self::$loggerRegistered) {
+            Log::addLogger(
+                ['text_file' => 'cwmscripture.bible.php'],
+                Log::ALL,
+                ['cwmscripture.bible']
+            );
+            self::$loggerRegistered = true;
+        }
+    }
+
+    /**
      * Convert Proclaim book number (101-166) to standard (1-66).
      *
      * @param   int  $proclaimBook  Proclaim book number
