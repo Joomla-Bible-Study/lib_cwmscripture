@@ -19,6 +19,19 @@
 <changelogs>
 
     <!-- ============================================================ -->
+    <!-- 1.1.12                                                   -->
+    <!-- ============================================================ -->
+    <changelog>
+        <element>lib_cwmscripture</element>
+        <type>library</type>
+        <version>1.1.12</version>
+        <date>2026-08-13</date>
+        <note>
+            <item>fix: fold non-Latin book names, key the name cache, and map the deuterocanon by @bcordis in https://github.com/Joomla-Bible-Study/lib_cwmscripture/pull/47</item>
+        </note>
+    </changelog>
+
+    <!-- ============================================================ -->
     <!-- 1.1.11                                                   -->
     <!-- ============================================================ -->
     <changelog>
