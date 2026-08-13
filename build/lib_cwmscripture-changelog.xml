@@ -19,6 +19,22 @@
 <changelogs>
 
     <!-- ============================================================ -->
+    <!-- 1.1.13                                                   -->
+    <!-- ============================================================ -->
+    <changelog>
+        <element>lib_cwmscripture</element>
+        <type>library</type>
+        <version>1.1.13</version>
+        <date>2026-08-13</date>
+        <note>
+            <item>feat: structured entry point for fetching a passage (#1688 item 3) by @bcordis in https://github.com/Joomla-Bible-Study/lib_cwmscripture/pull/48</item>
+            <item>refactor: give book reference data its own namespace (#49) by @bcordis in https://github.com/Joomla-Bible-Study/lib_cwmscripture/pull/50</item>
+            <item>feat: resolve the remaining three providers from the book number by @bcordis in https://github.com/Joomla-Bible-Study/lib_cwmscripture/pull/51</item>
+            <item>feat: a supported way to read the whole book-name table by @bcordis in https://github.com/Joomla-Bible-Study/lib_cwmscripture/pull/53</item>
+        </note>
+    </changelog>
+
+    <!-- ============================================================ -->
     <!-- 1.1.12                                                   -->
     <!-- ============================================================ -->
     <changelog>
