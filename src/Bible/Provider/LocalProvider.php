@@ -15,6 +15,7 @@ use CWM\Library\Scripture\Bible\AbstractBibleProvider;
 use CWM\Library\Scripture\Bible\BiblePassageResult;
 use CWM\Library\Scripture\Book\BookCodes;
 use CWM\Library\Scripture\Helper\ScriptureHelper;
+use CWM\Library\Scripture\Helper\ScriptureReference;
 use Joomla\CMS\Log\Log;
 
 // phpcs:disable PSR1.Files.SideEffects
@@ -47,6 +48,83 @@ class LocalProvider extends AbstractBibleProvider
             );
         }
 
+        return $this->queryVerses($parsed, $reference, $translation);
+    }
+
+    /**
+     * Fetch a passage from an already-structured reference.
+     *
+     * parseReference() exists to recover a standard book number from a name. A
+     * ScriptureReference already carries a number — a *Proclaim* one — so only
+     * the offset conversion is needed and no name is involved.
+     *
+     * ⚠️ The two numbering schemes are the trap here. `$parsed['book']` is a
+     * standard number (1-66), matching `#__bsms_bible_verses.book`, while
+     * `ScriptureReference::$booknumber` is Proclaim (101-173). Passing the
+     * Proclaim number straight through would query a book that does not exist
+     * and return an empty passage rather than an error.
+     *
+     * @param   ScriptureReference  $ref          Parsed reference
+     * @param   string              $translation  Translation abbreviation
+     *
+     * @return  BiblePassageResult
+     *
+     * @since   __DEPLOY_VERSION__
+     */
+    #[\Override]
+    public function getPassageFor(ScriptureReference $ref, string $translation): BiblePassageResult
+    {
+        $reference = ScriptureHelper::formatReference(
+            $ref->booknumber,
+            $ref->chapterBegin,
+            $ref->verseBegin,
+            $ref->chapterEnd,
+            $ref->verseEnd
+        );
+
+        $standard = BookCodes::toStandard($ref->booknumber);
+
+        // 0 covers both an unknown book and the deuterocanon, which has no
+        // standard number and no rows in the local verse table.
+        if ($standard === 0 || $ref->chapterBegin === 0) {
+            Log::add(
+                'Local: no local verses for book ' . $ref->booknumber,
+                Log::WARNING,
+                'cwmscripture.bible'
+            );
+
+            return new BiblePassageResult(reference: $reference, translation: $translation);
+        }
+
+        $chapterEnd = $ref->chapterEnd > 0 ? $ref->chapterEnd : $ref->chapterBegin;
+
+        $parsed = [
+            'book'          => $standard,
+            'chapter_begin' => $ref->chapterBegin,
+            'verse_begin'   => $ref->verseBegin,
+            'chapter_end'   => $chapterEnd,
+            'verse_end'     => $ref->verseEnd,
+        ];
+
+        return $this->queryVerses($parsed, $reference, $translation);
+    }
+
+    /**
+     * Read verses for a parsed reference out of the local table.
+     *
+     * Shared by both entry points so there is one query: they differ only in how
+     * they arrive at a standard book number.
+     *
+     * @param   array<string, int>  $parsed       Standard book number, chapters and verses
+     * @param   string              $reference    Human-readable reference, for display
+     * @param   string              $translation  Translation abbreviation
+     *
+     * @return  BiblePassageResult
+     *
+     * @since   __DEPLOY_VERSION__
+     */
+    protected function queryVerses(array $parsed, string $reference, string $translation): BiblePassageResult
+    {
         $db    = $this->getDatabase();
         $query = $db->getQuery(true)
             ->select($db->quoteName(['book', 'chapter', 'verse', 'text']))
