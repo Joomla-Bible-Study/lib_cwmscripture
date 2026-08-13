@@ -1,6 +1,6 @@
 {
   "name": "lib_cwmscripture",
-  "version": "1.1.14",
+  "version": "1.1.15",
   "description": "CWM Scripture Library - Frontend assets build pipeline",
   "license": "GPL-2.0-or-later",
   "private": true,
