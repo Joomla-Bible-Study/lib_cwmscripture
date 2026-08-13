@@ -1,85 +1,87 @@
 {
-  "name": "joomla-bible-study/lib-cwmscripture",
-  "type": "joomla-library",
-  "description": "CWM Scripture Library - Bible scripture retrieval, parsing, rendering, and translation management for Joomla",
-  "keywords": [
-    "bible",
-    "scripture",
-    "joomla",
-    "library"
-  ],
-  "homepage": "https://github.com/Joomla-Bible-Study/lib_cwmscripture",
-  "license": "GPL-2.0-or-later",
-  "authors": [
-    {
-      "name": "CWM Team",
-      "email": "info@christianwebministries.org",
-      "homepage": "https://www.christianwebministries.org"
-    }
-  ],
-  "minimum-stability": "stable",
-  "prefer-stable": true,
-  "repositories": [
-    {
-      "type": "vcs",
-      "url": "https://github.com/Joomla-Bible-Study/cwm-build-tools"
-    }
-  ],
-  "config": {
-    "optimize-autoloader": true,
-    "platform": {
-      "php": "8.3.0"
+    "name": "joomla-bible-study/lib-cwmscripture",
+    "type": "joomla-library",
+    "description": "CWM Scripture Library - Bible scripture retrieval, parsing, rendering, and translation management for Joomla",
+    "keywords": [
+        "bible",
+        "scripture",
+        "joomla",
+        "library"
+    ],
+    "homepage": "https://github.com/Joomla-Bible-Study/lib_cwmscripture",
+    "license": "GPL-2.0-or-later",
+    "authors": [
+        {
+            "name": "CWM Team",
+            "email": "info@christianwebministries.org",
+            "homepage": "https://www.christianwebministries.org"
+        }
+    ],
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/Joomla-Bible-Study/cwm-build-tools"
+        }
+    ],
+    "config": {
+        "optimize-autoloader": true,
+        "platform": {
+            "php": "8.3.0"
+        },
+        "allow-plugins": {}
     },
-    "allow-plugins": {}
-  },
-  "autoload": {
-    "psr-4": {
-      "CWM\\Library\\Scripture\\": "src/"
+    "autoload": {
+        "psr-4": {
+            "CWM\\Library\\Scripture\\": "src/"
+        }
+    },
+    "require": {
+        "php": "^8.3.0",
+        "ext-json": "*",
+        "ext-mbstring": "*"
+    },
+    "require-dev": {
+        "cwm/build-tools": "^1.17.0",
+        "friendsofphp/php-cs-fixer": "^3.0",
+        "phpunit/phpunit": "^11.0"
+    },
+    "extra": {
+        "cwm-build-tools": {
+            "joomlaLinks": [
+                {
+                    "type": "library",
+                    "name": "cwmscripture"
+                }
+            ]
+        }
+    },
+    "scripts": {
+        "lint": "php-cs-fixer fix --dry-run --diff",
+        "lint:fix": "php-cs-fixer fix",
+        "test": "phpunit",
+        "test:unit": "phpunit --testsuite unit",
+        "build:package": "cwm-build",
+        "build:package:verbose": "cwm-build -v",
+        "release": "cwm-release",
+        "bump-version": "cwm-bump",
+        "ars-publish": "cwm-ars-publish",
+        "ars-list": "cwm-ars-list",
+        "changelog": "cwm-changelog",
+        "sync-languages": "cwm-sync-languages",
+        "sync-configs": "cwm-sync-configs",
+        "setup": "cwm-setup",
+        "link": "cwm-link",
+        "link-check": "cwm-link-check",
+        "clean": "cwm-clean",
+        "verify": "cwm-verify",
+        "joomla-install": "cwm-joomla-install",
+        "joomla-latest": "cwm-joomla-latest"
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "CWM\\Library\\Scripture\\Tests\\": "tests/unit/"
+        }
     }
-  },
-  "require": {
-    "php": "^8.3.0",
-    "ext-json": "*",
-    "ext-mbstring": "*"
-  },
-  "require-dev": {
-    "cwm/build-tools": "^1.13.0",
-    "friendsofphp/php-cs-fixer": "^3.0",
-    "phpunit/phpunit": "^11.0"
-  },
-  "extra": {
-    "cwm-build-tools": {
-      "joomlaLinks": [
-        { "type": "library", "name": "cwmscripture" }
-      ]
-    }
-  },
-  "scripts": {
-    "lint":                  "php-cs-fixer fix --dry-run --diff",
-    "lint:fix":              "php-cs-fixer fix",
-    "test":                  "phpunit",
-    "test:unit":             "phpunit --testsuite unit",
-    "build:package":         "cwm-build",
-    "build:package:verbose": "cwm-build -v",
-    "release":               "cwm-release",
-    "bump-version":          "cwm-bump",
-    "ars-publish":           "cwm-ars-publish",
-    "ars-list":              "cwm-ars-list",
-    "changelog":             "cwm-changelog",
-    "sync-languages":        "cwm-sync-languages",
-    "sync-configs":          "cwm-sync-configs",
-
-    "setup":                 "cwm-setup",
-    "link":                  "cwm-link",
-    "link-check":            "cwm-link-check",
-    "clean":                 "cwm-clean",
-    "verify":                "cwm-verify",
-    "joomla-install":        "cwm-joomla-install",
-    "joomla-latest":         "cwm-joomla-latest"
-  },
-  "autoload-dev": {
-    "psr-4": {
-      "CWM\\Library\\Scripture\\Tests\\": "tests/unit/"
-    }
-  }
 }
