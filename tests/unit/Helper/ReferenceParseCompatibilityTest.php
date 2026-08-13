@@ -36,7 +36,7 @@ use PHPUnit\Framework\TestCase;
  * and `testChapterRangeIsStillUnsupported()` asserts that deliberately so the
  * gap cannot be forgotten when LocalProvider is converted.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  1.1.13
  */
 class ReferenceParseCompatibilityTest extends TestCase
 {

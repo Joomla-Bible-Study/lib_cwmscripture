@@ -26,7 +26,7 @@ use PHPUnit\Framework\TestCase;
  * book that does not exist and returns an empty passage, which is exactly how
  * the localisation bug in Proclaim#1688 hid for months.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  1.1.13
  */
 class StructuredResolutionTest extends TestCase
 {

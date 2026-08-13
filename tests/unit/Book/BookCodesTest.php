@@ -19,7 +19,7 @@ use PHPUnit\Framework\TestCase;
  * Covers the extracted reference data and, more importantly, the property that
  * made extracting it worthwhile: `Book\` depends on nothing.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  1.1.13
  */
 class BookCodesTest extends TestCase
 {

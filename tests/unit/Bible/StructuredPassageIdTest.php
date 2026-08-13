@@ -26,7 +26,7 @@ use PHPUnit\Framework\TestCase;
  * reference returns different scripture depending on which entry point a caller
  * happened to use.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  1.1.13
  */
 class StructuredPassageIdTest extends TestCase
 {
