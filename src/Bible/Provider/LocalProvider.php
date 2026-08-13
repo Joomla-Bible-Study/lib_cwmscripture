@@ -13,6 +13,7 @@ namespace CWM\Library\Scripture\Bible\Provider;
 
 use CWM\Library\Scripture\Bible\AbstractBibleProvider;
 use CWM\Library\Scripture\Bible\BiblePassageResult;
+use CWM\Library\Scripture\Book\BookCodes;
 use CWM\Library\Scripture\Helper\ScriptureHelper;
 use Joomla\CMS\Log\Log;
 
@@ -241,7 +242,7 @@ class LocalProvider extends AbstractBibleProvider
             }
         }
 
-        foreach (self::BOOK_NAMES as $number => $bookName) {
+        foreach (BookCodes::names() as $number => $bookName) {
             if (strtolower($bookName) === $normalized) {
                 return $number;
             }

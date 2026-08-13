@@ -13,6 +13,7 @@ namespace CWM\Library\Scripture\Bible\Provider;
 
 use CWM\Library\Scripture\Bible\AbstractBibleProvider;
 use CWM\Library\Scripture\Bible\BiblePassageResult;
+use CWM\Library\Scripture\Book\BookCodes;
 use CWM\Library\Scripture\Helper\ScriptureHelper;
 use CWM\Library\Scripture\Helper\ScriptureReference;
 use Joomla\CMS\Log\Log;
@@ -312,7 +313,7 @@ class ApiBibleProvider extends AbstractBibleProvider
      */
     public static function getOsisCodes(): array
     {
-        return self::BOOK_CODES;
+        return BookCodes::codes();
     }
 
     /**

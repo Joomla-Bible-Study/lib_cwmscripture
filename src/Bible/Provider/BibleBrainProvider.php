@@ -15,6 +15,7 @@ use CWM\Library\Scripture\Bible\AbstractBibleProvider;
 use CWM\Library\Scripture\Bible\AudioPassageResult;
 use CWM\Library\Scripture\Bible\AudioProviderInterface;
 use CWM\Library\Scripture\Bible\BiblePassageResult;
+use CWM\Library\Scripture\Book\BookCodes;
 use Joomla\CMS\Log\Log;
 
 // phpcs:disable PSR1.Files.SideEffects
@@ -390,7 +391,7 @@ class BibleBrainProvider extends AbstractBibleProvider implements AudioProviderI
      */
     public static function getUsfmCodes(): array
     {
-        return self::BOOK_CODES;
+        return BookCodes::codes();
     }
 
     /**
