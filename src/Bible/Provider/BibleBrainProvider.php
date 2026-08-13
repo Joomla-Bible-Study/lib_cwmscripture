@@ -16,6 +16,8 @@ use CWM\Library\Scripture\Bible\AudioPassageResult;
 use CWM\Library\Scripture\Bible\AudioProviderInterface;
 use CWM\Library\Scripture\Bible\BiblePassageResult;
 use CWM\Library\Scripture\Book\BookCodes;
+use CWM\Library\Scripture\Helper\ScriptureHelper;
+use CWM\Library\Scripture\Helper\ScriptureReference;
 use Joomla\CMS\Log\Log;
 
 // phpcs:disable PSR1.Files.SideEffects
@@ -118,6 +120,89 @@ class BibleBrainProvider extends AbstractBibleProvider implements AudioProviderI
             );
         }
 
+        return $this->fetchParsed($parsed, $reference, $translation);
+    }
+
+    /**
+     * Fetch a passage from an already-structured reference.
+     *
+     * parseReference() exists to recover a USFM code from a book name. A
+     * ScriptureReference already carries the number the code comes from, so the
+     * name never enters it.
+     *
+     * @param   ScriptureReference  $ref          Parsed reference
+     * @param   string              $translation  Translation abbreviation
+     *
+     * @return  BiblePassageResult
+     *
+     * @since   __DEPLOY_VERSION__
+     */
+    #[\Override]
+    public function getPassageFor(ScriptureReference $ref, string $translation): BiblePassageResult
+    {
+        // The cache key stays the rendered reference, so entries written through
+        // either entry point match.
+        $reference = ScriptureHelper::formatReference(
+            $ref->booknumber,
+            $ref->chapterBegin,
+            $ref->verseBegin,
+            $ref->chapterEnd,
+            $ref->verseEnd
+        );
+
+        if (empty($this->apiKey)) {
+            Log::add('BibleBrain: No API key configured', Log::WARNING, 'cwmscripture.bible');
+
+            return new BiblePassageResult(reference: $reference, translation: $translation);
+        }
+
+        $cached = $this->readCache('biblebrain', $translation, $reference);
+
+        if ($cached) {
+            return $cached;
+        }
+
+        $code = BookCodes::forProclaim($ref->booknumber);
+
+        if ($code === '' || $ref->chapterBegin === 0) {
+            Log::add(
+                'BibleBrain: no book code for book ' . $ref->booknumber,
+                Log::WARNING,
+                'cwmscripture.bible'
+            );
+
+            return new BiblePassageResult(reference: $reference, translation: $translation);
+        }
+
+        // Matches what parseReference() produces, including dropping chapterEnd:
+        // the endpoint addresses a single chapter, so a cross-chapter range has
+        // always been served from its opening chapter.
+        $parsed = [
+            'book'        => $code,
+            'chapter'     => $ref->chapterBegin,
+            'verse_start' => $ref->verseBegin,
+            'verse_end'   => $ref->verseEnd,
+        ];
+
+        return $this->fetchParsed($parsed, $reference, $translation);
+    }
+
+    /**
+     * Request a parsed reference and turn the response into a result.
+     *
+     * Shared by both entry points so there is one fetch: they differ only in how
+     * they arrive at the book code.
+     *
+     * @param   array<string, mixed>  $parsed       Book code, chapter and verse range
+     * @param   string                $reference    Human-readable reference, for cache and display
+     * @param   string                $translation  Translation abbreviation
+     *
+     * @return  BiblePassageResult
+     *
+     * @since   __DEPLOY_VERSION__
+     */
+    protected function fetchParsed(array $parsed, string $reference, string $translation): BiblePassageResult
+    {
         $bibleId   = $this->resolveBibleId($translation);
         $filesetId = $this->resolveTextFileset($bibleId);
 

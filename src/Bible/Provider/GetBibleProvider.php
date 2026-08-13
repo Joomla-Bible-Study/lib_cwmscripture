@@ -13,7 +13,9 @@ namespace CWM\Library\Scripture\Bible\Provider;
 
 use CWM\Library\Scripture\Bible\AbstractBibleProvider;
 use CWM\Library\Scripture\Bible\BiblePassageResult;
+use CWM\Library\Scripture\Book\BookCodes;
 use CWM\Library\Scripture\Helper\ScriptureHelper;
+use CWM\Library\Scripture\Helper\ScriptureReference;
 use Joomla\CMS\Log\Log;
 
 // phpcs:disable PSR1.Files.SideEffects
@@ -96,6 +98,113 @@ class GetBibleProvider extends AbstractBibleProvider
             $apiRef
         );
 
+        return $this->fetchByApiRef($apiRef, $reference, $translation);
+    }
+
+    /**
+     * Fetch a passage from an already-structured reference.
+     *
+     * GetBible takes a book *name* on the wire, so the base class's round trip
+     * hurts twice here: a caller renders the number to a localised name, and
+     * anglicizeBookName() then parses that back to a number to recover the
+     * English one. With the number in hand both halves collapse into a single
+     * table lookup.
+     *
+     * @param   ScriptureReference  $ref          Parsed reference
+     * @param   string              $translation  Translation abbreviation
+     *
+     * @return  BiblePassageResult
+     *
+     * @since   __DEPLOY_VERSION__
+     */
+    #[\Override]
+    public function getPassageFor(ScriptureReference $ref, string $translation): BiblePassageResult
+    {
+        // The cache key stays the rendered reference, so entries written through
+        // either entry point match.
+        $reference = ScriptureHelper::formatReference(
+            $ref->booknumber,
+            $ref->chapterBegin,
+            $ref->verseBegin,
+            $ref->chapterEnd,
+            $ref->verseEnd
+        );
+
+        $cached = $this->readCache('getbible', $translation, $reference);
+
+        if ($cached) {
+            return $cached;
+        }
+
+        $english = BookCodes::name(BookCodes::toStandard($ref->booknumber));
+
+        if ($english === '' || $ref->chapterBegin === 0) {
+            Log::add(
+                'GetBible: no English name for book ' . $ref->booknumber,
+                Log::WARNING,
+                'cwmscripture.bible'
+            );
+
+            return new BiblePassageResult(reference: $reference, translation: $translation);
+        }
+
+        return $this->fetchByApiRef(
+            self::apiRefFromParts($english, $ref),
+            $reference,
+            $translation
+        );
+    }
+
+    /**
+     * Build the reference string GetBible expects.
+     *
+     * Assembled from parts rather than rewritten from a string, so the
+     * same-chapter tidy-up getPassage() has to apply after the fact
+     * ("Luke 12:54-12:56" -> "Luke 12:54-56") never needs to happen: a range
+     * within one chapter simply never grows the redundant prefix.
+     *
+     * @param   string              $english  English book name
+     * @param   ScriptureReference  $ref      Parsed reference
+     *
+     * @return  string
+     *
+     * @since   __DEPLOY_VERSION__
+     */
+    private static function apiRefFromParts(string $english, ScriptureReference $ref): string
+    {
+        $out = $english . ' ' . $ref->chapterBegin;
+
+        if ($ref->verseBegin === 0) {
+            return $out;
+        }
+
+        $out .= ':' . $ref->verseBegin;
+
+        $chapterEnd = $ref->chapterEnd > 0 ? $ref->chapterEnd : $ref->chapterBegin;
+
+        if ($ref->verseEnd > 0 && ($chapterEnd > $ref->chapterBegin || $ref->verseEnd > $ref->verseBegin)) {
+            $out .= '-' . ($chapterEnd > $ref->chapterBegin ? $chapterEnd . ':' : '') . $ref->verseEnd;
+        }
+
+        return $out;
+    }
+
+    /**
+     * Request a reference from the API and turn the response into a result.
+     *
+     * Shared by both entry points so there is one fetch: they differ only in how
+     * they arrive at the API reference string.
+     *
+     * @param   string  $apiRef       Reference with an English book name
+     * @param   string  $reference    Human-readable reference, for cache and display
+     * @param   string  $translation  Translation abbreviation
+     *
+     * @return  BiblePassageResult
+     *
+     * @since   __DEPLOY_VERSION__
+     */
+    private function fetchByApiRef(string $apiRef, string $reference, string $translation): BiblePassageResult
+    {
         $encodedRef = str_replace('%3A', ':', rawurlencode($apiRef));
         $url        = self::API_BASE . rawurlencode($translation) . '/' . $encodedRef;
         $body       = $this->httpGet($url, 15);
