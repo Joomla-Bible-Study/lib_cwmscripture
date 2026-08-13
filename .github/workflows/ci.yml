@@ -42,4 +42,7 @@ jobs:
       # over src/ and tests/ because this project has no lint:syntax script.
       # Those defaults were drawn from this repository's own pipeline, so
       # leaving them implicit is what keeps it in step with the others.
+      # Added in cwm-build-tools v1.16.0. lint:js is clean here, and it runs
+      # as its own parallel `JS Lint` check, so the PHP job is unaffected.
+      run-lint-js: true
       build-command: 'composer build:package'
