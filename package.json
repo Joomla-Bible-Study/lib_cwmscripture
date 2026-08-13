@@ -17,10 +17,10 @@
     "@rollup/plugin-node-resolve": "^16.0.3",
     "@rollup/plugin-terser": "^1.0.0",
     "csso": "^5.0.5",
-    "eslint": "^10.8.0",
-    "globals": "^17.9.0",
+    "eslint": "^10.8.1",
+    "globals": "^17.11.0",
     "rollup": "^4.62.4",
-    "rollup-plugin-gzip": "^4.1.1"
+    "rollup-plugin-gzip": "^4.2.0"
   },
   "scripts": {
     "build": "npm run build:js && npm run build:css",
@@ -28,5 +28,8 @@
     "build:css": "SOURCE_DIR=build/media_source/css OUTPUT_DIR=media/lib_cwmscripture/css node vendor/cwm/build-tools/templates/build-css.js",
     "watch": "SOURCE_DIR=build/media_source/js OUTPUT_DIR=media/lib_cwmscripture/js rollup -c vendor/cwm/build-tools/templates/rollup.config.js -w",
     "lint:js": "eslint -c build/eslint.config.mjs --max-warnings=0 ."
+  },
+  "allowScripts": {
+    "fsevents@2.3.3": true
   }
 }
