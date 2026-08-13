@@ -14,7 +14,9 @@ namespace CWM\Library\Scripture\Bible;
 use CWM\Library\Scripture\Book\BookCodes;
 use CWM\Library\Scripture\Helper\ScriptureHelper;
 use CWM\Library\Scripture\Helper\ScriptureReference;
+use Joomla\CMS\Factory;
 use Joomla\CMS\Log\Log;
+use Joomla\Database\DatabaseInterface;
 use Joomla\Http\HttpFactory;
 
 // phpcs:disable PSR1.Files.SideEffects
@@ -38,6 +40,82 @@ abstract class AbstractBibleProvider implements BibleProviderInterface
      * @since  1.0.0
      */
     private static bool $loggerRegistered = false;
+
+    /**
+     * How long a cached passage stays fresh, in seconds.
+     *
+     * ⚠️ Deleted by the 1.1.13 refactor while the code that reads it stayed.
+     * An undeclared property reads as null, so `time() + $this->cacheTtl`
+     * became `time()` and every cached passage expired the instant it was
+     * written — the cache table filled up and never served a hit.
+     *
+     * @var  int
+     *
+     * @since  1.0.0
+     */
+    protected int $cacheTtl = 86400;
+
+    /**
+     * Whether the last httpGet() failure was transient, and so worth retrying.
+     *
+     * ⚠️ Also deleted by that refactor, while four assignments to it remained.
+     * Writing to an undeclared property is deprecated in PHP 8.2 and becomes an
+     * error in PHP 9, so this was a forward-compatibility break as well as a
+     * behavioural one.
+     *
+     * @var  bool
+     *
+     * @since  1.0.0
+     */
+    protected bool $lastErrorTransient = false;
+
+    /**
+     * Get the database driver.
+     *
+     * ⚠️ Deleted by the 1.1.13 refactor even though this class calls it five
+     * times. Every database-touching path — the passage cache, local verse
+     * lookup — fataled from that release onward.
+     *
+     * @return  DatabaseInterface
+     *
+     * @since  1.0.0
+     */
+    protected function getDatabase(): DatabaseInterface
+    {
+        return Factory::getContainer()->get(DatabaseInterface::class);
+    }
+
+    /**
+     * Whether the last error was transient (retryable).
+     *
+     * Public API: Proclaim's CwmscriptureLookupHelper asks this to decide
+     * whether a lookup failure is worth reporting to the user.
+     *
+     * @return  bool
+     *
+     * @since  1.0.0
+     */
+    public function isLastErrorTransient(): bool
+    {
+        return $this->lastErrorTransient;
+    }
+
+    /**
+     * Set the cache TTL in seconds.
+     *
+     * Public API: Proclaim sets this from its own cache-days setting, in both
+     * Cwmshowscripture and CwmscriptureLookupHelper.
+     *
+     * @param   int  $seconds  TTL in seconds
+     *
+     * @return  void
+     *
+     * @since  1.0.0
+     */
+    public function setCacheTtl(int $seconds): void
+    {
+        $this->cacheTtl = max(3600, $seconds);
+    }
 
     /**
      * Register the Joomla logger for the cwmscripture.bible category.

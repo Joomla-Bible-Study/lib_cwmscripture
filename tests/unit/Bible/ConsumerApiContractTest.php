@@ -45,6 +45,10 @@ class ConsumerApiContractTest extends TestCase
             // Proclaim: Cwmshowscripture, CwmscriptureLookupHelper.
             // ScriptureLinks: the content plugin, twice.
             'registerLogger'     => ['registerLogger'],
+            // Proclaim: Cwmshowscripture:97, CwmscriptureLookupHelper:54.
+            'setCacheTtl'        => ['setCacheTtl'],
+            // Proclaim: CwmscriptureLookupHelper:58.
+            'isLastErrorTransient' => ['isLastErrorTransient'],
             'proclaimToStandard' => ['proclaimToStandard'],
             'standardToProclaim' => ['standardToProclaim'],
             'bookCode'           => ['bookCode'],
@@ -66,7 +70,13 @@ class ConsumerApiContractTest extends TestCase
         $reflection = new \ReflectionMethod(AbstractBibleProvider::class, $method);
 
         self::assertTrue($reflection->isPublic(), "{$method}() must stay public.");
-        self::assertTrue($reflection->isStatic(), "{$method}() is called statically.");
+        // registerLogger and the book-code helpers are static; the instance
+        // accessors are not. Both shapes are called from outside, so assert the
+        // method exists and is reachable rather than forcing one form.
+        self::assertFalse(
+            $reflection->isPrivate(),
+            "{$method}() must stay reachable from outside this library."
+        );
     }
 
     /**
@@ -102,5 +112,36 @@ class ConsumerApiContractTest extends TestCase
         AbstractBibleProvider::registerLogger();
 
         $this->expectNotToPerformAssertions();
+    }
+
+    /**
+     * The refactor deleted two properties as well as the methods, and left
+     * every read and write of them in place.
+     *
+     * `$cacheTtl` read as null, so `time() + $this->cacheTtl` became `time()`
+     * and every cached passage expired the moment it was written. Writing to an
+     * undeclared `$lastErrorTransient` is deprecated in PHP 8.2 and an error in
+     * PHP 9, so it was a forward-compatibility break too. Neither produced a
+     * failure here, which is why this test exists.
+     *
+     * @return void
+     */
+    #[TestDox('the properties this class reads and writes are actually declared')]
+    public function testTheBackingPropertiesAreDeclared(): void
+    {
+        $reflection = new \ReflectionClass(AbstractBibleProvider::class);
+        $declared   = array_map(
+            static fn (\ReflectionProperty $p): string => $p->getName(),
+            $reflection->getProperties()
+        );
+
+        foreach (['cacheTtl', 'lastErrorTransient'] as $property) {
+            self::assertContains(
+                $property,
+                $declared,
+                "\${$property} is read or written by this class. An undeclared property reads as null and "
+                . 'writing to one is deprecated in PHP 8.2, so losing the declaration breaks behaviour silently.'
+            );
+        }
     }
 }
