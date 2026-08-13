@@ -12,6 +12,7 @@
 namespace CWM\Library\Scripture\Bible;
 
 use CWM\Library\Scripture\Helper\ScriptureHelper;
+use CWM\Library\Scripture\Helper\ScriptureReference;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Log\Log;
 use Joomla\Database\DatabaseInterface;
@@ -282,6 +283,56 @@ abstract class AbstractBibleProvider implements BibleProviderInterface
         }
 
         return self::bookCode(self::proclaimToStandard($proclaimBook));
+    }
+
+    /**
+     * Fetch a passage from an already-structured reference.
+     *
+     * The structured entry point. `getPassage()` takes a string, so a caller
+     * holding a parsed reference had to render it to a name and hand that over,
+     * and the provider then recovered the book from that name by string
+     * matching — a round trip through the least reliable representation
+     * available, and the reason scripture broke on translated sites (#1688).
+     *
+     * This default preserves that behaviour exactly, so a provider that has not
+     * been converted is unaffected: it renders the reference and calls the
+     * string method. A converted provider overrides this with the real fetch and
+     * reduces its own `getPassage()` to parse-and-delegate, which is what
+     * removes the round trip rather than routing around it.
+     *
+     * Deliberately **not** declared on `BibleProviderInterface`. Every provider
+     * extends this class, so they all inherit it; adding it to the interface is
+     * the one change that would break an implementor outside this repository,
+     * and it buys nothing until every provider has been converted.
+     *
+     * @param   ScriptureReference  $ref          Parsed reference
+     * @param   string              $translation  Translation abbreviation
+     *
+     * @return  BiblePassageResult
+     *
+     * @since   __DEPLOY_VERSION__
+     */
+    public function getPassageFor(ScriptureReference $ref, string $translation): BiblePassageResult
+    {
+        $reference = ScriptureHelper::formatReference(
+            $ref->booknumber,
+            $ref->chapterBegin,
+            $ref->verseBegin,
+            $ref->chapterEnd,
+            $ref->verseEnd
+        );
+
+        // formatReference() returns '' for an unknown book or a missing chapter.
+        // Passing that on would have the provider fail against an empty string
+        // and report it as the reference, so answer with what the caller gave us.
+        if ($reference === '') {
+            return new BiblePassageResult(
+                reference: $ref->referenceText,
+                translation: $translation
+            );
+        }
+
+        return $this->getPassage($reference, $translation);
     }
 
     /**
