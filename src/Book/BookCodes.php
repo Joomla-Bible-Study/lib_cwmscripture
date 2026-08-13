@@ -35,7 +35,7 @@ namespace CWM\Library\Scripture\Book;
  * so it stays where it is. The line is pure number <-> code lives here;
  * anything requiring name resolution does not.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  1.1.13
  */
 final class BookCodes
 {
@@ -47,7 +47,7 @@ final class BookCodes
      * that table actually holds.
      *
      * @var  array<int, int>
-     * @since  __DEPLOY_VERSION__
+     * @since  1.1.13
      */
     public const PROCLAIM_TO_STANDARD = [
         101 => 1, 102 => 2, 103 => 3, 104 => 4, 105 => 5,
@@ -74,7 +74,7 @@ final class BookCodes
      * is what returns the translated name.
      *
      * @var  array<int, string>
-     * @since  __DEPLOY_VERSION__
+     * @since  1.1.13
      */
     public const BOOK_NAMES = [
         1  => 'Genesis', 2 => 'Exodus', 3 => 'Leviticus', 4 => 'Numbers',
@@ -106,7 +106,7 @@ final class BookCodes
      * deuterocanon, where OSIS writes `1Macc` against USFM's `1MA`.
      *
      * @var  array<int, string>
-     * @since  __DEPLOY_VERSION__
+     * @since  1.1.13
      */
     public const BOOK_CODES = [
         1  => 'GEN', 2 => 'EXO', 3 => 'LEV', 4 => 'NUM', 5 => 'DEU',
@@ -137,7 +137,7 @@ final class BookCodes
      * transcribed from that issue shifts four of the seven onto the wrong book.
      *
      * @var  array<int, string>
-     * @since  __DEPLOY_VERSION__
+     * @since  1.1.13
      */
     public const DEUTEROCANON_CODES = [
         167 => 'TOB', 168 => 'JDT', 169 => '1MA', 170 => '2MA',
@@ -151,7 +151,7 @@ final class BookCodes
      *
      * @return  int  Standard book number, or 0 when there is no equivalent
      *
-     * @since   __DEPLOY_VERSION__
+     * @since   1.1.13
      */
     public static function toStandard(int $proclaimBook): int
     {
@@ -170,7 +170,7 @@ final class BookCodes
      *
      * @return  int  Proclaim book number
      *
-     * @since   __DEPLOY_VERSION__
+     * @since   1.1.13
      */
     public static function toProclaim(int $standardBook): int
     {
@@ -184,7 +184,7 @@ final class BookCodes
      *
      * @return  string  Book code, or '' when out of range
      *
-     * @since   __DEPLOY_VERSION__
+     * @since   1.1.13
      */
     public static function code(int $standardBook): string
     {
@@ -198,7 +198,7 @@ final class BookCodes
      *
      * @return  string  Book code, or '' when there is no standard equivalent
      *
-     * @since   __DEPLOY_VERSION__
+     * @since   1.1.13
      */
     public static function forProclaim(int $proclaimBook): string
     {
@@ -218,7 +218,7 @@ final class BookCodes
      *
      * @return  string  Book name, or '' when out of range
      *
-     * @since   __DEPLOY_VERSION__
+     * @since   1.1.13
      */
     public static function name(int $standardBook): string
     {
@@ -234,7 +234,7 @@ final class BookCodes
      *
      * @return  array<int, string>
      *
-     * @since   __DEPLOY_VERSION__
+     * @since   1.1.13
      */
     public static function names(): array
     {
@@ -250,7 +250,7 @@ final class BookCodes
      *
      * @return  array<int, string>
      *
-     * @since   __DEPLOY_VERSION__
+     * @since   1.1.13
      */
     public static function codes(): array
     {

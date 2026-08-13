@@ -115,7 +115,7 @@ class GetBibleProvider extends AbstractBibleProvider
      *
      * @return  BiblePassageResult
      *
-     * @since   __DEPLOY_VERSION__
+     * @since   1.1.13
      */
     #[\Override]
     public function getPassageFor(ScriptureReference $ref, string $translation): BiblePassageResult
@@ -168,7 +168,7 @@ class GetBibleProvider extends AbstractBibleProvider
      *
      * @return  string
      *
-     * @since   __DEPLOY_VERSION__
+     * @since   1.1.13
      */
     private static function apiRefFromParts(string $english, ScriptureReference $ref): string
     {
@@ -201,7 +201,7 @@ class GetBibleProvider extends AbstractBibleProvider
      *
      * @return  BiblePassageResult
      *
-     * @since   __DEPLOY_VERSION__
+     * @since   1.1.13
      */
     private function fetchByApiRef(string $apiRef, string $reference, string $translation): BiblePassageResult
     {

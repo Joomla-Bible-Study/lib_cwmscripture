@@ -105,7 +105,7 @@ class ScriptureReference
      *
      * @return  string  Book code, or '' when the book number names no book
      *
-     * @since   __DEPLOY_VERSION__
+     * @since   1.1.13
      */
     public function bookCode(): string
     {

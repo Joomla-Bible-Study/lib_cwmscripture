@@ -111,7 +111,7 @@ abstract class AbstractBibleProvider implements BibleProviderInterface
      *
      * @return  BiblePassageResult
      *
-     * @since   __DEPLOY_VERSION__
+     * @since   1.1.13
      */
     public function getPassageFor(ScriptureReference $ref, string $translation): BiblePassageResult
     {
@@ -228,7 +228,7 @@ abstract class AbstractBibleProvider implements BibleProviderInterface
      *
      * @return  array<int, string>
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.1.13
      */
     public static function bookNames(): array
     {

@@ -135,7 +135,7 @@ class ApiBibleProvider extends AbstractBibleProvider
      *
      * @return  BiblePassageResult
      *
-     * @since   __DEPLOY_VERSION__
+     * @since   1.1.13
      */
     public function getPassageFor(ScriptureReference $ref, string $translation): BiblePassageResult
     {
@@ -199,7 +199,7 @@ class ApiBibleProvider extends AbstractBibleProvider
      *
      * @return  BiblePassageResult
      *
-     * @since   __DEPLOY_VERSION__
+     * @since   1.1.13
      */
     private function fetchByPassageId(
         string $passageId,
@@ -366,7 +366,7 @@ class ApiBibleProvider extends AbstractBibleProvider
      *
      * @return  string  Passage id, or '' when the book or chapter is unknown
      *
-     * @since   __DEPLOY_VERSION__
+     * @since   1.1.13
      */
     public function buildPassageIdFor(ScriptureReference $ref): string
     {
@@ -402,7 +402,7 @@ class ApiBibleProvider extends AbstractBibleProvider
      *
      * @return  string
      *
-     * @since   __DEPLOY_VERSION__
+     * @since   1.1.13
      */
     private static function passageIdFromParts(
         string $code,

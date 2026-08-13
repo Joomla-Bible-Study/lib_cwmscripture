@@ -135,7 +135,7 @@ class BibleBrainProvider extends AbstractBibleProvider implements AudioProviderI
      *
      * @return  BiblePassageResult
      *
-     * @since   __DEPLOY_VERSION__
+     * @since   1.1.13
      */
     #[\Override]
     public function getPassageFor(ScriptureReference $ref, string $translation): BiblePassageResult
@@ -199,7 +199,7 @@ class BibleBrainProvider extends AbstractBibleProvider implements AudioProviderI
      *
      * @return  BiblePassageResult
      *
-     * @since   __DEPLOY_VERSION__
+     * @since   1.1.13
      */
     protected function fetchParsed(array $parsed, string $reference, string $translation): BiblePassageResult
     {
