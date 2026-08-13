@@ -21,7 +21,7 @@ use PHPUnit\Framework\TestCase;
  * hurt most: a caller rendered the number to a localised name, and
  * `anglicizeBookName()` parsed that back to a number to recover the English one.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  1.1.13
  */
 class GetBibleApiRefTest extends TestCase
 {
