@@ -19,6 +19,24 @@
 <changelogs>
 
     <!-- ============================================================ -->
+    <!-- 1.1.14                                                   -->
+    <!-- ============================================================ -->
+    <changelog>
+        <element>lib_cwmscripture</element>
+        <type>library</type>
+        <version>1.1.14</version>
+        <date>2026-08-13</date>
+        <note>
+            <item>chore(deps): update npm dev dependencies, clear the brace-expansion advisory by @bcordis in https://github.com/Joomla-Bible-Study/lib_cwmscripture/pull/54</item>
+            <item>fix: substitute @since in tests/, and date the 1.1.13 tests to 1.1.13 by @bcordis in https://github.com/Joomla-Bible-Study/lib_cwmscripture/pull/57</item>
+            <item>ci: gate on npm run lint:js by @bcordis in https://github.com/Joomla-Bible-Study/lib_cwmscripture/pull/56</item>
+            <item>chore: refresh cwm/build-tools to 1.17.0 for the artifact token gate by @bcordis in https://github.com/Joomla-Bible-Study/lib_cwmscripture/pull/58</item>
+            <item>chore: restore composer.json formatting, and move to build-tools 1.18.0 by @bcordis in https://github.com/Joomla-Bible-Study/lib_cwmscripture/pull/59</item>
+            <item>chore: refresh cwm/build-tools to 1.19.0 by @bcordis in https://github.com/Joomla-Bible-Study/lib_cwmscripture/pull/60</item>
+        </note>
+    </changelog>
+
+    <!-- ============================================================ -->
     <!-- 1.1.13                                                   -->
     <!-- ============================================================ -->
     <changelog>
