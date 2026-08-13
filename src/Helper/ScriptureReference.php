@@ -11,6 +11,8 @@
 
 namespace CWM\Library\Scripture\Helper;
 
+use CWM\Library\Scripture\Book\BookCodes;
+
 // phpcs:disable PSR1.Files.SideEffects
 \defined('_JEXEC') or die;
 // phpcs:enable PSR1.Files.SideEffects
@@ -88,5 +90,25 @@ class ScriptureReference
             referenceText: (string) ($row->reference_text ?? ''),
             ordering:      (int) ($row->ordering ?? 0),
         );
+    }
+
+    /**
+     * The USFM book code this reference names.
+     *
+     * Derived, never stored: the book number is the fact, and the code is a view
+     * of it, so nothing has to migrate and the two cannot drift apart.
+     *
+     * This is what the providers need on the wire — api.bible and Bible Brain
+     * both address books by code — and having it here means a caller holding a
+     * reference no longer has to render a book *name* for a provider to match
+     * back to a code (Proclaim#1688 item 4).
+     *
+     * @return  string  Book code, or '' when the book number names no book
+     *
+     * @since   __DEPLOY_VERSION__
+     */
+    public function bookCode(): string
+    {
+        return BookCodes::forProclaim($this->booknumber);
     }
 }

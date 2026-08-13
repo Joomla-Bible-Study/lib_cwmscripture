@@ -11,11 +11,10 @@
 
 namespace CWM\Library\Scripture\Bible;
 
+use CWM\Library\Scripture\Book\BookCodes;
 use CWM\Library\Scripture\Helper\ScriptureHelper;
 use CWM\Library\Scripture\Helper\ScriptureReference;
-use Joomla\CMS\Factory;
 use Joomla\CMS\Log\Log;
-use Joomla\Database\DatabaseInterface;
 use Joomla\Http\HttpFactory;
 
 // phpcs:disable PSR1.Files.SideEffects
@@ -32,198 +31,6 @@ use Joomla\Http\HttpFactory;
 abstract class AbstractBibleProvider implements BibleProviderInterface
 {
     /**
-     * Mapping from Proclaim book numbers (101-166) to standard book numbers (1-66).
-     *
-     * @var  array<int, int>
-     * @since  1.0.0
-     */
-    protected const PROCLAIM_TO_STANDARD = [
-        101 => 1, 102 => 2, 103 => 3, 104 => 4, 105 => 5,
-        106 => 6, 107 => 7, 108 => 8, 109 => 9, 110 => 10,
-        111 => 11, 112 => 12, 113 => 13, 114 => 14, 115 => 15,
-        116 => 16, 117 => 17, 118 => 18, 119 => 19, 120 => 20,
-        121 => 21, 122 => 22, 123 => 23, 124 => 24, 125 => 25,
-        126 => 26, 127 => 27, 128 => 28, 129 => 29, 130 => 30,
-        131 => 31, 132 => 32, 133 => 33, 134 => 34, 135 => 35,
-        136 => 36, 137 => 37, 138 => 38, 139 => 39, 140 => 40,
-        141 => 41, 142 => 42, 143 => 43, 144 => 44, 145 => 45,
-        146 => 46, 147 => 47, 148 => 48, 149 => 49, 150 => 50,
-        151 => 51, 152 => 52, 153 => 53, 154 => 54, 155 => 55,
-        156 => 56, 157 => 57, 158 => 58, 159 => 59, 160 => 60,
-        161 => 61, 162 => 62, 163 => 63, 164 => 64, 165 => 65,
-        166 => 66,
-    ];
-
-    /**
-     * Standard book names indexed by standard book number (1-66).
-     *
-     * @var  array<int, string>
-     * @since  1.0.0
-     */
-    protected const BOOK_NAMES = [
-        1  => 'Genesis', 2 => 'Exodus', 3 => 'Leviticus', 4 => 'Numbers',
-        5  => 'Deuteronomy', 6 => 'Joshua', 7 => 'Judges', 8 => 'Ruth',
-        9  => '1 Samuel', 10 => '2 Samuel', 11 => '1 Kings', 12 => '2 Kings',
-        13 => '1 Chronicles', 14 => '2 Chronicles', 15 => 'Ezra',
-        16 => 'Nehemiah', 17 => 'Esther', 18 => 'Job', 19 => 'Psalms',
-        20 => 'Proverbs', 21 => 'Ecclesiastes', 22 => 'Song of Solomon',
-        23 => 'Isaiah', 24 => 'Jeremiah', 25 => 'Lamentations',
-        26 => 'Ezekiel', 27 => 'Daniel', 28 => 'Hosea', 29 => 'Joel',
-        30 => 'Amos', 31 => 'Obadiah', 32 => 'Jonah', 33 => 'Micah',
-        34 => 'Nahum', 35 => 'Habakkuk', 36 => 'Zephaniah', 37 => 'Haggai',
-        38 => 'Zechariah', 39 => 'Malachi',
-        40 => 'Matthew', 41 => 'Mark', 42 => 'Luke', 43 => 'John',
-        44 => 'Acts', 45 => 'Romans', 46 => '1 Corinthians',
-        47 => '2 Corinthians', 48 => 'Galatians', 49 => 'Ephesians',
-        50 => 'Philippians', 51 => 'Colossians', 52 => '1 Thessalonians',
-        53 => '2 Thessalonians', 54 => '1 Timothy', 55 => '2 Timothy',
-        56 => 'Titus', 57 => 'Philemon', 58 => 'Hebrews', 59 => 'James',
-        60 => '1 Peter', 61 => '2 Peter', 62 => '1 John', 63 => '2 John',
-        64 => '3 John', 65 => 'Jude', 66 => 'Revelation',
-    ];
-
-    /**
-     * Whether the Joomla logger has been registered for our category.
-     *
-     * @var  bool
-     * @since  1.0.0
-     */
-    private static bool $loggerRegistered = false;
-
-    /**
-     * Cache TTL in seconds. Default 24 hours; configurable via params.
-     *
-     * @var  int
-     * @since  1.0.0
-     */
-    protected int $cacheTtl = 86400;
-
-    /**
-     * Maximum number of HTTP retry attempts.
-     *
-     * @var  int
-     * @since  1.0.0
-     */
-    private const HTTP_MAX_RETRIES = 3;
-
-    /**
-     * Whether the last httpGet() failure was a transient (retryable) error.
-     *
-     * @var  bool
-     * @since  1.0.0
-     */
-    protected bool $lastErrorTransient = false;
-
-    /**
-     * Register the Joomla logger for the cwmscripture.bible category.
-     *
-     * Call once before any Log::add() calls. Safe to call multiple times.
-     *
-     * @return  void
-     *
-     * @since  1.0.0
-     */
-    public static function registerLogger(): void
-    {
-        if (!self::$loggerRegistered) {
-            Log::addLogger(
-                ['text_file' => 'cwmscripture.bible.php'],
-                Log::ALL,
-                ['cwmscripture.bible']
-            );
-            self::$loggerRegistered = true;
-        }
-    }
-
-    /**
-     * Set the cache TTL in seconds.
-     *
-     * @param   int  $seconds  TTL in seconds
-     *
-     * @return  void
-     *
-     * @since  1.0.0
-     */
-    public function setCacheTtl(int $seconds): void
-    {
-        $this->cacheTtl = max(3600, $seconds);
-    }
-
-    /**
-     * Whether the last error was transient (retryable).
-     *
-     * @return  bool
-     *
-     * @since  1.0.0
-     */
-    public function isLastErrorTransient(): bool
-    {
-        return $this->lastErrorTransient;
-    }
-
-    /**
-     * Get the database driver.
-     *
-     * @return  DatabaseInterface
-     *
-     * @since  1.0.0
-     */
-    protected function getDatabase(): DatabaseInterface
-    {
-        return Factory::getContainer()->get(DatabaseInterface::class);
-    }
-
-    /**
-     * OSIS / USFM book code by standard book number (1-66).
-     *
-     * The two standards agree on the canonical 66, and that agreement is what
-     * providers speak on the wire: API.Bible sends `JHN.3.16`, Bible Brain sends
-     * `/JHN/3`. Held once here because both providers carried byte-identical
-     * copies of it (#1688).
-     *
-     * @var    array<int, string>
-     * @since  1.1.11
-     */
-    protected const BOOK_CODES = [
-        1  => 'GEN', 2 => 'EXO', 3 => 'LEV', 4 => 'NUM', 5 => 'DEU',
-        6  => 'JOS', 7 => 'JDG', 8 => 'RUT', 9 => '1SA', 10 => '2SA',
-        11 => '1KI', 12 => '2KI', 13 => '1CH', 14 => '2CH', 15 => 'EZR',
-        16 => 'NEH', 17 => 'EST', 18 => 'JOB', 19 => 'PSA', 20 => 'PRO',
-        21 => 'ECC', 22 => 'SNG', 23 => 'ISA', 24 => 'JER', 25 => 'LAM',
-        26 => 'EZK', 27 => 'DAN', 28 => 'HOS', 29 => 'JOL', 30 => 'AMO',
-        31 => 'OBA', 32 => 'JON', 33 => 'MIC', 34 => 'NAM', 35 => 'HAB',
-        36 => 'ZEP', 37 => 'HAG', 38 => 'ZEC', 39 => 'MAL',
-        40 => 'MAT', 41 => 'MRK', 42 => 'LUK', 43 => 'JHN',
-        44 => 'ACT', 45 => 'ROM', 46 => '1CO', 47 => '2CO',
-        48 => 'GAL', 49 => 'EPH', 50 => 'PHP', 51 => 'COL',
-        52 => '1TH', 53 => '2TH', 54 => '1TI', 55 => '2TI',
-        56 => 'TIT', 57 => 'PHM', 58 => 'HEB', 59 => 'JAS',
-        60 => '1PE', 61 => '2PE', 62 => '1JN', 63 => '2JN',
-        64 => '3JN', 65 => 'JUD', 66 => 'REV',
-    ];
-
-    /**
-     * Book codes for the deuterocanon, keyed by *Proclaim* number (167-173).
-     *
-     * Keyed by Proclaim number rather than folded into BOOK_CODES because there
-     * is no standard number for these: 1-66 is the canonical index, and
-     * PROCLAIM_TO_STANDARD deliberately stops at 166 so LocalProvider keeps
-     * querying `#__bsms_bible_verses.book` over the canon it actually holds.
-     *
-     * These are USFM codes, matching BOOK_CODES. USFM and OSIS agree on the
-     * canonical 66 — which is why one table serves both providers — but they do
-     * not agree here: OSIS writes `1Macc` where USFM writes `1MA`. Adding OSIS
-     * spellings to a USFM table would break both providers for these books.
-     *
-     * @var array<int, string>
-     * @since 1.1.12
-     */
-    protected const DEUTEROCANON_CODES = [
-        167 => 'TOB', 168 => 'JDT', 169 => '1MA', 170 => '2MA',
-        171 => 'WIS', 172 => 'SIR', 173 => 'BAR',
-    ];
-
-    /**
      * Convert Proclaim book number (101-166) to standard (1-66).
      *
      * @param   int  $proclaimBook  Proclaim book number
@@ -234,7 +41,7 @@ abstract class AbstractBibleProvider implements BibleProviderInterface
      */
     public static function proclaimToStandard(int $proclaimBook): int
     {
-        return self::PROCLAIM_TO_STANDARD[$proclaimBook] ?? 0;
+        return BookCodes::toStandard($proclaimBook);
     }
 
     /**
@@ -248,7 +55,7 @@ abstract class AbstractBibleProvider implements BibleProviderInterface
      */
     public static function standardToProclaim(int $standardBook): int
     {
-        return $standardBook + 100;
+        return BookCodes::toProclaim($standardBook);
     }
 
     /**
@@ -262,7 +69,7 @@ abstract class AbstractBibleProvider implements BibleProviderInterface
      */
     public static function bookCode(int $standardBook): string
     {
-        return self::BOOK_CODES[$standardBook] ?? '';
+        return BookCodes::code($standardBook);
     }
 
     /**
@@ -276,13 +83,7 @@ abstract class AbstractBibleProvider implements BibleProviderInterface
      */
     public static function bookCodeForProclaim(int $proclaimBook): string
     {
-        // The deuterocanon is checked first: it has no standard number, so
-        // proclaimToStandard() answers 0 for 167-173 and would lose the book.
-        if (isset(self::DEUTEROCANON_CODES[$proclaimBook])) {
-            return self::DEUTEROCANON_CODES[$proclaimBook];
-        }
-
-        return self::bookCode(self::proclaimToStandard($proclaimBook));
+        return BookCodes::forProclaim($proclaimBook);
     }
 
     /**
@@ -378,7 +179,7 @@ abstract class AbstractBibleProvider implements BibleProviderInterface
             }
         }
 
-        foreach (self::BOOK_NAMES as $num => $name) {
+        foreach (BookCodes::names() as $num => $name) {
             if (strtolower($name) === $normalized) {
                 return self::bookCode($num);
             }
@@ -386,7 +187,7 @@ abstract class AbstractBibleProvider implements BibleProviderInterface
 
         $matches = [];
 
-        foreach (self::BOOK_NAMES as $num => $name) {
+        foreach (BookCodes::names() as $num => $name) {
             if (str_starts_with(strtolower($name), $normalized)) {
                 $matches[] = $num;
             }
@@ -406,7 +207,7 @@ abstract class AbstractBibleProvider implements BibleProviderInterface
      */
     public static function getBookName(int $bookNumber): string
     {
-        return self::BOOK_NAMES[$bookNumber] ?? '';
+        return BookCodes::name($bookNumber);
     }
 
     /**
