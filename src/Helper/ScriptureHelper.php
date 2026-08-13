@@ -198,7 +198,11 @@ class ScriptureHelper
      */
     public static function parseReference(string $text): ?ScriptureReference
     {
-        $text = trim($text);
+        // `+` is a separator, not part of a book name: references arrive
+        // URL-encoded from query strings, and the providers each normalised it
+        // themselves before matching. Doing it here lets them delegate to this
+        // method without silently rejecting a form they accept today.
+        $text = trim(str_replace('+', ' ', $text));
 
         if ($text === '') {
             return null;
