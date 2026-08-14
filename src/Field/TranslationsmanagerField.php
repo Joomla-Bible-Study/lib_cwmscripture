@@ -15,6 +15,7 @@ use CWM\Library\Scripture\Helper\ScriptureParamsHelper;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Form\FormField;
 use Joomla\CMS\Language\Text;
+use Joomla\CMS\Plugin\PluginHelper;
 use Joomla\CMS\Session\Session;
 use Joomla\CMS\Uri\Uri;
 use Joomla\Database\DatabaseInterface;
@@ -113,6 +114,16 @@ class TranslationsmanagerField extends FormField
         }
 
         $html = '';
+
+        // Every action on this panel posts to a com_ajax endpoint the content
+        // plugin serves. Say so when it cannot answer, rather than leaving a
+        // spinner that never resolves.
+        if (!self::endpointIsServed()) {
+            $html .= '<div class="alert alert-warning" role="alert">'
+                . '<span class="icon-warning" aria-hidden="true"></span> '
+                . Text::_('LIB_CWMSCRIPTURE_TRANSLATIONS_ENDPOINT_UNAVAILABLE')
+                . '</div>';
+        }
 
         // ── Two-column panels: Providers (left) + Settings (right) ──
         $html .= '<div class="row" id="scripture-settings">';
@@ -277,6 +288,7 @@ class TranslationsmanagerField extends FormField
 
         // ── Config div for bible-translations.js ──
         $html .= '<div id="bible-translations-config" class="d-none"'
+            . ' data-ajax-url="' . self::esc(self::ajaxUrl()) . '"'
             . ' data-gdpr-mode="' . $gdprMode . '"'
             . ' data-token="' . $token . '"'
             . ' data-str-loading="' . self::esc(Text::_('LIB_CWMSCRIPTURE_STR_LOADING')) . '"'
@@ -479,6 +491,46 @@ class TranslationsmanagerField extends FormField
         $html .= '</select>';
 
         return $html;
+    }
+
+    /**
+     * The endpoint this UI posts its actions to.
+     *
+     * A library cannot own a `com_ajax` endpoint — only a component or a plugin
+     * can — so the URL has to name whichever extension is actually serving it.
+     * Passing it as data rather than hardcoding it in the JS is the same
+     * arrangement the passage renderer already uses for `getPassage`, and it
+     * means a consumer can serve these actions itself without this field
+     * changing again.
+     *
+     * The content plugin is the only implementation today: the eight handlers
+     * moved there from com_proclaim in 10.3.0.
+     *
+     * @return  string  Endpoint URL, ending in `action=` for the JS to append to
+     *
+     * @since   __DEPLOY_VERSION__
+     */
+    private static function ajaxUrl(): string
+    {
+        return 'index.php?option=com_ajax&plugin=scripturelinks&group=content&format=json&action=';
+    }
+
+    /**
+     * Whether anything is actually listening on that endpoint.
+     *
+     * ⚠️ `com_ajax` dispatches only to **enabled** plugins. Disabling the
+     * ScriptureLinks content plugin is a reasonable choice for a site that does
+     * not want `{scripture}` tags processed in articles, and it leaves this
+     * whole panel issuing requests that resolve to nothing — a spinner that
+     * never resolves, with no error to explain it.
+     *
+     * @return  bool  True when the endpoint's host is installed and enabled
+     *
+     * @since   __DEPLOY_VERSION__
+     */
+    private static function endpointIsServed(): bool
+    {
+        return PluginHelper::isEnabled('content', 'scripturelinks');
     }
 
     /**
