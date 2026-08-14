@@ -508,7 +508,7 @@ class TranslationsmanagerField extends FormField
      *
      * @return  string  Endpoint URL, ending in `action=` for the JS to append to
      *
-     * @since   __DEPLOY_VERSION__
+     * @since   1.1.18
      */
     private static function ajaxUrl(): string
     {
@@ -526,7 +526,7 @@ class TranslationsmanagerField extends FormField
      *
      * @return  bool  True when the endpoint's host is installed and enabled
      *
-     * @since   __DEPLOY_VERSION__
+     * @since   1.1.18
      */
     private static function endpointIsServed(): bool
     {

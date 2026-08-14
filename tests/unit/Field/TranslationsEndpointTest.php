@@ -29,7 +29,7 @@ class TranslationsEndpointTest extends TestCase
     /**
      * @return  string  The field's source
      *
-     * @since   __DEPLOY_VERSION__
+     * @since   1.1.18
      */
     private static function field(): string
     {
@@ -41,7 +41,7 @@ class TranslationsEndpointTest extends TestCase
     /**
      * @return  string  The script's source
      *
-     * @since   __DEPLOY_VERSION__
+     * @since   1.1.18
      */
     private static function script(): string
     {
@@ -53,7 +53,7 @@ class TranslationsEndpointTest extends TestCase
     /**
      * @return  void
      *
-     * @since   __DEPLOY_VERSION__
+     * @since   1.1.18
      */
     #[TestDox('the field passes the endpoint to the script as data')]
     public function testTheFieldEmitsTheEndpoint(): void
@@ -76,7 +76,7 @@ class TranslationsEndpointTest extends TestCase
     /**
      * @return  void
      *
-     * @since   __DEPLOY_VERSION__
+     * @since   1.1.18
      */
     #[TestDox('the script takes the endpoint from the field rather than assuming one')]
     public function testTheScriptReadsTheEndpoint(): void
@@ -94,7 +94,7 @@ class TranslationsEndpointTest extends TestCase
      *
      * @return  void
      *
-     * @since   __DEPLOY_VERSION__
+     * @since   1.1.18
      */
     #[TestDox('the panel says so when nothing is serving its endpoint')]
     public function testADisabledHostIsReported(): void
@@ -124,7 +124,7 @@ class TranslationsEndpointTest extends TestCase
     /**
      * @return  void
      *
-     * @since   __DEPLOY_VERSION__
+     * @since   1.1.18
      */
     #[TestDox('the message the warning uses is translated')]
     public function testTheWarningStringExists(): void
