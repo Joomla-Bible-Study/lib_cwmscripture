@@ -23,7 +23,13 @@
         }
 
         const { token } = config.dataset;
-        const baseUrl = 'index.php?option=com_ajax&plugin=scripturelinks&group=content&format=json&action=';
+
+        // The endpoint comes from the field that rendered this panel. A library
+        // cannot own a com_ajax endpoint, so which extension answers is not this
+        // script's to assume — see TranslationsmanagerField::ajaxUrl(). The literal
+        // is only a fallback for markup rendered before that attribute existed.
+        const baseUrl = config.dataset.ajaxUrl
+            || 'index.php?option=com_ajax&plugin=scripturelinks&group=content&format=json&action=';
 
         // Escape HTML to prevent XSS when interpolating external data into innerHTML
         const esc = (str) => {
