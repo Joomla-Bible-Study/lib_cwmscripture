@@ -45,4 +45,10 @@ jobs:
       # Added in cwm-build-tools v1.16.0. lint:js is clean here, and it runs
       # as its own parallel `JS Lint` check, so the PHP job is unaffected.
       run-lint-js: true
+      # Executes the migration files themselves. Everything else here proves the
+      # destination schema is right: a fresh install applies install.sql and
+      # Joomla stamps #__schemas at the newest version without running a single
+      # update file, so until this the update SQL only ever ran on a consumer's
+      # site mid-upgrade. Runs as its own job with its own MySQL service.
+      run-schema-replay: true
       build-command: 'composer build:package'
