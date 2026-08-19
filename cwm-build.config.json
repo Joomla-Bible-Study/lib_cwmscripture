@@ -9,6 +9,17 @@
             { "type": "library", "path": "cwmscripture.xml" }
         ]
     },
+    "_schemaReplay_comment": "One baseline file, not two: the migrations here touch only #__bsms_scripture_consumers, a table this library owns, so no Joomla core skeleton is needed. No `root` either \u2014 cwmscripture.xml sits beside the sql/ it names, so the manifest's directory IS the extension root. `from` is the highest migration file SHIPPED at v1.0.0, which is 1.0.0.sql; a fresh install stamps #__schemas at the highest file present without running any of them.",
+    "schemaReplay": {
+        "targets": [
+            {
+                "name": "lib_cwmscripture",
+                "manifest": "cwmscripture.xml",
+                "baseline": "build/sql-baselines/lib_cwmscripture-1.0.0.sql",
+                "from": "1.0.0"
+            }
+        ]
+    },
     "build": {
         "command":    "npm run build && cwm-build",
         "outputGlob": "build/dist/lib_cwmscripture-*.zip",
