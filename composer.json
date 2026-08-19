@@ -43,7 +43,7 @@
     "ext-mbstring": "*"
   },
   "require-dev": {
-    "cwm/build-tools": "^1.28",
+    "cwm/build-tools": "^1.29",
     "friendsofphp/php-cs-fixer": "^3.0",
     "phpunit/phpunit": "^11.0"
   },
