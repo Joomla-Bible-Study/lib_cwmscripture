@@ -19,6 +19,19 @@
 <changelogs>
 
     <!-- ============================================================ -->
+    <!-- 1.1.20                                                   -->
+    <!-- ============================================================ -->
+    <changelog>
+        <element>lib_cwmscripture</element>
+        <type>library</type>
+        <version>1.1.20</version>
+        <date>2026-08-23</date>
+        <note>
+            <item>fix(assets): declare core, and stop the autocomplete throwing without it by @bcordis in https://github.com/Joomla-Bible-Study/lib_cwmscripture/pull/74</item>
+        </note>
+    </changelog>
+
+    <!-- ============================================================ -->
     <!-- 1.1.19                                                   -->
     <!-- ============================================================ -->
     <changelog>
