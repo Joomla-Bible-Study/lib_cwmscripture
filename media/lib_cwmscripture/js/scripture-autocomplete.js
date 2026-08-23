@@ -618,6 +618,6 @@
 
         // Also re-init after AJAX updates (Joomla subform might reload)
         document.addEventListener('joomla:updated', initAll);
-    })(Joomla);
+    })(window.Joomla);
 
 })();

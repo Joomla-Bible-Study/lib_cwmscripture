@@ -8,7 +8,10 @@
         {
             "name": "lib_cwmscripture.cwm-fetch",
             "type": "script",
-            "uri": "media/lib_cwmscripture/js/cwm-fetch.js"
+            "uri": "media/lib_cwmscripture/js/cwm-fetch.js",
+            "dependencies": [
+                "core"
+            ]
         },
         {
             "name": "lib_cwmscripture.scripture-text",
@@ -25,6 +28,7 @@
             "type": "script",
             "uri": "media/lib_cwmscripture/js/scripture-tooltip.js",
             "dependencies": [
+                "core",
                 "lib_cwmscripture.cwm-fetch",
                 "bootstrap.popover"
             ]
@@ -39,13 +43,17 @@
             "type": "script",
             "uri": "media/lib_cwmscripture/js/scripture-switcher.js",
             "dependencies": [
+                "core",
                 "lib_cwmscripture.cwm-fetch"
             ]
         },
         {
             "name": "lib_cwmscripture.scripture-autocomplete",
             "type": "script",
-            "uri": "media/lib_cwmscripture/js/scripture-autocomplete.js"
+            "uri": "media/lib_cwmscripture/js/scripture-autocomplete.js",
+            "dependencies": [
+                "core"
+            ]
         },
         {
             "name": "lib_cwmscripture.translations-manager",
@@ -57,6 +65,7 @@
             "type": "script",
             "uri": "media/lib_cwmscripture/js/bible-translations.js",
             "dependencies": [
+                "core",
                 "lib_cwmscripture.cwm-fetch"
             ]
         }
