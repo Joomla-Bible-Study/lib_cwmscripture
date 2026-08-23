@@ -19,6 +19,24 @@
 <changelogs>
 
     <!-- ============================================================ -->
+    <!-- 1.1.19                                                   -->
+    <!-- ============================================================ -->
+    <changelog>
+        <element>lib_cwmscripture</element>
+        <type>library</type>
+        <version>1.1.19</version>
+        <date>2026-08-23</date>
+        <note>
+            <item>chore: drop the database keys from the build.properties template by @bcordis in https://github.com/Joomla-Bible-Study/lib_cwmscripture/pull/67</item>
+            <item>chore: drop the database keys from the committed properties template by @bcordis in https://github.com/Joomla-Bible-Study/lib_cwmscripture/pull/68</item>
+            <item>chore(deps): bump cwm/build-tools to ^1.27 by @bcordis in https://github.com/Joomla-Bible-Study/lib_cwmscripture/pull/69</item>
+            <item>chore(deps): bump cwm/build-tools to ^1.28 by @bcordis in https://github.com/Joomla-Bible-Study/lib_cwmscripture/pull/70</item>
+            <item>chore(deps): bump cwm/build-tools to ^1.29 by @bcordis in https://github.com/Joomla-Bible-Study/lib_cwmscripture/pull/71</item>
+            <item>test(schema): replay migrations in CI, from a committed baseline by @bcordis in https://github.com/Joomla-Bible-Study/lib_cwmscripture/pull/72</item>
+        </note>
+    </changelog>
+
+    <!-- ============================================================ -->
     <!-- 1.1.18                                                   -->
     <!-- ============================================================ -->
     <changelog>
