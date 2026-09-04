@@ -356,6 +356,68 @@ class BibleImporter
     }
 
     /**
+     * Remove every installed translation except the protected core ones.
+     *
+     * Backs the "Remove all" button in the translations manager. Core
+     * translations are skipped rather than reported as failures — removeTranslation()
+     * throws for them by design, and the button is not an attempt to remove them.
+     *
+     * @return  int  Number of translations removed
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public static function removeAllTranslations(): int
+    {
+        $db    = Factory::getContainer()->get(DatabaseInterface::class);
+        $query = $db->getQuery(true)
+            ->select($db->quoteName('abbreviation'))
+            ->from($db->quoteName('#__bsms_bible_translations'))
+            ->where($db->quoteName('installed') . ' = 1');
+        $db->setQuery($query);
+
+        $removed = 0;
+
+        foreach ($db->loadColumn() ?: [] as $abbreviation) {
+            if (self::isCoreTranslation($abbreviation)) {
+                continue;
+            }
+
+            self::removeTranslation($abbreviation);
+            $removed++;
+        }
+
+        return $removed;
+    }
+
+    /**
+     * Drop catalog entries for a provider that are not installed locally.
+     *
+     * Runs when a provider is switched off. Only entries with no local verses
+     * go: an installed translation keeps working offline no matter which
+     * provider first advertised it, so removing it here would destroy usable
+     * data on a settings change.
+     *
+     * @param   string  $source  Provider source key, e.g. "api_bible"
+     *
+     * @return  int  Number of catalog entries removed
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public static function removeProviderEntries(string $source): int
+    {
+        $db    = Factory::getContainer()->get(DatabaseInterface::class);
+        $query = $db->getQuery(true)
+            ->delete($db->quoteName('#__bsms_bible_translations'))
+            ->where($db->quoteName('source') . ' = :source')
+            ->where($db->quoteName('installed') . ' = 0')
+            ->bind(':source', $source);
+        $db->setQuery($query);
+        $db->execute();
+
+        return (int) $db->getAffectedRows();
+    }
+
+    /**
      * Seed the GetBible translation catalog if depleted.
      *
      * @return  int  Number of rows inserted

@@ -24,6 +24,7 @@
 namespace CWM\Library\Scripture\Tests\Bible;
 
 use CWM\Library\Scripture\Bible\AbstractBibleProvider;
+use CWM\Library\Scripture\Importer\BibleImporter;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\TestCase;
@@ -143,5 +144,51 @@ class ConsumerApiContractTest extends TestCase
                 . 'writing to one is deprecated in PHP 8.2, so losing the declaration breaks behaviour silently.'
             );
         }
+    }
+
+    /**
+     * BibleImporter methods the translations-manager UI calls through its
+     * consumer's AJAX endpoints.
+     *
+     * ⚠️ This library ships the JavaScript that posts to those endpoints
+     * (`bible-translations.js` calls `removeAllTranslations` and
+     * `cleanupProvider`), but the endpoints themselves live in the
+     * ScriptureLinks plugin, which forwards to this class. Two of them
+     * forwarded to methods that were never written, so both buttons answered a
+     * bodyless 500 and the UI simply hung — CWMScriptureLinks#46.
+     *
+     * @return array<string, array{0: string}>
+     */
+    public static function importerMethodsUsedByConsumers(): array
+    {
+        return [
+            // ScriptureLinks: ajaxRemoveAllTranslations().
+            'removeAllTranslations' => ['removeAllTranslations'],
+            // ScriptureLinks: ajaxCleanupProvider(), on provider disable.
+            'removeProviderEntries' => ['removeProviderEntries'],
+            // ScriptureLinks: the per-row remove action.
+            'removeTranslation'     => ['removeTranslation'],
+            'isCoreTranslation'     => ['isCoreTranslation'],
+            'isInstalled'           => ['isInstalled'],
+            'downloadAndImport'     => ['downloadAndImport'],
+            'seedGetBibleCatalog'   => ['seedGetBibleCatalog'],
+        ];
+    }
+
+    #[DataProvider('importerMethodsUsedByConsumers')]
+    #[TestDox('BibleImporter::$method() is still callable from outside the library')]
+    public function testImporterMethodsUsedByConsumersExist(string $method): void
+    {
+        self::assertTrue(
+            method_exists(BibleImporter::class, $method),
+            "BibleImporter::{$method}() is called by code outside this repository. A missing one is not a "
+            . 'compile error — it is an Error at click time, and the consumer catches \Exception, so the '
+            . 'browser gets a 500 with no body.'
+        );
+
+        $reflection = new \ReflectionMethod(BibleImporter::class, $method);
+
+        self::assertTrue($reflection->isPublic(), "BibleImporter::{$method}() must stay public.");
+        self::assertTrue($reflection->isStatic(), "BibleImporter::{$method}() is called statically by consumers.");
     }
 }
