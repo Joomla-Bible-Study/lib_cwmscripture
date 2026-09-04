@@ -148,6 +148,12 @@ class LocalProvider extends AbstractBibleProvider
                     ->bind(':vend', $parsed['verse_end'], \Joomla\Database\ParameterType::INTEGER);
             }
         } else {
+            // ⚠️ bind() takes $value by reference, so these must be variables:
+            // passing `$parsed['verse_begin'] ?: 1` directly throws an Error at
+            // runtime, which is why any cross-chapter reference failed.
+            $verseBegin = $parsed['verse_begin'] ?: 1;
+            $verseEnd   = $parsed['verse_end'] ?: 999;
+
             $query->where('(' .
                 '(' . $db->quoteName('chapter') . ' = :cbegin AND ' . $db->quoteName('verse') . ' >= :vbegin2)' .
                 ' OR ' .
@@ -156,11 +162,11 @@ class LocalProvider extends AbstractBibleProvider
                 '(' . $db->quoteName('chapter') . ' = :cend2 AND ' . $db->quoteName('verse') . ' <= :vend2)' .
                 ')')
                 ->bind(':cbegin', $parsed['chapter_begin'], \Joomla\Database\ParameterType::INTEGER)
-                ->bind(':vbegin2', $parsed['verse_begin'] ?: 1, \Joomla\Database\ParameterType::INTEGER)
+                ->bind(':vbegin2', $verseBegin, \Joomla\Database\ParameterType::INTEGER)
                 ->bind(':cbegin2', $parsed['chapter_begin'], \Joomla\Database\ParameterType::INTEGER)
                 ->bind(':cend', $parsed['chapter_end'], \Joomla\Database\ParameterType::INTEGER)
                 ->bind(':cend2', $parsed['chapter_end'], \Joomla\Database\ParameterType::INTEGER)
-                ->bind(':vend2', $parsed['verse_end'] ?: 999, \Joomla\Database\ParameterType::INTEGER);
+                ->bind(':vend2', $verseEnd, \Joomla\Database\ParameterType::INTEGER);
         }
 
         $query->order($db->quoteName('chapter') . ' ASC, ' . $db->quoteName('verse') . ' ASC');

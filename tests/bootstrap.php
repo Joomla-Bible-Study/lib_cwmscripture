@@ -60,6 +60,37 @@ if (!class_exists(\Joomla\CMS\Log\Log::class)) {
     ');
 }
 
+// Stub the database contract the Bible providers query through.
+//
+// The library has no Joomla runtime dependency, so these do not exist here.
+// They are only needed by tests that execute a provider's real query builder
+// (see CrossChapterBindTest) -- ⚠️ note bind() declares $value BY REFERENCE,
+// exactly as Joomla does, because that is the behaviour under test.
+if (!interface_exists(\Joomla\Database\DatabaseInterface::class)) {
+    eval('
+        namespace Joomla\Database;
+        interface DatabaseInterface {
+            public function getQuery($new = false);
+            public function quoteName($name, $as = null);
+            public function setQuery($query, $offset = 0, $limit = 0);
+            public function loadObjectList($key = "", $class = "stdClass");
+        }
+    ');
+}
+
+if (!class_exists(\Joomla\Database\ParameterType::class)) {
+    eval('
+        namespace Joomla\Database;
+        class ParameterType {
+            public const BOOLEAN = "boolean";
+            public const INTEGER = "integer";
+            public const LARGE_OBJECT = "large_object";
+            public const NULL = "null";
+            public const STRING = "string";
+        }
+    ');
+}
+
 // Stub Joomla\CMS\Factory if not available
 if (!class_exists(\Joomla\CMS\Factory::class)) {
     eval('
