@@ -19,6 +19,20 @@
 <changelogs>
 
     <!-- ============================================================ -->
+    <!-- 1.1.21                                                   -->
+    <!-- ============================================================ -->
+    <changelog>
+        <element>lib_cwmscripture</element>
+        <type>library</type>
+        <version>1.1.21</version>
+        <date>2026-09-04</date>
+        <note>
+            <item>fix(bible): bind cross-chapter verse bounds by variable, not expression (#78) by @bcordis in https://github.com/Joomla-Bible-Study/lib_cwmscripture/pull/79</item>
+            <item>feat(importer): add the remove-all and provider-cleanup methods consumers call by @bcordis in https://github.com/Joomla-Bible-Study/lib_cwmscripture/pull/80</item>
+        </note>
+    </changelog>
+
+    <!-- ============================================================ -->
     <!-- 1.1.20                                                   -->
     <!-- ============================================================ -->
     <changelog>
