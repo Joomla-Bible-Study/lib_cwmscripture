@@ -364,7 +364,7 @@ class BibleImporter
      *
      * @return  int  Number of translations removed
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.1.21
      */
     public static function removeAllTranslations(): int
     {
@@ -401,7 +401,7 @@ class BibleImporter
      *
      * @return  int  Number of catalog entries removed
      *
-     * @since  __DEPLOY_VERSION__
+     * @since  1.1.21
      */
     public static function removeProviderEntries(string $source): int
     {

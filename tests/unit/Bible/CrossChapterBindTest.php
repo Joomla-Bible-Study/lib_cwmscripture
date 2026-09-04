@@ -20,7 +20,7 @@
  * @copyright  (C) 2026 CWM Team All rights reserved
  * @license    GNU General Public License version 2 or later; see LICENSE.txt
  *
- * @since  __DEPLOY_VERSION__
+ * @since  1.1.21
  */
 
 namespace CWM\Library\Scripture\Tests\Bible;
@@ -32,13 +32,13 @@ use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @since __DEPLOY_VERSION__
+ * @since 1.1.21
  */
 class CrossChapterBindTest extends TestCase
 {
     /**
      * @return  void
-     * @since __DEPLOY_VERSION__
+     * @since 1.1.21
      */
     #[TestDox('⚠️ A cross-chapter passage binds without passing an expression by reference')]
     public function testCrossChapterQueryDoesNotThrow(): void
@@ -61,7 +61,7 @@ class CrossChapterBindTest extends TestCase
      * affected; asserting it keeps the fix honest about its scope.
      *
      * @return  void
-     * @since __DEPLOY_VERSION__
+     * @since 1.1.21
      */
     #[TestDox('A single-chapter passage still queries cleanly')]
     public function testSingleChapterQueryDoesNotThrow(): void
@@ -84,7 +84,7 @@ class CrossChapterBindTest extends TestCase
      * @param   array<string, int>  $parsed  Parsed reference parts.
      *
      * @return  BiblePassageResult
-     * @since __DEPLOY_VERSION__
+     * @since 1.1.21
      */
     private function runQuery(array $parsed): BiblePassageResult
     {
