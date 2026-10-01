@@ -75,7 +75,7 @@ class BibleImporter
 
         if (!$force) {
             $db     = Factory::getContainer()->get(DatabaseInterface::class);
-            $checkQ = $db->getQuery(true)
+            $checkQ = $db->createQuery()
                 ->select('COUNT(*)')
                 ->from($db->quoteName('#__bsms_bible_verses'))
                 ->where($db->quoteName('translation') . ' = :abbr')
@@ -312,7 +312,7 @@ class BibleImporter
     public static function isInstalled(string $abbreviation): bool
     {
         $db    = Factory::getContainer()->get(DatabaseInterface::class);
-        $query = $db->getQuery(true)
+        $query = $db->createQuery()
             ->select($db->quoteName('installed'))
             ->from($db->quoteName('#__bsms_bible_translations'))
             ->where($db->quoteName('abbreviation') . ' = :abbr')
@@ -344,7 +344,7 @@ class BibleImporter
         self::removeTranslationVerses($abbreviation);
 
         $db    = Factory::getContainer()->get(DatabaseInterface::class);
-        $query = $db->getQuery(true)
+        $query = $db->createQuery()
             ->update($db->quoteName('#__bsms_bible_translations'))
             ->set($db->quoteName('installed') . ' = 0')
             ->set($db->quoteName('verse_count') . ' = 0')
@@ -369,7 +369,7 @@ class BibleImporter
     public static function removeAllTranslations(): int
     {
         $db    = Factory::getContainer()->get(DatabaseInterface::class);
-        $query = $db->getQuery(true)
+        $query = $db->createQuery()
             ->select($db->quoteName('abbreviation'))
             ->from($db->quoteName('#__bsms_bible_translations'))
             ->where($db->quoteName('installed') . ' = 1');
@@ -406,7 +406,7 @@ class BibleImporter
     public static function removeProviderEntries(string $source): int
     {
         $db    = Factory::getContainer()->get(DatabaseInterface::class);
-        $query = $db->getQuery(true)
+        $query = $db->createQuery()
             ->delete($db->quoteName('#__bsms_bible_translations'))
             ->where($db->quoteName('source') . ' = :source')
             ->where($db->quoteName('installed') . ' = 0')
@@ -428,7 +428,7 @@ class BibleImporter
     {
         $db = Factory::getContainer()->get(DatabaseInterface::class);
 
-        $query = $db->getQuery(true)
+        $query = $db->createQuery()
             ->select('COUNT(*)')
             ->from($db->quoteName('#__bsms_bible_translations'))
             ->where($db->quoteName('source') . ' = ' . $db->quote('getbible'));
@@ -442,7 +442,7 @@ class BibleImporter
         $inserted = 0;
 
         foreach (self::GETBIBLE_SEED as [$abbr, $name, $lang, $bundled, $size]) {
-            $query = $db->getQuery(true)
+            $query = $db->createQuery()
                 ->select('COUNT(*)')
                 ->from($db->quoteName('#__bsms_bible_translations'))
                 ->where($db->quoteName('abbreviation') . ' = :abbr')
@@ -453,7 +453,7 @@ class BibleImporter
                 continue;
             }
 
-            $query = $db->getQuery(true)
+            $query = $db->createQuery()
                 ->insert($db->quoteName('#__bsms_bible_translations'))
                 ->columns($db->quoteName(['abbreviation', 'name', 'language', 'source', 'installed', 'bundled', 'estimated_size']))
                 ->values(':abbr, :name, :lang, ' . $db->quote('getbible') . ', 0, :bundled, :size')
@@ -511,7 +511,7 @@ class BibleImporter
     private static function removeTranslationVerses(string $abbreviation): void
     {
         $db    = Factory::getContainer()->get(DatabaseInterface::class);
-        $query = $db->getQuery(true)
+        $query = $db->createQuery()
             ->delete($db->quoteName('#__bsms_bible_verses'))
             ->where($db->quoteName('translation') . ' = :abbr')
             ->bind(':abbr', $abbreviation);
@@ -574,7 +574,7 @@ class BibleImporter
         $language  = $metadata['lang'] ?? 'en';
         $copyright = $metadata['translation_note'] ?? '';
 
-        $query = $db->getQuery(true)
+        $query = $db->createQuery()
             ->select('COUNT(*)')
             ->from($db->quoteName('#__bsms_bible_translations'))
             ->where($db->quoteName('abbreviation') . ' = :abbr')
@@ -584,7 +584,7 @@ class BibleImporter
 
         if ($exists) {
             $now   = Factory::getDate()->toSql();
-            $query = $db->getQuery(true)
+            $query = $db->createQuery()
                 ->update($db->quoteName('#__bsms_bible_translations'))
                 ->set($db->quoteName('installed') . ' = 1')
                 ->set($db->quoteName('verse_count') . ' = :count')
@@ -603,7 +603,7 @@ class BibleImporter
                 ->bind(':abbr', $abbreviation);
         } else {
             $now    = Factory::getDate()->toSql();
-            $query  = $db->getQuery(true)
+            $query  = $db->createQuery()
                 ->insert($db->quoteName('#__bsms_bible_translations'))
                 ->columns($db->quoteName([
                     'abbreviation', 'name', 'language', 'source', 'installed',

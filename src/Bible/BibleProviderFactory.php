@@ -100,7 +100,7 @@ class BibleProviderFactory
         // Check if version is locally installed
         try {
             $db    = Factory::getContainer()->get(DatabaseInterface::class);
-            $query = $db->getQuery(true)
+            $query = $db->createQuery()
                 ->select('COUNT(*)')
                 ->from($db->quoteName('#__bsms_bible_verses'))
                 ->where($db->quoteName('translation') . ' = :version')
@@ -118,7 +118,7 @@ class BibleProviderFactory
         if ($bibleBrainEnabled && !empty($bibleBrainKey)) {
             try {
                 $db    = Factory::getContainer()->get(DatabaseInterface::class);
-                $query = $db->getQuery(true)
+                $query = $db->createQuery()
                     ->select('COUNT(*)')
                     ->from($db->quoteName('#__bsms_bible_translations'))
                     ->where($db->quoteName('abbreviation') . ' = :version')
@@ -138,7 +138,7 @@ class BibleProviderFactory
         if ($apiBibleEnabled && !empty($apiBibleKey)) {
             try {
                 $db    = Factory::getContainer()->get(DatabaseInterface::class);
-                $query = $db->getQuery(true)
+                $query = $db->createQuery()
                     ->select('COUNT(*)')
                     ->from($db->quoteName('#__bsms_bible_translations'))
                     ->where($db->quoteName('abbreviation') . ' = :version')
@@ -158,7 +158,7 @@ class BibleProviderFactory
         if ($getbibleEnabled) {
             try {
                 $db    = Factory::getContainer()->get(DatabaseInterface::class);
-                $query = $db->getQuery(true)
+                $query = $db->createQuery()
                     ->select('COUNT(*)')
                     ->from($db->quoteName('#__bsms_bible_translations'))
                     ->where($db->quoteName('abbreviation') . ' = :version')

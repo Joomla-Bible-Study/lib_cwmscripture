@@ -115,7 +115,7 @@ class ConsumerRegistry
                 $db->quote(Factory::getDate()->toSql()),
             ];
 
-            $query = $db->getQuery(true)
+            $query = $db->createQuery()
                 ->insert($db->quoteName(self::TABLE))
                 ->columns($db->quoteName($columns))
                 ->values(implode(',', $values));
@@ -143,7 +143,7 @@ class ConsumerRegistry
     {
         try {
             $db    = self::db();
-            $query = $db->getQuery(true)
+            $query = $db->createQuery()
                 ->delete($db->quoteName(self::TABLE))
                 ->where($db->quoteName('element') . ' = ' . $db->quote($element))
                 ->where($db->quoteName('type') . ' = ' . $db->quote($type))
@@ -300,7 +300,7 @@ class ConsumerRegistry
     private static function registered(DatabaseInterface $db): array
     {
         try {
-            $query = $db->getQuery(true)
+            $query = $db->createQuery()
                 ->select($db->quoteName(['element', 'type', 'folder', 'name']))
                 ->from($db->quoteName(self::TABLE));
             $db->setQuery($query);
@@ -323,7 +323,7 @@ class ConsumerRegistry
      */
     private static function isInstalled(DatabaseInterface $db, array $consumer): bool
     {
-        $query = $db->getQuery(true)
+        $query = $db->createQuery()
             ->select('COUNT(*)')
             ->from($db->quoteName('#__extensions'))
             ->where($db->quoteName('type') . ' = ' . $db->quote($consumer['type']))

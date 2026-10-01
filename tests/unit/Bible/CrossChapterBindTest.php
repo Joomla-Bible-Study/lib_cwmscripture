@@ -97,6 +97,11 @@ class CrossChapterBindTest extends TestCase
 
             public function getQuery($new = false)
             {
+                return $this->createQuery();
+            }
+
+            public function createQuery()
+            {
                 return new class ($this) {
                     public function __construct(private $db)
                     {

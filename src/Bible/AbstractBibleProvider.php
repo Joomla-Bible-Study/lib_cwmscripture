@@ -380,7 +380,7 @@ abstract class AbstractBibleProvider implements BibleProviderInterface
     protected function readCache(string $provider, string $translation, string $reference): ?BiblePassageResult
     {
         $db    = $this->getDatabase();
-        $query = $db->getQuery(true)
+        $query = $db->createQuery()
             ->select($db->quoteName(['text', 'copyright']))
             ->from($db->quoteName('#__bsms_scripture_cache'))
             ->where($db->quoteName('provider') . ' = :provider')
@@ -431,7 +431,7 @@ abstract class AbstractBibleProvider implements BibleProviderInterface
         $expiresAt = date('Y-m-d H:i:s', time() + $this->cacheTtl);
 
         // Upsert: delete old entry then insert new
-        $query = $db->getQuery(true)
+        $query = $db->createQuery()
             ->delete($db->quoteName('#__bsms_scripture_cache'))
             ->where($db->quoteName('provider') . ' = :provider')
             ->where($db->quoteName('translation') . ' = :translation')
@@ -445,7 +445,7 @@ abstract class AbstractBibleProvider implements BibleProviderInterface
         $columns = ['provider', 'translation', 'reference', 'text', 'copyright', 'expires_at'];
         $values  = ':provider2, :translation2, :reference2, :text, :copyright, :expires_at';
 
-        $query = $db->getQuery(true)
+        $query = $db->createQuery()
             ->insert($db->quoteName('#__bsms_scripture_cache'))
             ->columns($db->quoteName($columns))
             ->values($values)

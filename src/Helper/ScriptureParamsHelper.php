@@ -74,7 +74,7 @@ class ScriptureParamsHelper
 
         try {
             $db    = Factory::getContainer()->get(DatabaseInterface::class);
-            $query = $db->getQuery(true)
+            $query = $db->createQuery()
                 ->select($db->quoteName('params'))
                 ->from($db->quoteName('#__extensions'))
                 ->where($db->quoteName('type') . ' = ' . $db->quote('plugin'))
@@ -109,7 +109,7 @@ class ScriptureParamsHelper
     public static function save(Registry $params): void
     {
         $db    = Factory::getContainer()->get(DatabaseInterface::class);
-        $query = $db->getQuery(true)
+        $query = $db->createQuery()
             ->update($db->quoteName('#__extensions'))
             ->set($db->quoteName('params') . ' = ' . $db->quote($params->toString()))
             ->where($db->quoteName('type') . ' = ' . $db->quote('plugin'))
@@ -124,7 +124,7 @@ class ScriptureParamsHelper
             $gdprMode = $params->get('gdpr_mode');
 
             if ($gdprMode !== null) {
-                $query = $db->getQuery(true)
+                $query = $db->createQuery()
                     ->select($db->quoteName('params'))
                     ->from($db->quoteName('#__bsms_admin'))
                     ->where($db->quoteName('id') . ' = 1');
@@ -135,7 +135,7 @@ class ScriptureParamsHelper
                     $adminParams = new Registry($adminJson);
                     $adminParams->set('gdpr_mode', $gdprMode);
 
-                    $query = $db->getQuery(true)
+                    $query = $db->createQuery()
                         ->update($db->quoteName('#__bsms_admin'))
                         ->set($db->quoteName('params') . ' = ' . $db->quote($adminParams->toString()))
                         ->where($db->quoteName('id') . ' = 1');

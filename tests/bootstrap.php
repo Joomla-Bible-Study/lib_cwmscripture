@@ -71,6 +71,7 @@ if (!interface_exists(\Joomla\Database\DatabaseInterface::class)) {
         namespace Joomla\Database;
         interface DatabaseInterface {
             public function getQuery($new = false);
+            public function createQuery();
             public function quoteName($name, $as = null);
             public function setQuery($query, $offset = 0, $limit = 0);
             public function loadObjectList($key = "", $class = "stdClass");

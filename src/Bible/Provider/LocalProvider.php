@@ -126,7 +126,7 @@ class LocalProvider extends AbstractBibleProvider
     protected function queryVerses(array $parsed, string $reference, string $translation): BiblePassageResult
     {
         $db    = $this->getDatabase();
-        $query = $db->getQuery(true)
+        $query = $db->createQuery()
             ->select($db->quoteName(['book', 'chapter', 'verse', 'text']))
             ->from($db->quoteName('#__bsms_bible_verses'))
             ->where($db->quoteName('translation') . ' = :translation')
@@ -215,7 +215,7 @@ class LocalProvider extends AbstractBibleProvider
     public function getAvailableTranslations(): array
     {
         $db    = $this->getDatabase();
-        $query = $db->getQuery(true)
+        $query = $db->createQuery()
             ->select($db->quoteName(['abbreviation', 'name', 'language']))
             ->from($db->quoteName('#__bsms_bible_translations'))
             ->where($db->quoteName('installed') . ' = 1')
@@ -364,7 +364,7 @@ class LocalProvider extends AbstractBibleProvider
     private function getTranslationCopyright(string $abbreviation): string
     {
         $db    = $this->getDatabase();
-        $query = $db->getQuery(true)
+        $query = $db->createQuery()
             ->select($db->quoteName('copyright'))
             ->from($db->quoteName('#__bsms_bible_translations'))
             ->where($db->quoteName('abbreviation') . ' = :abbr')

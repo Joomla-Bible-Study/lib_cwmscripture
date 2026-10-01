@@ -294,7 +294,7 @@ class GetBibleProvider extends AbstractBibleProvider
     public function getAvailableTranslations(): array
     {
         $db    = $this->getDatabase();
-        $query = $db->getQuery(true)
+        $query = $db->createQuery()
             ->select($db->quoteName(['abbreviation', 'name', 'language']))
             ->from($db->quoteName('#__bsms_bible_translations'))
             ->where($db->quoteName('source') . ' = ' . $db->quote('getbible'))

@@ -338,7 +338,7 @@ return new class () implements InstallerScriptInterface {
         ];
 
         foreach ($known as $consumer) {
-            $query = $db->getQuery(true)
+            $query = $db->createQuery()
                 ->select('COUNT(*)')
                 ->from($db->quoteName('#__extensions'))
                 ->where($db->quoteName('type') . ' = ' . $db->quote($consumer['type']))
@@ -422,7 +422,7 @@ return new class () implements InstallerScriptInterface {
     {
         try {
             $db    = Factory::getContainer()->get(DatabaseInterface::class);
-            $query = $db->getQuery(true)
+            $query = $db->createQuery()
                 ->select($db->quoteName('manifest_cache'))
                 ->from($db->quoteName('#__extensions'))
                 ->where($db->quoteName('type') . ' = ' . $db->quote('library'))
@@ -559,7 +559,7 @@ return new class () implements InstallerScriptInterface {
             return;
         }
 
-        $query = $db->getQuery(true)
+        $query = $db->createQuery()
             ->select('COUNT(*)')
             ->from($db->quoteName('#__bsms_bible_translations'))
             ->where($db->quoteName('source') . ' = ' . $db->quote('getbible'));
