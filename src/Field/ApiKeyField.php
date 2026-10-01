@@ -11,21 +11,25 @@
 
 namespace CWM\Library\Scripture\Field;
 
-use Joomla\CMS\Form\Field\TextField;
+use Joomla\CMS\Form\Field\PasswordField;
 
 // phpcs:disable PSR1.Files.SideEffects
 \defined('_JEXEC') or die;
 // phpcs:enable PSR1.Files.SideEffects
 
 /**
- * API Key Field - Masked text input with reveal toggle
+ * API Key Field - masked text input with reveal toggle
  *
- * Renders as a password field with an eye toggle button.
- * When a value exists, shows dots with the last 4 characters as a placeholder hint.
+ * Extends core's PasswordField rather than hand-building a masked input: the
+ * same visible result (dots + an eye-toggle button), but with an accessible,
+ * translated label (JSHOWPASSWORD/JHIDEPASSWORD in a visually-hidden span,
+ * not a hardcoded English aria-label) and the toggle wired through core's
+ * own asset-managed `field.passwordview` script instead of an inline script
+ * tag duplicated on every field instance.
  *
  * @since  1.1.0
  */
-class ApiKeyField extends TextField
+class ApiKeyField extends PasswordField
 {
     /**
      * The form field type.
@@ -36,66 +40,41 @@ class ApiKeyField extends TextField
     protected $type = 'ApiKey';
 
     /**
-     * Get the field input markup.
+     * Method to attach a Form object to the field.
      *
-     * @return  string  The field input markup.
+     * @param   \SimpleXMLElement  $element  The SimpleXMLElement object representing the `<field>` tag.
+     * @param   mixed              $value    The form field value to validate.
+     * @param   string             $group    The field name group control value.
      *
-     * @since   1.1.0
+     * @return  bool  True on success.
+     *
+     * @since   __DEPLOY_VERSION__
      */
-    protected function getInput(): string
+    #[\Override]
+    public function setup(\SimpleXMLElement $element, $value, $group = null)
     {
-        $value = (string) $this->value;
+        $return = parent::setup($element, $value, $group);
 
-        // If no value, render a normal text input
-        if ($value === '') {
-            return parent::getInput();
+        if ($return) {
+            // PasswordField::setup() defaults maxLength to 99, tuned for a
+            // user password. This field stores third-party API credentials
+            // of many shapes, not a password -- a real Anthropic key
+            // (sk-ant-api03-..., ~108 characters, the configured default
+            // provider in admin.xml's ai_provider list) would be silently
+            // truncated by the browser's own maxlength enforcement. Only
+            // applies when the field's own XML doesn't set maxlength itself.
+            if (!$this->element['maxlength']) {
+                $this->maxLength = 255;
+            }
+
+            // FormField defaults autocomplete to 'on' when the XML doesn't
+            // set it; an API key is exactly the kind of one-off credential
+            // a browser should never offer to save or autofill.
+            if ((string) $this->element['autocomplete'] === '') {
+                $this->autocomplete = 'new-password';
+            }
         }
 
-        $name         = $this->name;
-        $id           = $this->id;
-        $class        = $this->class ? ' ' . $this->class : '';
-        $disabled     = $this->disabled ? ' disabled' : '';
-        $readonly     = $this->readonly ? ' readonly' : '';
-        $required     = $this->required ? ' required' : '';
-        $hint         = $this->hint ? ' placeholder="' . htmlspecialchars($this->hint, ENT_COMPAT, 'UTF-8') . '"' : '';
-        $autocomplete = $this->autocomplete ?? '';
-        $acAttr       = $autocomplete !== '' ? ' autocomplete="' . htmlspecialchars($autocomplete, ENT_COMPAT, 'UTF-8') . '"' : '';
-
-        // Build last-4-char hint for placeholder
-        $lastFour    = substr($value, -4);
-        $maskedHint  = str_repeat("\u{2022}", 20) . $lastFour;
-
-        $toggleId    = $id . '_toggle';
-
-        $html = '<div class="input-group">';
-        $html .= '<input type="password"'
-            . ' name="' . $name . '"'
-            . ' id="' . $id . '"'
-            . ' value="' . htmlspecialchars($value, ENT_COMPAT, 'UTF-8') . '"'
-            . ' placeholder="' . htmlspecialchars($maskedHint, ENT_COMPAT, 'UTF-8') . '"'
-            . ' class="form-control' . $class . '"'
-            . $disabled . $readonly . $required . $acAttr
-            . ' />';
-        $html .= '<button type="button" class="btn btn-secondary" id="' . $toggleId . '"'
-            . ' aria-label="Toggle visibility">';
-        $html .= '<span class="icon-eye" aria-hidden="true"></span>';
-        $html .= '</button>';
-        $html .= '</div>';
-
-        $html .= '<script>'
-            . 'document.getElementById(' . json_encode($toggleId) . ').addEventListener("click", function() {'
-            . '  var input = document.getElementById(' . json_encode($id) . ');'
-            . '  var icon = this.querySelector("span");'
-            . '  if (input.type === "password") {'
-            . '    input.type = "text";'
-            . '    icon.className = "icon-eye-close";'
-            . '  } else {'
-            . '    input.type = "password";'
-            . '    icon.className = "icon-eye";'
-            . '  }'
-            . '});'
-            . '</script>';
-
-        return $html;
+        return $return;
     }
 }
