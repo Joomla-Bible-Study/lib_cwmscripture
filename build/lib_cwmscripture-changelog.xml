@@ -19,6 +19,19 @@
 <changelogs>
 
     <!-- ============================================================ -->
+    <!-- 1.1.22                                                   -->
+    <!-- ============================================================ -->
+    <changelog>
+        <element>lib_cwmscripture</element>
+        <type>library</type>
+        <version>1.1.22</version>
+        <date>2026-10-01</date>
+        <note>
+            <item>chore(deps-dev): refresh package-lock.json and cwm/build-tools (v1.34.0 to v1.37.0); no runtime changes</item>
+        </note>
+    </changelog>
+
+    <!-- ============================================================ -->
     <!-- 1.1.21                                                   -->
     <!-- ============================================================ -->
     <changelog>
