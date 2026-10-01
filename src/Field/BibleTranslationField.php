@@ -123,7 +123,7 @@ class BibleTranslationField extends GroupedlistField
 
         try {
             $db    = Factory::getContainer()->get(DatabaseInterface::class);
-            $query = $db->getQuery(true)
+            $query = $db->createQuery()
                 ->select($db->quoteName(['abbreviation', 'name', 'language', 'installed', 'source']))
                 ->from($db->quoteName('#__bsms_bible_translations'))
                 ->order($db->quoteName('language') . ' ASC, ' . $db->quoteName('name') . ' ASC');

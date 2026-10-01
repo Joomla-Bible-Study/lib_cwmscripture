@@ -47,8 +47,8 @@ class TranslationsmanagerField extends FormField
     protected function getInput(): string
     {
         // Load library language file
-        Factory::getLanguage()->load('lib_cwmscripture', JPATH_ADMINISTRATOR);
-        Factory::getLanguage()->load('lib_cwmscripture', JPATH_LIBRARIES . '/cwmscripture');
+        Factory::getApplication()->getLanguage()->load('lib_cwmscripture', JPATH_ADMINISTRATOR);
+        Factory::getApplication()->getLanguage()->load('lib_cwmscripture', JPATH_LIBRARIES . '/cwmscripture');
 
         $prefix = $this->formControl
             ? $this->formControl . '[' . $this->group . ']'
@@ -93,8 +93,8 @@ class TranslationsmanagerField extends FormField
     public static function renderScriptureTab(string $fieldPrefix = 'jform[params]'): string
     {
         // Load library language file
-        Factory::getLanguage()->load('lib_cwmscripture', JPATH_ADMINISTRATOR);
-        Factory::getLanguage()->load('lib_cwmscripture', JPATH_LIBRARIES . '/cwmscripture');
+        Factory::getApplication()->getLanguage()->load('lib_cwmscripture', JPATH_ADMINISTRATOR);
+        Factory::getApplication()->getLanguage()->load('lib_cwmscripture', JPATH_LIBRARIES . '/cwmscripture');
 
         $params             = ScriptureParamsHelper::getParams();
         $token              = Session::getFormToken();
@@ -455,7 +455,7 @@ class TranslationsmanagerField extends FormField
 
         try {
             $db    = Factory::getContainer()->get(DatabaseInterface::class);
-            $query = $db->getQuery(true)
+            $query = $db->createQuery()
                 ->select($db->quoteName(['abbreviation', 'name', 'language', 'installed']))
                 ->from($db->quoteName('#__bsms_bible_translations'))
                 ->order($db->quoteName('name') . ' ASC');
