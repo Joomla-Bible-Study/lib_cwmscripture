@@ -26,9 +26,9 @@
         <type>library</type>
         <version>1.1.24</version>
         <date>2026-10-01</date>
-        <note>
-            <item>fix: replace deprecated $db-&gt;getQuery(true) with createQuery() across the library (39 call sites)</item>
-        </note>
+        <change>
+            <item>Database queries across the library use Joomla's current createQuery() instead of the deprecated getQuery(true). Nothing behaves differently. Sites that log deprecations stop getting a notice from scripture detection, which runs on most pages.</item>
+        </change>
     </changelog>
 
     <!-- ============================================================ -->
@@ -39,10 +39,12 @@
         <type>library</type>
         <version>1.1.23</version>
         <date>2026-10-01</date>
-        <note>
-            <item>fix: replace deprecated getQuery(true)/Factory::getLanguage() calls in BibleTranslationField and TranslationsmanagerField</item>
-            <item>fix: rebase ApiKeyField on core's PasswordField for an accessible, asset-managed reveal toggle and a maxLength that doesn't truncate real API keys</item>
-        </note>
+        <fix>
+            <item>The API key field in the scripture settings now uses Joomla's own password field. Its show and hide button is labelled in your site's language and is announced to screen readers; before, it had a fixed English label.</item>
+        </fix>
+        <change>
+            <item>The translation fields use Joomla's current database and language calls instead of ones Joomla has deprecated.</item>
+        </change>
     </changelog>
 
     <!-- ============================================================ -->
@@ -54,7 +56,7 @@
         <version>1.1.22</version>
         <date>2026-10-01</date>
         <note>
-            <item>chore(deps-dev): refresh package-lock.json and cwm/build-tools (v1.34.0 to v1.37.0); no runtime changes</item>
+            <item>No changes for sites. This release updates the developer tooling only.</item>
         </note>
     </changelog>
 
@@ -66,9 +68,13 @@
         <type>library</type>
         <version>1.1.21</version>
         <date>2026-09-04</date>
+        <fix>
+            <item>A scripture passage that crosses a chapter boundary, such as Genesis 1:26-2:3, showed an error page instead of the verses when the translation was stored on your own site. It now returns the verses. Nothing was damaged, and nothing needs repairing.</item>
+            <item>On the Scripture tab of Proclaim's Admin Center, Remove all translations and the automatic clean-up when a provider is switched off both did nothing and showed no message. Both now work, and if either fails it says why.</item>
+        </fix>
         <note>
-            <item>fix(bible): bind cross-chapter verse bounds by variable, not expression (#78) by @bcordis in https://github.com/Joomla-Bible-Study/lib_cwmscripture/pull/79</item>
-            <item>feat(importer): add the remove-all and provider-cleanup methods consumers call by @bcordis in https://github.com/Joomla-Bible-Study/lib_cwmscripture/pull/80</item>
+            <item>Remove all translations keeps the built-in KJV and WEB, so the site always has a working Bible. Switching a provider off only clears catalogue entries you never downloaded; translations stored on your site stay.</item>
+            <item>No action is needed after updating.</item>
         </note>
     </changelog>
 
@@ -214,7 +220,7 @@
             <item>fix: one book-code table, and an abbreviation can no longer resolve to the wrong book (#1688) by @bcordis in https://github.com/Joomla-Bible-Study/lib_cwmscripture/pull/43</item>
             <item>style: write the anonymous class with explicit parentheses (#1688) by @bcordis in https://github.com/Joomla-Bible-Study/lib_cwmscripture/pull/44</item>
             <item>chore(deps-dev): Bump the npm-minor-and-patch group with 2 updates by @dependabot[bot] in https://github.com/Joomla-Bible-Study/lib_cwmscripture/pull/42</item>
-            <item>fix: resolve book names in the site&#x27;s own language, not only English (#1688) by @bcordis in https://github.com/Joomla-Bible-Study/lib_cwmscripture/pull/45</item>
+            <item>fix: resolve book names in the site's own language, not only English (#1688) by @bcordis in https://github.com/Joomla-Bible-Study/lib_cwmscripture/pull/45</item>
         </note>
     </changelog>
 
@@ -272,17 +278,17 @@
         <version>1.1.7</version>
         <date>2026-07-30</date>
         <fix>
-            <item>ensureTables() checks each expected table instead of returning as soon as #__bsms_bible_translations exists, so it can create a table introduced in a later version. #__bsms_scripture_consumers previously reached upgraded sites only via Joomla&#x27;s schema replay; the uninstall guard&#x27;s own storage no longer depends on that.</item>
-            <item>installedExcluding() loads the scanner defensively. Both package installers reach ConsumerRegistry through require_once because the namespace is not autoloadable mid-install, and a plain static call would have thrown &quot;class not found&quot; into their catch-all — silently disabling the scan in exactly the situation it exists for.</item>
+            <item>ensureTables() checks each expected table instead of returning as soon as #__bsms_bible_translations exists, so it can create a table introduced in a later version. #__bsms_scripture_consumers previously reached upgraded sites only via Joomla's schema replay; the uninstall guard's own storage no longer depends on that.</item>
+            <item>installedExcluding() loads the scanner defensively. Both package installers reach ConsumerRegistry through require_once because the namespace is not autoloadable mid-install, and a plain static call would have thrown "class not found" into their catch-all - silently disabling the scan in exactly the situation it exists for.</item>
             <item>The manifest and LibraryVersion::VERSION are bumped together rather than drifting apart (#15).</item>
         </fix>
         <addition>
-            <item>Two-line consumer registration. src/consumer.php is a self-bootstrapping entry point, so an install script declaring a dependency on this library no longer needs a use statement, class_exists() guards, JLoader wrangling or a try/catch. See the README section &quot;Depending on this library&quot;.</item>
+            <item>Two-line consumer registration. src/consumer.php is a self-bootstrapping entry point, so an install script declaring a dependency on this library no longer needs a use statement, class_exists() guards, JLoader wrangling or a try/catch. See the README section "Depending on this library".</item>
             <item>Consumers are detected even when they never register. ConsumerScanner walks the installed extension roots for references to CWM\Library\Scripture; anything mentioning it is a consumer by definition, since those classes cannot resolve otherwise. Registration is now optional politeness rather than the thing your data depends on. The scan runs only in the uninstall guard, bounded, skipping vendor and node_modules.</item>
         </addition>
         <change>
-            <item>Documented and enforced by test: update SQL is replayed in full on every upgrade. LibraryAdapter recreates the #__extensions row, so parseSchemaUpdates() finds no recorded #__schemas version and runs every file from 0.0.0. Library migrations must therefore be idempotent — a bare ALTER TABLE ADD COLUMN fails on the second upgrade and aborts the install.</item>
-            <item>README&#x27;s &quot;Depending on this library&quot; rewritten around the entry point.</item>
+            <item>Documented and enforced by test: update SQL is replayed in full on every upgrade. LibraryAdapter recreates the #__extensions row, so parseSchemaUpdates() finds no recorded #__schemas version and runs every file from 0.0.0. Library migrations must therefore be idempotent - a bare ALTER TABLE ADD COLUMN fails on the second upgrade and aborts the install.</item>
+            <item>README's "Depending on this library" rewritten around the entry point.</item>
         </change>
     </changelog>
 
