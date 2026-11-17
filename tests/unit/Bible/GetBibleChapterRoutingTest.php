@@ -24,7 +24,7 @@ use PHPUnit\Framework\TestCase;
  * These tests replace HTTP and the cache with in-memory doubles. They pin which
  * endpoint each reference shape reaches and what text comes back.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  1.1.26
  */
 class GetBibleChapterRoutingTest extends TestCase
 {

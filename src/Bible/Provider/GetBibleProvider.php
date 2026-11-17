@@ -53,7 +53,7 @@ class GetBibleProvider extends AbstractBibleProvider
      * invalid reference. The chapter endpoint returns every verse of one chapter.
      *
      * @var  string
-     * @since  __DEPLOY_VERSION__
+     * @since  1.1.26
      */
     private const CHAPTER_API_BASE = 'https://api.getbible.net/v2/';
 
@@ -66,7 +66,7 @@ class GetBibleProvider extends AbstractBibleProvider
      * so it can't stall the page.
      *
      * @var  int
-     * @since  __DEPLOY_VERSION__
+     * @since  1.1.26
      */
     private const MAX_CHAPTERS = 30;
 
@@ -80,7 +80,7 @@ class GetBibleProvider extends AbstractBibleProvider
      * read again, and they expire on their own.
      *
      * @var  string
-     * @since  __DEPLOY_VERSION__
+     * @since  1.1.26
      */
     private const CHAPTER_CACHE = 'getbible-chapter';
 
@@ -284,7 +284,7 @@ class GetBibleProvider extends AbstractBibleProvider
      *
      * @return  bool
      *
-     * @since   __DEPLOY_VERSION__
+     * @since   1.1.26
      */
     private static function isChapterShaped(ScriptureReference $ref): bool
     {
@@ -311,7 +311,7 @@ class GetBibleProvider extends AbstractBibleProvider
      *
      * @return  BiblePassageResult
      *
-     * @since   __DEPLOY_VERSION__
+     * @since   1.1.26
      */
     private function fetchChapters(ScriptureReference $ref, string $reference, string $translation): BiblePassageResult
     {
@@ -404,7 +404,7 @@ class GetBibleProvider extends AbstractBibleProvider
      *
      * @return  list<array{verse: int, text: string}>|null  Null when the chapter could not be fetched
      *
-     * @since   __DEPLOY_VERSION__
+     * @since   1.1.26
      */
     private function fetchChapterVerses(string $translation, int $book, int $chapter): ?array
     {
