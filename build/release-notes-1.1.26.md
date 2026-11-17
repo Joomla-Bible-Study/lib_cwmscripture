@@ -12,4 +12,6 @@ Answers cached by the old lookup are no longer used, so a chapter won't keep sho
 
 Translations stored on your own site, and API.Bible, work as they did before.
 
+This release also lets the library install on Joomla 5.0 and 5.1. It required Joomla 5.2, though nothing it uses needs more than 5.0. CWM LivingWord, which bundles it, already supports Joomla 5.0.
+
 No action is needed after updating.
