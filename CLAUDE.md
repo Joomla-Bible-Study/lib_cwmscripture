@@ -23,7 +23,7 @@ A strategy pattern for retrieving scripture passages from multiple sources:
 - **`BibleProviderFactory`** — static factory with caching. `getProviderForTranslation()` resolves providers in priority order: local DB → API.Bible → GetBible.net → fallback. Respects `gdpr_mode` (disables external providers)
 - **Providers**:
   - `LocalProvider` — reads from `#__bsms_bible_verses`, fully offline
-  - `GetBibleProvider` — GetBible.net v2 API (`https://query.getbible.net/v2/{translation}/{reference}`)
+  - `GetBibleProvider` — GetBible.net v2 API: `https://query.getbible.net/v2/{translation}/{reference}` for verses within one chapter, and `https://api.getbible.net/v2/{translation}/{book}/{chapter}.json` for chapter-shaped references (see Provider Gotchas)
   - `ApiBibleProvider` — API.Bible REST API with `api-key` header auth, OSIS passage IDs, mandatory FUMS tracking pings
 
 ### Book Numbering
@@ -150,6 +150,21 @@ $ref = str_replace('%3A', ':', rawurlencode($reference));
 ```
 
 Use this pattern in `GetBibleProvider` when building request URLs. Other providers (API.Bible) accept either form, so this is GetBible-specific.
+
+### GetBible: chapters come from the chapter endpoint
+
+The query endpoint serves a verse, or a verse range within one chapter. It gets every chapter-shaped reference wrong, without an error you'd notice:
+
+| Request to `query.getbible.net/v2/kjv/…` | Response |
+|---|---|
+| `Genesis 1` | **verse 1 only** |
+| `Genesis 1-3` | 404 `invalid_reference` |
+| `John 3:16-4:2` | 404 `invalid_reference` |
+| `Psalm 23:1-99` | 404 (an end verse past the chapter's last verse is an error) |
+
+So `GetBibleProvider` sends whole chapters, chapter ranges and cross-chapter ranges to `https://api.getbible.net/v2/{translation}/{book 1-66}/{chapter}.json`. That's one request per chapter, capped at `MAX_CHAPTERS`, and the verses are sliced to the reference's bounds. Those results are cached under the provider tag `getbible-chapter`, never `getbible`. The query path's old one-verse answers are still sitting under `getbible`, keyed by the same reference strings.
+
+`getPassage()` only takes the chapter route for strings `ScriptureHelper::parseReference()` can read. A verse-less chapter range like `John 3-4` keeps its original path, because what that form means is still an open decision. See `ReferenceParseCompatibilityTest::testChapterRangeIsStillUnsupported()`.
 
 ## Code Style
 
