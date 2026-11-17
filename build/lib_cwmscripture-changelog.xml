@@ -20,6 +20,19 @@
 <changelogs>
 
     <!-- ============================================================ -->
+    <!-- 1.1.25                                                   -->
+    <!-- ============================================================ -->
+    <changelog>
+        <element>lib_cwmscripture</element>
+        <type>library</type>
+        <version>1.1.25</version>
+        <date>2026-11-17</date>
+        <change>
+            <item>Maintenance release. Nothing changes in how the library behaves. The build tools are updated, including symfony/filesystem 7.4.23 for its path-handling advisory, and the 1.1.21 to 1.1.24 changelog entries are rewritten so Joomla shows each item whole.</item>
+        </change>
+    </changelog>
+
+    <!-- ============================================================ -->
     <!-- 1.1.24                                                   -->
     <!-- ============================================================ -->
     <changelog>

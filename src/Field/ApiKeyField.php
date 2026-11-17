@@ -48,7 +48,7 @@ class ApiKeyField extends PasswordField
      *
      * @return  bool  True on success.
      *
-     * @since   __DEPLOY_VERSION__
+     * @since   1.1.23
      */
     #[\Override]
     public function setup(\SimpleXMLElement $element, $value, $group = null)
