@@ -32,6 +32,9 @@
             <item>A passage that crosses a chapter boundary, such as John 3:16-4:2, now works with GetBible.net translations. It returned nothing before.</item>
             <item>One-verse answers cached before this update are no longer shown, so the fix applies straight away rather than when the cache expires.</item>
         </fix>
+        <change>
+            <item>The library installs on Joomla 5.0 and later. It required Joomla 5.2, though nothing it uses needs more than 5.0.</item>
+        </change>
     </changelog>
 
     <!-- ============================================================ -->
