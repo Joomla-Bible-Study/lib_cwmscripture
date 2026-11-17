@@ -37,12 +37,16 @@ return new class () implements InstallerScriptInterface {
     private string $minimumPhp = '8.3.0';
 
     /**
-     * Minimum Joomla version required.
+     * Minimum Joomla version required: the oldest the library's code runs on.
+     *
+     * It must not exceed the floor of any package that bundles the library.
+     * That package would admit a site this check then refuses, part-way
+     * through its install.
      *
      * @var  string
      * @since  1.0.0
      */
-    private string $minimumJoomla = '5.2.0';
+    private string $minimumJoomla = '5.0.0';
 
     /**
      * Called before install/update to check requirements.

@@ -3,11 +3,11 @@
 [![CI](https://github.com/Joomla-Bible-Study/lib_cwmscripture/actions/workflows/ci.yml/badge.svg)](https://github.com/Joomla-Bible-Study/lib_cwmscripture/actions/workflows/ci.yml)
 [![License: GPL v2](https://img.shields.io/badge/License-GPLv2-blue.svg)](LICENSE)
 
-A Joomla 5.2+ library extension that provides Bible scripture retrieval, parsing, rendering, and translation management. It serves as the shared scripture engine for the [CWM Proclaim](https://www.christianwebministries.org) component and the `plg_content_scripturelinks` plugin.
+A Joomla 5 library extension that provides Bible scripture retrieval, parsing, rendering, and translation management. It serves as the shared scripture engine for the [CWM Proclaim](https://www.christianwebministries.org) component and the `plg_content_scripturelinks` plugin.
 
 ## Requirements
 
-- Joomla 5.2+
+- Joomla 5.0+
 - PHP 8.3+
 - MySQL 5.7+ / MariaDB 10.2+ (InnoDB, utf8mb4)
 - Node.js 24+ / npm 11+ (for building frontend assets)
