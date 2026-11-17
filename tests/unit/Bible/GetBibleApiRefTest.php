@@ -21,6 +21,12 @@ use PHPUnit\Framework\TestCase;
  * hurt most: a caller rendered the number to a localised name, and
  * `anglicizeBookName()` parsed that back to a number to recover the English one.
  *
+ * `apiRefFromParts()` still builds the "chapter only" and "cross-chapter range"
+ * shapes below, but neither is sent any more. The query endpoint answers a
+ * chapter with verse 1 alone and rejects a cross-chapter range, so both now go
+ * to the chapter endpoint instead (#100; see GetBibleChapterRoutingTest).
+ * They stay pinned here because the builder is a pure function.
+ *
  * @since  1.1.13
  */
 class GetBibleApiRefTest extends TestCase

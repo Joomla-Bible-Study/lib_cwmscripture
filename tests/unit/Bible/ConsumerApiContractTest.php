@@ -55,6 +55,11 @@ class ConsumerApiContractTest extends TestCase
             'bookCode'           => ['bookCode'],
             'getBookName'        => ['getBookName'],
             'bookNames'          => ['bookNames'],
+            // Proclaim: Cwmshowscripture::fetchPassage(), behind method_exists().
+            // CWM LivingWord: CwmscriptureHelper, for structured plan readings.
+            'getPassageFor'      => ['getPassageFor'],
+            // CWM LivingWord: CwmscriptureHelper, book codes for BibleBrain audio.
+            'resolveBookCode'    => ['resolveBookCode'],
         ];
     }
 
