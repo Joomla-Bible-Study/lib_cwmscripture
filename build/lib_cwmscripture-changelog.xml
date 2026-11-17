@@ -20,6 +20,21 @@
 <changelogs>
 
     <!-- ============================================================ -->
+    <!-- 1.1.26                                                   -->
+    <!-- ============================================================ -->
+    <changelog>
+        <element>lib_cwmscripture</element>
+        <type>library</type>
+        <version>1.1.26</version>
+        <date>2026-11-17</date>
+        <fix>
+            <item>Whole chapters from GetBible.net come back complete. Asking for a chapter such as Psalm 23 returned only its first verse, and a reading spanning several chapters returned a single verse.</item>
+            <item>A passage that crosses a chapter boundary, such as John 3:16-4:2, now works with GetBible.net translations. It returned nothing before.</item>
+            <item>One-verse answers cached before this update are no longer shown, so the fix applies straight away rather than when the cache expires.</item>
+        </fix>
+    </changelog>
+
+    <!-- ============================================================ -->
     <!-- 1.1.25                                                   -->
     <!-- ============================================================ -->
     <changelog>
