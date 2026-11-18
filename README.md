@@ -9,6 +9,7 @@ A Joomla 5 library extension that provides Bible scripture retrieval, parsing, r
 
 - Joomla 5.0+
 - PHP 8.3+
+  - PHP 8.3 is supported until Proclaim 11 is released. From then on, the CWM extensions, this one included, require PHP 8.4 or later.
 - MySQL 5.7+ / MariaDB 10.2+ (InnoDB, utf8mb4)
 - Node.js 24+ / npm 11+ (for building frontend assets)
 
