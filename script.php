@@ -34,7 +34,7 @@ return new class () implements InstallerScriptInterface {
      * @var  string
      * @since  1.0.0
      */
-    private string $minimumPhp = '8.3.0';
+    private string $minimumPhp = '8.4.0';
 
     /**
      * Minimum Joomla version required: the oldest the library's code runs on.
