@@ -37,8 +37,11 @@ jobs:
     # the CI equivalent of the `^1.9.0` Composer constraint in composer.json.
     uses: Joomla-Bible-Study/cwm-build-tools/.github/workflows/joomla-library-ci.yml@v1
     with:
+      # Development and CI run on 8.5 (the shared default is 8.3); the
+      # library itself still supports 8.4.
+      php-version: '8.5'
       # Everything else is a shared default and deliberately left unset:
-      # PHP 8.3, Node 24, no submodules, npm asset build on, and `php -l`
+      # Node 24, no submodules, npm asset build on, and `php -l`
       # over src/ and tests/ because this project has no lint:syntax script.
       # Those defaults were drawn from this repository's own pipeline, so
       # leaving them implicit is what keeps it in step with the others.

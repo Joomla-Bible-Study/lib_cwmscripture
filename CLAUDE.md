@@ -8,7 +8,7 @@ This is **lib_cwmscripture**, a Joomla 5 library extension (`type="library"`) th
 
 - **Namespace**: `CWM\Library\Scripture` (PSR-4 rooted at `src/`)
 - **Manifest**: `cwmscripture.xml` (Joomla extension manifest)
-- **PHP requirement**: 8.3+ (uses named arguments, `match`, promoted constructor properties, typed `const array`). Matches Proclaim's `"php": "^8.3.0"` requirement.
+- **PHP requirement**: 8.4+ (uses named arguments, `match`, promoted constructor properties, typed `const array`). Matches Proclaim's `"php": "^8.4.0"` requirement. Development and CI run on PHP 8.5, so don't use 8.5-only syntax or functions such as the pipe operator (`|>`), `clone()` with properties, or `array_first()` / `array_last()`.
 - **Joomla requirement**: 5.0+ (`$minimumJoomla` in `script.php`). Keep it at or below the floor of every package that bundles the library: Proclaim (5.4.0) and Living Word (5.0.0). ScriptureLinks declares none of its own, so this check is its floor too.
 - **License**: GPL-2.0-or-later
 

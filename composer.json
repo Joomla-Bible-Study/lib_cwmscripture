@@ -28,7 +28,7 @@
   "config": {
     "optimize-autoloader": true,
     "platform": {
-      "php": "8.3.0"
+      "php": "8.5.0"
     },
     "allow-plugins": {}
   },
@@ -38,7 +38,7 @@
     }
   },
   "require": {
-    "php": "^8.3.0",
+    "php": "^8.4.0",
     "ext-json": "*",
     "ext-mbstring": "*"
   },
