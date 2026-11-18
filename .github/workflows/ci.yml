@@ -37,8 +37,8 @@ jobs:
     # the CI equivalent of the `^1.9.0` Composer constraint in composer.json.
     uses: Joomla-Bible-Study/cwm-build-tools/.github/workflows/joomla-library-ci.yml@v1
     with:
-      # Development and CI run on 8.5 (the shared default is 8.3); the
-      # library itself still supports 8.4.
+      # Development and CI run on 8.5. The library itself supports 8.3, which
+      # the php83 job below tests.
       php-version: '8.5'
       # Everything else is a shared default and deliberately left unset:
       # Node 24, no submodules, npm asset build on, and `php -l`
@@ -55,3 +55,14 @@ jobs:
       # site mid-upgrade. Runs as its own job with its own MySQL service.
       run-schema-replay: true
       build-command: 'composer build:package'
+  php83:
+    name: PHP 8.3
+    # The library supports PHP 8.3, and Proclaim, which bundles it, installs
+    # there, so the tests run on 8.3 too. Only the tests and the syntax check:
+    # the job above lints, builds and packages.
+    uses: Joomla-Bible-Study/cwm-build-tools/.github/workflows/joomla-library-ci.yml@v1
+    with:
+      php-version: '8.3'
+      npm-build: false
+      run-lint: false
+      build-command: ''

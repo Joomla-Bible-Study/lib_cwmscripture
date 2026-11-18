@@ -8,7 +8,7 @@ A Joomla 5 library extension that provides Bible scripture retrieval, parsing, r
 ## Requirements
 
 - Joomla 5.0+
-- PHP 8.4+
+- PHP 8.3+
 - MySQL 5.7+ / MariaDB 10.2+ (InnoDB, utf8mb4)
 - Node.js 24+ / npm 11+ (for building frontend assets)
 
